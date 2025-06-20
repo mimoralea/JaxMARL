@@ -1,21 +1,36 @@
+# NORMAL TRAINING PARAMS
 "LR": 2.5e-4
+"ANNEAL_LR": True
 "NUM_ENVS": 16
 "NUM_STEPS": 128
 "TOTAL_TIMESTEPS": 1e7
 "UPDATE_EPOCHS": 4
 "NUM_MINIBATCHES": 4
+"ENT_COEF": 0.01
+"SEED": 30
+"NUM_SEEDS": 10
+
+# # FAST TRAINING DEBUG
+# "LR":            1e-3        # larger step => learns useful signal in few updates
+# "ANNEAL_LR":     False       # skip schedule to save compute
+# "NUM_ENVS":      4           # fewer parallel sims keeps JAX dispatch light
+# "NUM_STEPS":     32          # shorter rollout per update
+# "TOTAL_TIMESTEPS": 4096      # ≈32 updates with the above settings
+# "UPDATE_EPOCHS": 2           # fewer passes over data
+# "NUM_MINIBATCHES": 2         # bigger minibatch, less shuffling overhead
+# "ENT_COEF":      0.0         # skip entropy bonus for speed; still explores via ε-greedy init
+# "SEED":          0
+# "NUM_SEEDS":     3           # one run is enough for quick iteration, three for plots with std 
+
+# SAME FOR BOTH
 "GAMMA": 0.99
 "GAE_LAMBDA": 0.95
 "CLIP_EPS": 0.2
-"ENT_COEF": 0.01
 "VF_COEF": 0.5
 "MAX_GRAD_NORM": 0.5
 "ACTIVATION": "tanh"
-"ENV_NAME": "MPE_simple_spread_v3"
-"ENV_KWARGS": {}
-"ANNEAL_LR": True
-"SEED": 30
-"NUM_SEEDS": 10
+"ENV_NAME":      "MPE_simple_sumo_v3"
+"ENV_KWARGS":    {}
 
 # WandB Params
 "ENTITY": ""

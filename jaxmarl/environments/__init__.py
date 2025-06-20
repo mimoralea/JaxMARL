@@ -7,6 +7,7 @@ from .mpe import (
     SimpleCryptoMPE,
     SimpleSpeakerListenerMPE,
     SimplePushMPE,
+    SimpleSumoMPE,
     SimpleAdversaryMPE,
     SimpleReferenceMPE,
     SimpleFacmacMPE,

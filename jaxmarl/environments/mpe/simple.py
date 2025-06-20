@@ -1,4 +1,4 @@
-""" 
+"""
 Base class for MPE PettingZoo envs.
 
 TODO: viz for communication env, e.g. crypto
@@ -19,6 +19,13 @@ import matplotlib.pyplot as plt
 import matplotlib
 
 @struct.dataclass
+class Snap:
+    p_pos: chex.Array  # [num_entities, [x, y]]
+    p_vel: chex.Array  # [num_entities, [x, y]]
+    step: int
+
+
+@struct.dataclass
 class State:
     """Basic MPE State"""
 
@@ -27,7 +34,8 @@ class State:
     c: chex.Array  # communication state [num_agents, [dim_c]]
     done: chex.Array  # bool [num_agents, ]
     step: int  # current step
-    goal: int = None  # index of target landmark, used in: SimpleSpeakerListenerMPE, SimpleReferenceMPE, SimplePushMPE, SimpleAdversaryMPE
+    goal: int = None  # index of target landmark, used in various tasks
+    snap: Snap = None
 
 
 class SimpleMPE(MultiAgentEnv):
@@ -227,6 +235,8 @@ class SimpleMPE(MultiAgentEnv):
 
     @partial(jax.jit, static_argnums=[0])
     def step_env(self, key: chex.PRNGKey, state: State, actions: dict):
+        
+        # Step through the world
         u, c = self.set_actions(actions)
         if (
             c.shape[1] < self.dim_c
@@ -240,31 +250,38 @@ class SimpleMPE(MultiAgentEnv):
 
         key_c = jax.random.split(key, self.num_agents)
         c = self._apply_comm_action(key_c, c, self.c_noise, self.silent)
-        done = jnp.full((self.num_agents), state.step >= self.max_steps)
 
-        state = state.replace(
+        # Create a "next" state (without the done--since that depends on the next state)
+        snap = Snap(p_pos=p_pos, p_vel=p_vel, step=state.step + 1)
+        next_state = state.replace(
             p_pos=p_pos,
             p_vel=p_vel,
             c=c,
-            done=done,
             step=state.step + 1,
+            snap=snap,
         )
 
-        reward = self.rewards(state)
-
-        obs = self.get_obs(state)
-
-        info = {}
-
+        # Get the dones and rewards
+        rewards = self.rewards(state, next_state)
+        done = self.dones(state, next_state)
         dones = {a: done[i] for i, a in enumerate(self.agents)}
         dones.update({"__all__": jnp.all(done)})
 
-        return obs, state, reward, dones, info
+        # Update the "next" state with the dones
+        next_state = next_state.replace(
+            done=done,
+        )
+
+        # Get the "next" observations
+        next_obs = self.get_obs(next_state)
+        info = {}
+
+        return next_obs, next_state, rewards, dones, info
+
 
     @partial(jax.jit, static_argnums=[0])
     def reset(self, key: chex.PRNGKey) -> Tuple[chex.Array, State]:
         """Initialise with random positions"""
-
         key_a, key_l = jax.random.split(key)
 
         p_pos = jnp.concatenate(
@@ -278,12 +295,14 @@ class SimpleMPE(MultiAgentEnv):
             ]
         )
 
+        snap = Snap(p_pos=p_pos, p_vel=jnp.zeros((self.num_entities, self.dim_p)), step=0)
         state = State(
             p_pos=p_pos,
             p_vel=jnp.zeros((self.num_entities, self.dim_p)),
             c=jnp.zeros((self.num_agents, self.dim_c)),
             done=jnp.full((self.num_agents), False),
             step=0,
+            snap=snap,
         )
 
         return self.get_obs(state), state
@@ -304,7 +323,11 @@ class SimpleMPE(MultiAgentEnv):
         obs = _observation(self.agent_range, state)
         return {a: obs[i] for i, a in enumerate(self.agents)}
 
-    def rewards(self, state: State) -> Dict[str, float]:
+    def dones(self, state: State, next_state: State) -> Dict[str, bool]:
+        """Assign dones for all agents"""
+        return jnp.full((self.num_agents), state.step >= self.max_steps)
+
+    def rewards(self, state: State, next_state: State) -> Dict[str, float]:
         """Assign rewards for all agents"""
 
         @partial(jax.vmap, in_axes=[0, None])
@@ -490,7 +513,7 @@ class SimpleMPE(MultiAgentEnv):
         m = x < 1.0
         mr = (x - 0.9) * 10
         br = jnp.min(jnp.array([jnp.exp(2 * x - 2), 10]))
-        return jax.lax.select(m, mr, br) * ~w   
+        return jax.lax.select(m, mr, br) * ~w
 
 
 if __name__ == "__main__":

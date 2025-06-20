@@ -10,6 +10,7 @@ from .environments import (
     SimpleFacmacMPE6a,
     SimpleFacmacMPE9a,
     SimplePushMPE,
+    SimpleSumoMPE,
     SimpleAdversaryMPE,
     SimpleReferenceMPE,
     SMAX,
@@ -53,6 +54,8 @@ def make(env_id: str, **env_kwargs):
         env = SimpleSpeakerListenerMPE(**env_kwargs)
     elif env_id == "MPE_simple_push_v3":
         env = SimplePushMPE(**env_kwargs)
+    elif env_id == "MPE_simple_sumo_v3":
+        env = SimpleSumoMPE(**env_kwargs)
     elif env_id == "MPE_simple_adversary_v3":
         env = SimpleAdversaryMPE(**env_kwargs)
     elif env_id == "MPE_simple_reference_v3":
@@ -127,6 +130,7 @@ registered_envs = [
     "MPE_simple_crypto_v3",
     "MPE_simple_speaker_listener_v4",
     "MPE_simple_push_v3",
+    "MPE_simple_sumo_v3",
     "MPE_simple_adversary_v3",
     "MPE_simple_reference_v3",
     "MPE_simple_facmac_v1",
