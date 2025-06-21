@@ -333,15 +333,15 @@ def make_train(config):
     return train
 
 
-@hydra.main(version_base=None, config_path="config", config_name="ippo_ff_mpe")
+@hydra.main(version_base=None, config_path="config", config_name="spppo_ff_mpe")
 def main(config):
-    """Train with IPPO then generate rollouts via eval_arena for demo."""
+    """Train with SPPPO then generate rollouts via eval_arena for demo."""
     config = OmegaConf.to_container(config)
 
     wandb.init(
         entity=config["ENTITY"],
         project=config["PROJECT"],
-        tags=["IPPO", "FF"],
+        tags=["SPPPO", "FF"],
         config=config,
         mode=config["WANDB_MODE"],
     )
@@ -376,8 +376,8 @@ def main(config):
     metrics = out["metrics"]
 
     # ---- Delegated training ----
-    from baselines.IPPO.train_ippo import train_ippo
-    train_state, metrics = train_ippo(config)
+    from baselines.SPPPO.train_spppo import train_spppo
+    train_state, metrics = train_spppo(config)
 
     # Extract the trained model parameters from the first seed
     train_state = jax.tree_util.tree_map(lambda x: x[0], out["runner_state"][0])
@@ -450,7 +450,7 @@ def main(config):
         ax.grid(alpha=0.3)
 
         plt.tight_layout(rect=[0, 0.03, 1, 0.97])
-        plt.savefig(f"ippo_ff_{config['ENV_NAME']}.png")
+        plt.savefig(f"spppo_ff_{config['ENV_NAME']}.png")
 
 
 def get_rollout(train_state, config, opponent_type="self_play", seed=None):
@@ -557,7 +557,7 @@ def get_rollout(train_state, config, opponent_type="self_play", seed=None):
 
     # Generate GIF
     viz = MPEVisualizer(env, state_seq, reward_seq=reward_seq)
-    gif_filename = f"ippo_ff_{config['ENV_NAME']}_{opponent_type}.gif"
+    gif_filename = f"spppo_ff_{config['ENV_NAME']}_{opponent_type}.gif"
     viz.animate(save_fname=gif_filename, view=False, loop=False)
     print(f"Animation saved to {gif_filename}")
 

@@ -15,5 +15,6 @@ tmp/
 wandb/
 outputs/
 models/
+checkpoints/
 *.png
 *.gif
