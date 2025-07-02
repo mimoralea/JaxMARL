@@ -109,22 +109,34 @@ def make_train(config):
 
     def train(rng):
 
-        # INIT NETWORK
-        network = ActorCritic(env.action_space(env.agents[0]).n, activation=config["ACTIVATION"])
-        rng, _rng = jax.random.split(rng)
+        # ------------------------------------------------------------------
+        # INIT TWO *INDEPENDENT* NETWORK PARAM SETS (one per agent)
+        # ------------------------------------------------------------------
+        network = ActorCritic(
+            env.action_space(env.agents[0]).n,
+            activation=config["ACTIVATION"],
+        )
+        rng, _rng0, _rng1 = jax.random.split(rng, 3)
         init_x = jnp.zeros(env.observation_space(env.agents[0]).shape)
-        network_params = network.init(_rng, init_x)
+
+        params0 = network.init(_rng0, init_x)  # player-0 parameters
+        params1 = network.init(_rng1, init_x)  # player-1 parameters
+
+        # Shared optimiser *object* but separate state per agent
         if config["ANNEAL_LR"]:
             tx = optax.chain(
                 optax.clip_by_global_norm(config["MAX_GRAD_NORM"]),
                 optax.adam(learning_rate=linear_schedule, eps=1e-5),
             )
         else:
-            tx = optax.chain(optax.clip_by_global_norm(config["MAX_GRAD_NORM"]), optax.adam(config["LR"], eps=1e-5))
+            tx = optax.chain(
+                optax.clip_by_global_norm(config["MAX_GRAD_NORM"]),
+                optax.adam(config["LR"], eps=1e-5),
+            )
 
         train_state = TrainState.create(
             apply_fn=network.apply,
-            params=network_params,
+            params=(params0, params1),  # tuple of pytrees
             tx=tx,
         )
 
@@ -140,12 +152,25 @@ def make_train(config):
                 train_state, env_state, last_obs, rng = runner_state
 
                 obs_batch = batchify(last_obs, env.agents, config["NUM_ACTORS"])
-                # SELECT ACTION
+                # SELECT ACTIONS – independent per agent
                 rng, _rng = jax.random.split(rng)
+                subkeys = jax.random.split(_rng, env.num_agents)
 
-                pi, value = network.apply(train_state.params, obs_batch)
-                action = pi.sample(seed=_rng)
-                log_prob = pi.log_prob(action)
+                obs_split = jnp.split(obs_batch, env.num_agents, axis=0)
+                actions = []
+                values = []
+                log_probs = []
+                for i in range(env.num_agents):
+                    pi_i, v_i = network.apply(train_state.params[i], obs_split[i])
+                    act_i = pi_i.sample(seed=subkeys[i])
+                    lp_i = pi_i.log_prob(act_i)
+                    actions.append(act_i)
+                    values.append(v_i)
+                    log_probs.append(lp_i)
+
+                action = jnp.concatenate(actions, axis=0)
+                value = jnp.concatenate(values, axis=0)
+                log_prob = jnp.concatenate(log_probs, axis=0)
                 env_act = unbatchify(action, env.agents, config["NUM_ENVS"], env.num_agents)
 
                 # STEP ENV
@@ -175,7 +200,14 @@ def make_train(config):
             # CALCULATE ADVANTAGE
             train_state, env_state, last_obs, rng = runner_state
             last_obs_batch = batchify(last_obs, env.agents, config["NUM_ACTORS"])
-            _, last_val = network.apply(train_state.params, last_obs_batch)
+            # compute value predictions for each agent separately
+            obs_split = jnp.split(last_obs_batch, env.num_agents, axis=0)
+            last_vals = []
+            for i in range(env.num_agents):
+                _, v_i = network.apply(train_state.params[i], obs_split[i])
+                last_vals.append(v_i)
+            # interleave values to match actor ordering (agent0_env0, agent1_env0, ...)
+            last_val = jnp.reshape(jnp.stack(last_vals, axis=1), (-1,))
 
             def _calculate_gae(traj_batch, last_val):
                 def _get_advantages(gae_and_next_value, transition):
@@ -208,56 +240,53 @@ def make_train(config):
                 def _update_minbatch(train_state, batch_info):
                     traj_batch, advantages, targets = batch_info
 
-                    def _loss_fn(params, traj_batch, gae, targets):
-                        # RERUN NETWORK
-                        pi, value = network.apply(params, traj_batch.obs)
-                        log_prob = pi.log_prob(traj_batch.action)
+                    # -------- split minibatch by agent ------------
+                    mb_split = []
+                    for agent_idx in range(env.num_agents):
+                        sel = slice(agent_idx, None, env.num_agents)
+                        tb_agent = jax.tree_util.tree_map(lambda x: x[sel], traj_batch)
+                        gae_agent = advantages[sel]
+                        tgt_agent = targets[sel]
+                        mb_split.append((tb_agent, gae_agent, tgt_agent))
 
-                        # CALCULATE VALUE LOSS
-                        value_pred_clipped = traj_batch.value + (
-                            value - traj_batch.value
-                        ).clip(-config["CLIP_EPS"], config["CLIP_EPS"])
-                        value_losses = jnp.square(value - targets)
-                        value_losses_clipped = jnp.square(value_pred_clipped - targets)
-                        value_loss = (
-                            0.5 * jnp.maximum(value_losses, value_losses_clipped).mean()
-                        )
-
-                        # CALCULATE ACTOR LOSS
-                        ratio = jnp.exp(log_prob - traj_batch.log_prob)
-                        gae = (gae - gae.mean()) / (gae.std() + 1e-8)
-                        loss_actor1 = ratio * gae
-                        loss_actor2 = (
-                            jnp.clip(
-                                ratio,
-                                1.0 - config["CLIP_EPS"],
-                                1.0 + config["CLIP_EPS"],
-                            )
-                            * gae
-                        )
-                        loss_actor = -jnp.minimum(loss_actor1, loss_actor2)
-                        loss_actor = loss_actor.mean()
+                    def _loss_single(params, tb, gae, tgt):
+                        pi, value = network.apply(params, tb.obs)
+                        log_prob = pi.log_prob(tb.action)
+                        # value loss
+                        v_clipped = tb.value + (value - tb.value).clip(-config["CLIP_EPS"], config["CLIP_EPS"])
+                        v_loss = 0.5 * jnp.maximum(jnp.square(value - tgt), jnp.square(v_clipped - tgt)).mean()
+                        # policy loss
+                        ratio = jnp.exp(log_prob - tb.log_prob)
+                        gae_n = (gae - gae.mean()) / (gae.std() + 1e-8)
+                        loss_pi = -jnp.minimum(ratio * gae_n,
+                                               jnp.clip(ratio, 1.0 - config["CLIP_EPS"], 1.0 + config["CLIP_EPS"]) * gae_n).mean()
                         entropy = pi.entropy().mean()
+                        total = loss_pi + config["VF_COEF"] * v_loss - config["ENT_COEF"] * entropy
+                        return total, (v_loss, loss_pi, entropy, ratio.mean())
 
-                        total_loss = (
-                            loss_actor
-                            + config["VF_COEF"] * value_loss
-                            - config["ENT_COEF"] * entropy
-                        )
-                        return total_loss, (value_loss, loss_actor, entropy, ratio)
-
-                    grad_fn = jax.value_and_grad(_loss_fn, has_aux=True)
-                    total_loss, grads = grad_fn(
-                        train_state.params, traj_batch, advantages, targets
+                    # compute grads per agent
+                    (loss0, aux0), grads0 = jax.value_and_grad(_loss_single, has_aux=True)(
+                        train_state.params[0], mb_split[0][0], mb_split[0][1], mb_split[0][2]
                     )
-                    train_state = train_state.apply_gradients(grads=grads)
+                    (loss1, aux1), grads1 = jax.value_and_grad(_loss_single, has_aux=True)(
+                        train_state.params[1], mb_split[1][0], mb_split[1][1], mb_split[1][2]
+                    )
 
+                    # pack grads to match params structure and update once
+                    grads_tuple = (grads0, grads1)
+                    updates_tuple, new_opt_state = train_state.tx.update(
+                        grads_tuple, train_state.opt_state, train_state.params
+                    )
+                    new_params = optax.apply_updates(train_state.params, updates_tuple)
+                    train_state = train_state.replace(params=new_params, opt_state=new_opt_state)
+
+                    # log averaged metrics
                     loss_info = {
-                        "total_loss": total_loss[0],
-                        "actor_loss": total_loss[1][1],
-                        "critic_loss": total_loss[1][0],
-                        "entropy": total_loss[1][2],
-                        "ratio": total_loss[1][3],
+                        "total_loss": (loss0 + loss1) / 2.0,
+                        "actor_loss": (aux0[1] + aux1[1]) / 2.0,
+                        "critic_loss": (aux0[0] + aux1[0]) / 2.0,
+                        "entropy": (aux0[2] + aux1[2]) / 2.0,
+                        "ratio": (aux0[3] + aux1[3]) / 2.0,
                     }
 
                     return train_state, loss_info

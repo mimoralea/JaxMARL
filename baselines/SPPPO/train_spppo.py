@@ -72,7 +72,7 @@ def train_spppo(config: Dict[str, Any]):
 # -----------------------------------------------------------------------------
 
 def train_and_save(config: Dict[str, Any], save_dir: str = "checkpoints") -> Tuple[Any, Any]:
-    """Train and dump player_0/player_1 parameter pickles to *save_dir*."""
+    """Train and dump shared policy parameters to *save_dir*."""
     # Create a timestamp for the run
     timestamp = time.strftime("%Y%m%d_%H%M%S")
     
@@ -93,21 +93,22 @@ def train_and_save(config: Dict[str, Any], save_dir: str = "checkpoints") -> Tup
         seed_dir = os.path.join(run_dir, f"seed{seed_idx}")
         os.makedirs(seed_dir, exist_ok=True)
         
-        # Save parameters for both players
-        for i in range(2):
-            file_path = os.path.join(seed_dir, f"spppo_player_{i}.pkl")
-            with open(file_path, "wb") as fh:
-                pickle.dump(params, fh)
-            print(f"[train_spppo] Saved parameters for seed{seed_idx} player_{i} -> {file_path}")
+        # In SPPPO, there's only one shared policy for both agents
+        # Save the shared policy parameters once with a clear name
+        shared_policy_path = os.path.join(seed_dir, f"spppo_shared_policy.pkl")
+        with open(shared_policy_path, "wb") as fh:
+            pickle.dump(params, fh)
+        print(f"[train_spppo] Saved shared policy parameters for seed{seed_idx} -> {shared_policy_path}")
 
     # For backward compatibility, also save the first seed's model at the top level
     first_seed_params = jax.tree_util.tree_map(lambda x: x[0], train_states).params
-    for i in range(2):
-        file_path = os.path.join(save_dir, f"spppo_player_{i}.pkl")
-        with open(file_path, "wb") as fh:
-            pickle.dump(first_seed_params, fh)
-        print(f"[train_spppo] Saved parameters for default player_{i} -> {file_path}")
-
+    
+    # Save the shared policy with a clear name at the top level
+    shared_policy_path = os.path.join(save_dir, "spppo_shared_policy.pkl")
+    with open(shared_policy_path, "wb") as fh:
+        pickle.dump(first_seed_params, fh)
+    print(f"[train_spppo] Saved default shared policy parameters -> {shared_policy_path}")
+    
     # Return the first seed's train state for backward compatibility
     first_seed_train_state = jax.tree_util.tree_map(lambda x: x[0], train_states)
     return first_seed_train_state, metrics

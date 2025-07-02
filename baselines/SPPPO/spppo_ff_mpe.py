@@ -513,7 +513,7 @@ def get_rollout(train_state, config, opponent_type="self_play", seed=None):
 
         # Handle second agent (opponent) based on opponent_type
         if second_agent:
-            if opponent_type == "self_play":  # Both use trained policy
+            if opponent_type == "self_play":  # True self-play: both agents use the same shared policy
                 agent_obs = obs[second_agent].flatten()
                 pi, _ = network.apply(network_params, agent_obs)
                 action = pi.sample(seed=key_a)

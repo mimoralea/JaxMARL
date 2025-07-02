@@ -72,10 +72,10 @@ def train_ippo(config: Dict[str, Any]):
 # -----------------------------------------------------------------------------
 
 def train_and_save(config: Dict[str, Any], save_dir: str = "checkpoints") -> Tuple[Any, Any]:
-    """Train and dump player_0/player_1 parameter pickles to *save_dir*."""
+    """Train and save a single shared policy pickle per seed (IPPO currently uses one set of params)."""
     # Create a timestamp for the run
     timestamp = time.strftime("%Y%m%d_%H%M%S")
-    
+
     # Create a run-specific directory with timestamp
     run_dir = os.path.join(save_dir, f"ippo_{timestamp}")
     os.makedirs(run_dir, exist_ok=True)
@@ -83,30 +83,29 @@ def train_and_save(config: Dict[str, Any], save_dir: str = "checkpoints") -> Tup
 
     train_states, metrics = train_ippo(config)
 
-    # Save each seed's model
+    # Save each seed's model (single shared policy)
     for seed_idx in range(config["NUM_SEEDS"]):
         # Extract this seed's train state
         train_state = jax.tree_util.tree_map(lambda x: x[seed_idx], train_states)
-        params = train_state.params
-        
+        params0, params1 = train_state.params
+
         # Create a seed-specific directory
         seed_dir = os.path.join(run_dir, f"seed{seed_idx}")
         os.makedirs(seed_dir, exist_ok=True)
-        
-        # Save parameters for both players
-        for i in range(2):
-            file_path = os.path.join(seed_dir, f"ippo_player_{i}.pkl")
-            with open(file_path, "wb") as fh:
-                pickle.dump(params, fh)
-            print(f"[train_ippo] Saved parameters for seed{seed_idx} player_{i} -> {file_path}")
 
-    # For backward compatibility, also save the first seed's model at the top level
-    first_seed_params = jax.tree_util.tree_map(lambda x: x[0], train_states).params
-    for i in range(2):
-        file_path = os.path.join(save_dir, f"ippo_player_{i}.pkl")
-        with open(file_path, "wb") as fh:
-            pickle.dump(first_seed_params, fh)
-        print(f"[train_ippo] Saved parameters for default player_{i} -> {file_path}")
+        for i, p in enumerate((params0, params1)):
+            p_path = os.path.join(seed_dir, f"ippo_player_{i}.pkl")
+            with open(p_path, "wb") as fh:
+                pickle.dump(p, fh)
+            print(f"[train_ippo] Saved player_{i} params for seed{seed_idx} -> {p_path}")
+
+    # Also save the first seed's model at the top level for quick access
+    first_seed_params0, first_seed_params1 = jax.tree_util.tree_map(lambda x: x[0], train_states).params
+    for i, p in enumerate((first_seed_params0, first_seed_params1)):
+        p_path = os.path.join(save_dir, f"ippo_{timestamp}_player_{i}.pkl")
+        with open(p_path, "wb") as fh:
+            pickle.dump(p, fh)
+        print(f"[train_ippo] Saved default player_{i} params -> {p_path}")
 
     # Return the first seed's train state for backward compatibility
     first_seed_train_state = jax.tree_util.tree_map(lambda x: x[0], train_states)
