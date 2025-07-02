@@ -95,17 +95,17 @@ class MPEVisualizer(object):
             self.entity_artists.append(c)
             self.entity_indices.append(i)
 
-        # Then render agents on top with consistent colors (green for player_0, red for player_1)
+        # Then render agents on top with consistent colors (green for 'green'/player_0, red for 'red'/player_1)
         for i in agent_indices:
             # Get the agent name to determine color
             agent_name = self.env.agents[i]
-            
-            # Use consistent colors based on agent name, not index
-            if agent_name == "player_0":
+
+            # Map agent names to colors in a robust way
+            if agent_name in ("player_0", "green"):
                 agent_color = np.array([38, 166, 38]) / 255  # Green
-            else:  # player_1
+            else:  # "player_1" or "red"
                 agent_color = np.array([166, 38, 38]) / 255  # Red
-                
+
             c = Circle(
                 state.p_pos[i], self.env.rad[i], color=agent_color
             )
@@ -175,7 +175,9 @@ class MPEVisualizer(object):
             for i, (player, t) in enumerate(zip(self.reward_seq, self.rew_texts)):
                 rew_seq = self.reward_seq[player][:safe_index+1]
                 t.set_position((current_ring_pos[0] - 0.73, current_ring_pos[1] + 0.63 - i * 0.10))
-                t.set_text(f"{player.replace('player_0', 'Green').replace('player_1', 'Red')}: {np.sum(rew_seq):.1f}")
+                t.set_text(
+                    f"{player.replace('player_0', 'Green').replace('green', 'Green').replace('player_1', 'Red').replace('red', 'Red')}: {np.sum(rew_seq):.1f}"
+                )
 
         if self.comm_active:
             for i, a in enumerate(self.comm_artists):
