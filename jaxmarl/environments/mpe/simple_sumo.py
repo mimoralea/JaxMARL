@@ -18,13 +18,16 @@ class SimpleSumoMPE(SimpleMPE):
     2-D thrust controls, zero-sum terminal reward.
     """
 
-    def __init__(self, R: float = 0.4, action_type=DISCRETE_ACT, **kwargs):
+    def __init__(self, R: float = 0.4, action_type=DISCRETE_ACT, *, random_spawn: bool = True, **kwargs):
         self.R = R
+        self.random_spawn = random_spawn
         num_agents = 2
         # Optional visual landmark – a static outline ring for rendering.
         num_landmarks = 1
 
-        agents = [f"player_{i}" for i in range(num_agents)]
+        # Use color names for agents instead of player_0/player_1
+        # agents = [f"player_{i}" for i in range(num_agents)]
+        agents = ["green", "red"]
         landmarks = ["arena"]
 
         # Action & observation spaces
@@ -92,29 +95,32 @@ class SimpleSumoMPE(SimpleMPE):
         # Green agent (player_0) and Red agent (player_1) should be in consistent positions visually
         # regardless of which agent ID is actually on which side
 
-        # Use a coin flip to decide if positions should be swapped
-        key, subkey = jax.random.split(key)
-        swap_positions = jax.random.bernoulli(subkey)
+        if self.random_spawn:
+            # Sample two independent angles and radii inside 70%–90% of arena
+            key, sub1, sub2 = jax.random.split(key, 3)
+            angles = jax.random.uniform(sub1, (2,), minval=0.0, maxval=2 * jnp.pi)
+            radii = jax.random.uniform(sub2, (2,), minval=0.2 * self.R, maxval=0.7 * self.R)
+        else:
+            # Deterministic symmetric spawn (left / right) for fair evaluation
+            angles = jnp.array([0.0, jnp.pi])
+            radii = jnp.array([0.5 * self.R, 0.5 * self.R])
 
-        # Define the standard positions (agent 0 on right, agent 1 on left)
-        angles = jnp.array([0.0, jnp.pi])  # 0 = right, π = left
+        # Generate positions
+        p_pos_agents = jnp.stack([
+            jnp.array([radii[i] * jnp.cos(angles[i]), radii[i] * jnp.sin(angles[i])])
+            for i in range(2)
+        ])
 
-        # Conditionally swap angles if the random flag is True
-        angles = jax.lax.cond(
-            swap_positions,
-            lambda _: jnp.array([jnp.pi, 0.0]),  # Swapped positions
-            lambda _: jnp.array([0.0, jnp.pi]),  # Standard positions
-            operand=None
-        )
-
-        # Note: We can't dynamically swap colors here because they are fixed at initialization time.
-        # For a proper solution, we would need to modify the underlying visualizer or environment structure.
-        # For now, we'll just randomize positions but keep color mapping consistent with agent indices.
-
-        # Generate positions from the angles
-        p_pos_agents = jnp.stack(
-            [jnp.array([jnp.cos(a), jnp.sin(a)]) for a in angles]
-        ) * (0.7 * self.R)  # Start closer to the edge (70% of radius)
+        # Optional symmetric swap only in deterministic mode to keep visual variety
+        if not self.random_spawn:
+            key, subkey = jax.random.split(key)
+            swap_positions = jax.random.bernoulli(subkey)
+            p_pos_agents = jax.lax.cond(
+                swap_positions,
+                lambda _: jnp.flipud(p_pos_agents),
+                lambda _: p_pos_agents,
+                operand=None,
+            )
         p_pos = jnp.concatenate([p_pos_agents, jnp.zeros((self.num_landmarks, 2))])
 
         snap = Snap(p_pos=p_pos, p_vel=jnp.zeros((self.num_entities, self.dim_p)), step=0)
