@@ -79,21 +79,31 @@ class Transition(NamedTuple):
     obs: jnp.ndarray
     info: jnp.ndarray
 
-def batchify(x: dict, agent_list, num_actors):
-    max_dim = max([x[a].shape[-1] for a in agent_list])
-    def pad(z, length):
-        return jnp.concatenate([z, jnp.zeros(z.shape[:-1] + [length - z.shape[-1]])], -1)
+def batchify_main_agent(x: dict, main_agent: str, num_envs: int):
+    """Batchify data for the main agent only (for training)."""
+    return x[main_agent].reshape((num_envs, -1))
 
-    x = jnp.stack([x[a] if x[a].shape[-1] == max_dim else pad(x[a]) for a in agent_list])
-    return x.reshape((num_actors, -1))
+def get_main_agent_data(x: dict, main_agent: str):
+    """Extract data for the main agent only."""
+    return x[main_agent]
 
-def unbatchify(x: jnp.ndarray, agent_list, num_envs, num_actors):
-    x = x.reshape((num_actors, num_envs, -1))
-    return {a: x[i] for i, a in enumerate(agent_list)}
+def create_full_action_dict(main_action: jnp.ndarray, opponent_action: jnp.ndarray, 
+                           main_agent: str, opponent_agent: str, num_envs: int):
+    """Create action dictionary for both agents from separate action arrays."""
+    return {
+        main_agent: main_action.reshape((num_envs,)),
+        opponent_agent: opponent_action.reshape((num_envs,))
+    }
 
 def make_train(config):
     env = jaxmarl.make(config["ENV_NAME"], **config["ENV_KWARGS"])
-    config["NUM_ACTORS"] = env.num_agents * config["NUM_ENVS"]
+    
+    # FSPPPO: Only the main agent is trainable, so NUM_ACTORS = NUM_ENVS
+    # (one main agent per environment, opponent is not trainable)
+    config["NUM_ACTORS"] = config["NUM_ENVS"]  # Only main agent contributes to training data
+    config["MAIN_AGENT"] = env.agents[0]  # First agent is the main trainable agent
+    config["OPPONENT_AGENT"] = env.agents[1] if len(env.agents) > 1 else None
+    
     config["NUM_UPDATES"] = (
         config["TOTAL_TIMESTEPS"] // config["NUM_STEPS"] // config["NUM_ENVS"]
     )
@@ -139,14 +149,32 @@ def make_train(config):
             def _env_step(runner_state, unused):
                 train_state, env_state, last_obs, rng = runner_state
 
-                obs_batch = batchify(last_obs, env.agents, config["NUM_ACTORS"])
-                # SELECT ACTION
+                # FSPPPO: Only process main agent's observation for training
+                main_obs_batch = batchify_main_agent(last_obs, config["MAIN_AGENT"], config["NUM_ENVS"])
+                
+                # SELECT MAIN AGENT ACTION
                 rng, _rng = jax.random.split(rng)
-
-                pi, value = network.apply(train_state.params, obs_batch)
-                action = pi.sample(seed=_rng)
-                log_prob = pi.log_prob(action)
-                env_act = unbatchify(action, env.agents, config["NUM_ENVS"], env.num_agents)
+                pi, value = network.apply(train_state.params, main_obs_batch)
+                main_action = pi.sample(seed=_rng)
+                log_prob = pi.log_prob(main_action)
+                
+                # SELECT OPPONENT ACTION (for now, use same network - will be replaced with opponent sampling later)
+                # TODO: Replace this with opponent policy sampling in future iterations
+                if config["OPPONENT_AGENT"] is not None:
+                    opponent_obs_batch = batchify_main_agent(last_obs, config["OPPONENT_AGENT"], config["NUM_ENVS"])
+                    rng, _rng_opp = jax.random.split(rng)
+                    pi_opp, _ = network.apply(train_state.params, opponent_obs_batch)  # Same network for now
+                    opponent_action = pi_opp.sample(seed=_rng_opp)
+                    
+                    # Create full action dictionary for environment
+                    env_act = create_full_action_dict(
+                        main_action, opponent_action, 
+                        config["MAIN_AGENT"], config["OPPONENT_AGENT"], 
+                        config["NUM_ENVS"]
+                    )
+                else:
+                    # Single agent environment
+                    env_act = {config["MAIN_AGENT"]: main_action.reshape((config["NUM_ENVS"],))}
 
                 # STEP ENV
                 rng, _rng = jax.random.split(rng)
@@ -155,15 +183,21 @@ def make_train(config):
                     rng_step, env_state, env_act,
                 )
 
-                info = jax.tree_util.tree_map(lambda x: x.reshape((config["NUM_ACTORS"])), info)
+                # FSPPPO: Only collect data from main agent for training
+                # The info dict has shape (num_envs, num_agents), we need to reshape to (num_envs,) for single agent
+                main_info = jax.tree_util.tree_map(
+                    lambda x: x.reshape((config["NUM_ENVS"] * env.num_agents,))[:config["NUM_ENVS"]], 
+                    info
+                )
+                
                 transition = Transition(
-                    batchify(done, env.agents, config["NUM_ACTORS"]).squeeze(),
-                    action,
+                    get_main_agent_data(done, config["MAIN_AGENT"]).squeeze(),
+                    main_action,
                     value,
-                    batchify(reward, env.agents, config["NUM_ACTORS"]).squeeze(),
+                    get_main_agent_data(reward, config["MAIN_AGENT"]).squeeze(),
                     log_prob,
-                    obs_batch,
-                    info,
+                    main_obs_batch,
+                    main_info,
                 )
                 runner_state = (train_state, env_state, obsv, rng)
                 return runner_state, transition
@@ -174,7 +208,8 @@ def make_train(config):
 
             # CALCULATE ADVANTAGE
             train_state, env_state, last_obs, rng = runner_state
-            last_obs_batch = batchify(last_obs, env.agents, config["NUM_ACTORS"])
+            # FSPPPO: Only calculate value for main agent
+            last_obs_batch = batchify_main_agent(last_obs, config["MAIN_AGENT"], config["NUM_ENVS"])
             _, last_val = network.apply(train_state.params, last_obs_batch)
 
             def _calculate_gae(traj_batch, last_val):
@@ -302,18 +337,18 @@ def make_train(config):
 
             # Mean over time
             step_average = traj_batch.info["returned_episode_returns"].mean(axis=0)
-            # Separate envs vs agents
-            per_agent = step_average.reshape((config["NUM_ENVS"], env.num_agents))
-            # Mean over envs
-            env_average = per_agent.mean(axis=0) / env.num_agents
+            # FSPPPO: Only main agent data, so step_average has shape (NUM_ENVS,)
+            # Mean over envs for main agent only
+            main_agent_average = step_average.mean()
 
             rng = update_state[-1]
             r0 = {"ratio0": loss_info["ratio"][0,0].mean()}
             loss_info = jax.tree_util.tree_map(lambda x: x.mean(), loss_info)
             metric = jax.tree_util.tree_map(lambda x: x.mean(), metric)
-            # Add per-agent returns after blanket mean
-            metric["player_0_returns"] = env_average[0]
-            metric["player_1_returns"] = env_average[1]
+            # Add main agent returns only
+            metric["main_agent_returns"] = main_agent_average
+            # For backward compatibility, also store as player_0_returns
+            metric["player_0_returns"] = main_agent_average
             metric = {**metric, **loss_info, **r0}
 
             # Store update index in metrics for logging outside JIT
@@ -405,24 +440,20 @@ def main(config):
         # Create a figure with multiple subplots to show different metrics
         fig, axs = plt.subplots(2, 1, figsize=(12, 10), sharex=True)
 
-        # Plot 1: Get per-agent returns from a rollout
+        # Plot 1: Get main agent returns from training
         ax = axs[0]
         # Convert JAX arrays to NumPy and keep the seeds dimension to compute statistics
-        player_0 = np.asarray(out["metrics"]["player_0_returns"])  # shape (seeds, updates)
-        player_1 = np.asarray(out["metrics"]["player_1_returns"])  # shape (seeds, updates)
+        # FSPPPO: Only main agent is trained, so we only have main_agent_returns
+        main_agent = np.asarray(out["metrics"]["main_agent_returns"])  # shape (seeds, updates)
 
         # Average over seeds and compute standard deviation for error bars
-        mean_0, std_0 = player_0.mean(0), player_0.std(0)
-        mean_1, std_1 = player_1.mean(0), player_1.std(0)
+        mean_main, std_main = main_agent.mean(0), main_agent.std(0)
 
-        x = np.arange(mean_0.shape[0])   # Updates on the x-axis
+        x = np.arange(mean_main.shape[0])   # Updates on the x-axis
 
-        # Plot mean curve with shaded ±1 std region
-        ax.plot(x, mean_0, label="Player 0", color='green', linewidth=2)
-        ax.fill_between(x, mean_0 - std_0, mean_0 + std_0, color='green', alpha=0.2)
-
-        ax.plot(x, mean_1, label="Player 1", color='red', linewidth=2)
-        ax.fill_between(x, mean_1 - std_1, mean_1 + std_1, color='red', alpha=0.2)
+        # Plot mean curve with shaded ±1 std region for main agent only
+        ax.plot(x, mean_main, label="Main Agent (Green)", color='green', linewidth=2)
+        ax.fill_between(x, mean_main - std_main, mean_main + std_main, color='green', alpha=0.2)
 
         ax.set_title(f"Episode Returns in {config['ENV_NAME']}")
         ax.set_ylabel("Episode Returns")
@@ -551,8 +582,9 @@ def get_rollout(train_state, config, opponent_type="self_play", seed=None):
         # Break if episode is done
         if done["__all__"]:
             print(f"Episode done at step {step}")
-            print(f"\tCumulative rewards for player 0: {np.sum(reward_seq['player_0'])}")
-            print(f"\tCumulative rewards for player 1: {np.sum(reward_seq['player_1'])}")
+            print(f"\tCumulative rewards for {first_agent}: {np.sum(reward_seq[first_agent])}")
+            if second_agent:
+                print(f"\tCumulative rewards for {second_agent}: {np.sum(reward_seq[second_agent])}")
             break
 
     # Generate GIF

@@ -1,9 +1,9 @@
-"""Training module for SPPPO on MPE environments.
-Extracted from spppo_ff_mpe.py for modular reuse.
+"""Training module for FSPPPO on MPE environments.
+Extracted from fspppo_ff_mpe.py for modular reuse.
 
 Functions
 ---------
-train_spppo(config) -> (train_state, metrics)
+train_fspppo(config) -> (train_state, metrics)
     Runs training using the same logic as the original script and returns the
     trained Flax train_state along with training metrics.
 
@@ -24,20 +24,20 @@ import wandb
 from omegaconf import OmegaConf
 
 try:
-    # When executed via `python -m baselines.spppo.train_spppo`
+    # When executed via `python -m baselines.fspppo.train_fspppo`
     from .fspppo_ff_mpe import make_train  # type: ignore
 except ImportError:
-    # Fallback when run as a stand-alone script with `python baselines/spppo/train_spppo.py`
+    # Fallback when run as a stand-alone script with `python baselines/fspppo/train_fspppo.py`
     import sys, pathlib
     sys.path.append(str(pathlib.Path(__file__).resolve().parents[1].parents[0]))
-    from baselines.SPPPO.spppo_ff_mpe import make_train
+    from baselines.FSPPPO.fspppo_ff_mpe import make_train
 
 # -----------------------------------------------------------------------------
 # Core training logic
 # -----------------------------------------------------------------------------
 
-def train_spppo(config: Dict[str, Any]):
-    """Run SPPPO training and return (all train_states, metrics)."""
+def train_fspppo(config: Dict[str, Any]):
+    """Run FSPPPO training and return (all train_states, metrics)."""
     # Convert hydra config to pure dict if necessary
     if not isinstance(config, dict):
         config = OmegaConf.to_container(config)
@@ -81,7 +81,7 @@ def train_and_save(config: Dict[str, Any], save_dir: str = "checkpoints") -> Tup
     os.makedirs(run_dir, exist_ok=True)
     os.makedirs(save_dir, exist_ok=True)
 
-    train_states, metrics = train_spppo(config)
+    train_states, metrics = train_fspppo(config)
 
     # Save each seed's model
     for seed_idx in range(config["NUM_SEEDS"]):
