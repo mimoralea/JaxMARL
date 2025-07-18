@@ -3,10 +3,22 @@ Based on the PureJaxRL Implementation of PPO
 """
 
 import os
+import sys
 import time
+import logging
+from datetime import datetime
+from functools import partial
+from typing import Any, Dict, NamedTuple, Sequence
+
+# Configure logging to silence verbose output BEFORE importing JAX/Orbax
+logging.getLogger('absl').setLevel(logging.ERROR)
+logging.getLogger('orbax').setLevel(logging.ERROR)
+logging.getLogger('jax').setLevel(logging.WARNING)
+logging.getLogger('jax._src').setLevel(logging.ERROR)
+logging.getLogger('tensorstore').setLevel(logging.ERROR)
+
 import numpy as np
 import hydra
-import jaxmarl
 import jax
 import jax.numpy as jnp
 import flax
@@ -29,6 +41,14 @@ import matplotlib.pyplot as plt
 import hydra
 from omegaconf import OmegaConf
 import wandb
+
+# Import checkpoint management
+try:
+    from .orbax_checkpoint_manager import FSPPPOCheckpointManager
+    from .jax_checkpoint_utils import create_checkpoint_manager_for_training, save_final_checkpoints
+except ImportError:
+    from orbax_checkpoint_manager import FSPPPOCheckpointManager
+    from jax_checkpoint_utils import create_checkpoint_manager_for_training, save_final_checkpoints
 
 # At the top of your script
 # jax.config.update('jax_disable_jit', True)
@@ -137,6 +157,14 @@ def make_train(config):
             params=network_params,
             tx=tx,
         )
+        
+        # CHECKPOINT MANAGEMENT SETUP
+        from datetime import datetime
+        run_id = config.get("RUN_ID") or datetime.now().strftime("run_%Y%m%d_%H%M%S")
+        checkpoint_freq = config.get("CHECKPOINT_FREQ", 100)
+        max_checkpoints = config.get("MAX_CHECKPOINTS", 10)
+        checkpoint_base_dir = config.get("CHECKPOINT_BASE_DIR", "checkpoints")
+        agent_id = config.get("AGENT_ID", "main_agent")
 
         # INIT ENV
         rng, _rng = jax.random.split(rng)
@@ -363,6 +391,8 @@ def make_train(config):
         runner_state, metric = jax.lax.scan(
             _update_step, runner_state, jnp.arange(config["NUM_UPDATES"])
         )
+        
+        # Return training results (checkpoint config will be handled externally)
         return {"runner_state": runner_state, "metrics": metric}
 
     return train
@@ -409,10 +439,17 @@ def main(config):
 
     print(f"\nTraining complete! Processed {int(config['NUM_UPDATES'] * config['NUM_SEEDS'])} total updates")
     metrics = out["metrics"]
+    
+    # SAVE CHECKPOINTS AFTER TRAINING USING ORBAX
+    checkpoint_manager, base_run_id = create_checkpoint_manager_for_training(config)
+    
+    # Extract final training states
+    final_train_states = out["runner_state"][0]  # Get train_state from runner_state
+    
+    # Save final checkpoints using the new Orbax system
+    save_final_checkpoints(final_train_states, config, checkpoint_manager, base_run_id)
 
-    # ---- Delegated training ----
-    from baselines.FSPPPO.train_fspppo import train_fspppo
-    train_state, metrics = train_fspppo(config)
+    # Training already completed above - no need for delegated training
 
     # Extract the trained model parameters from the first seed
     train_state = jax.tree_util.tree_map(lambda x: x[0], out["runner_state"][0])
