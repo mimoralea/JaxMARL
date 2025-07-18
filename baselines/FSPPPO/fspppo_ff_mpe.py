@@ -489,12 +489,20 @@ def main(config):
 
     # Use current time-based seeds to ensure different starting positions each run
     base_seed = int(time.time() * 1000) % 100000
+    
+    # Get run ID for structured folder organization
+    # If no checkpoint manager, generate a simple run ID
+    if base_run_id is None:
+        import datetime
+        base_run_id = datetime.datetime.now().strftime("run_%Y%m%d_%H%M%S")
 
     for i, opponent_type in enumerate(opponent_types):
         print(f"\nGenerating rollout against {opponent_type} opponent...")
         # Use different seed for each opponent type by adding the index
         rollout_seed = base_seed + i
-        get_rollout(train_state, config, opponent_type=opponent_type, seed=rollout_seed)
+        # Use seed 0 for rollout organization (representing the first training seed)
+        get_rollout(train_state, config, opponent_type=opponent_type, seed=rollout_seed, 
+                   run_id=base_run_id, training_seed=0)
 
     # Get the environment name to check if it's a zero-sum game
     env_name = config['ENV_NAME'].lower()
@@ -550,7 +558,7 @@ def main(config):
         plt.savefig(f"fspppo_ff_{config['ENV_NAME']}.png")
 
 
-def get_rollout(train_state, config, opponent_type="self_play", seed=None):
+def get_rollout(train_state, config, opponent_type="self_play", seed=None, run_id=None, training_seed=0):
     """Generate a rollout of the environment for visualization
 
     Args:
@@ -558,6 +566,8 @@ def get_rollout(train_state, config, opponent_type="self_play", seed=None):
         config: Configuration dictionary
         opponent_type: Type of opponent ('self_play', 'noop', or 'random_walk')
         seed: Random seed for reproducibility. If None, uses current time.
+        run_id: Run identifier for organized folder structure
+        training_seed: Training seed used for this rollout (for folder organization)
     """
     # Use current time as seed if not provided to ensure different starting positions
     if seed is None:
@@ -653,11 +663,24 @@ def get_rollout(train_state, config, opponent_type="self_play", seed=None):
                 print(f"\tCumulative rewards for {second_agent}: {np.sum(reward_seq[second_agent])}")
             break
 
-    # Generate GIF
+    # Generate GIF in structured rollouts folder hierarchy
+    import os
+    
+    # Create structured folder path: rollouts/run_id/seed_X/
+    if run_id is None:
+        import datetime
+        run_id = datetime.datetime.now().strftime("run_%Y%m%d_%H%M%S")
+    
+    rollouts_base_dir = "rollouts"
+    run_dir = os.path.join(rollouts_base_dir, run_id)
+    seed_dir = os.path.join(run_dir, f"seed_{training_seed}")
+    os.makedirs(seed_dir, exist_ok=True)
+    
     viz = MPEVisualizer(env, state_seq, reward_seq=reward_seq)
     gif_filename = f"fspppo_ff_{config['ENV_NAME']}_{opponent_type}.gif"
-    viz.animate(save_fname=gif_filename, view=False, loop=False)
-    print(f"Animation saved to {gif_filename}")
+    gif_path = os.path.join(seed_dir, gif_filename)
+    viz.animate(save_fname=gif_path, view=False, loop=False)
+    print(f"Animation saved to {gif_path}")
 
     return state_seq, reward_seq
 
