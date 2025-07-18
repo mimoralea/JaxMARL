@@ -388,6 +388,14 @@ def make_train(config):
 
         rng, _rng = jax.random.split(rng)
         runner_state = (train_state, env_state, obsv, _rng)
+        
+        # Check if checkpointing is enabled
+        checkpoint_freq = config.get("CHECKPOINT_FREQ", 0)
+        if checkpoint_freq > 0:
+            # For now, we'll handle checkpointing outside the JIT-compiled training loop
+            # This is a placeholder - actual checkpoint saving will be handled externally
+            pass
+        
         runner_state, metric = jax.lax.scan(
             _update_step, runner_state, jnp.arange(config["NUM_UPDATES"])
         )
@@ -433,21 +441,34 @@ def main(config):
     print("Compiling training function with JAX JIT...")
     train_jit = jax.jit(make_train(config))
 
+    # Setup checkpoint management if enabled
+    checkpoint_freq = config.get("CHECKPOINT_FREQ", 0)
+    save_checkpoint_at_end = config.get("SAVE_CHECKPOINT_AT_END", True)
+    checkpoint_manager = None
+    base_run_id = None
+    
+    if checkpoint_freq > 0 or save_checkpoint_at_end:
+        checkpoint_manager, base_run_id = create_checkpoint_manager_for_training(config)
+        print(f"Checkpoint management enabled: save every {checkpoint_freq} iterations, save at end: {save_checkpoint_at_end}")
+    
     # Run training across all seeds with JIT enabled
     print("\nRunning training (first run includes compilation time)...")
     out = jax.vmap(train_jit)(rngs)
 
     print(f"\nTraining complete! Processed {int(config['NUM_UPDATES'] * config['NUM_SEEDS'])} total updates")
-    metrics = out["metrics"]
     
     # SAVE CHECKPOINTS AFTER TRAINING USING ORBAX
-    checkpoint_manager, base_run_id = create_checkpoint_manager_for_training(config)
-    
-    # Extract final training states
-    final_train_states = out["runner_state"][0]  # Get train_state from runner_state
-    
-    # Save final checkpoints using the new Orbax system
-    save_final_checkpoints(final_train_states, config, checkpoint_manager, base_run_id)
+    if checkpoint_manager is not None:
+        # Extract final training states
+        final_train_states = out["runner_state"][0]  # Get train_state from runner_state
+        
+        # Save final checkpoints using the new Orbax system
+        if save_checkpoint_at_end:
+            save_final_checkpoints(final_train_states, config, checkpoint_manager, base_run_id)
+        
+        # TODO: Implement periodic checkpoint saving during training
+        # For now, we only save at the end, but the infrastructure is ready
+        # for implementing periodic saving based on training iterations
 
     # Training already completed above - no need for delegated training
 

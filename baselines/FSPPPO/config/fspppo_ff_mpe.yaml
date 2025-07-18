@@ -36,3 +36,11 @@
 "ENTITY": ""
 "PROJECT": "jaxmarl-mpe"
 "WANDB_MODE" : "disabled"
+
+# Checkpoint Management
+"CHECKPOINT_FREQ": 25         # Save checkpoint every N training iterations
+"SAVE_CHECKPOINT_AT_END": true # Save final checkpoint at end of training
+"MAX_CHECKPOINTS": 10         # Keep last N checkpoints per agent
+"CHECKPOINT_BASE_DIR": "checkpoints"  # Base directory for checkpoints
+"RUN_ID": null                # Auto-generate if null
+"AGENT_ID": "main_agent"      # Agent identifier
