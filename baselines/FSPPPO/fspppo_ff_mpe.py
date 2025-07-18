@@ -46,9 +46,11 @@ import wandb
 try:
     from .orbax_checkpoint_manager import FSPPPOCheckpointManager
     from .jax_checkpoint_utils import create_checkpoint_manager_for_training, save_final_checkpoints
+    from .opponent_sampling import create_opponent_sampler
 except ImportError:
     from orbax_checkpoint_manager import FSPPPOCheckpointManager
     from jax_checkpoint_utils import create_checkpoint_manager_for_training, save_final_checkpoints
+    from opponent_sampling import create_opponent_sampler
 
 # At the top of your script
 # jax.config.update('jax_disable_jit', True)
@@ -165,6 +167,13 @@ def make_train(config):
         max_checkpoints = config.get("MAX_CHECKPOINTS", 10)
         checkpoint_base_dir = config.get("CHECKPOINT_BASE_DIR", "checkpoints")
         agent_id = config.get("AGENT_ID", "main_agent")
+        
+        # INIT OPPONENT SAMPLER
+        opponent_sampler = create_opponent_sampler(config)
+        current_seed = config.get("SEED", 0)
+        
+        # Initialize opponent parameters (start with self-play)
+        current_opponent_params = train_state.params
 
         # INIT ENV
         rng, _rng = jax.random.split(rng)
@@ -186,12 +195,11 @@ def make_train(config):
                 main_action = pi.sample(seed=_rng)
                 log_prob = pi.log_prob(main_action)
                 
-                # SELECT OPPONENT ACTION (for now, use same network - will be replaced with opponent sampling later)
-                # TODO: Replace this with opponent policy sampling in future iterations
+                # SELECT OPPONENT ACTION using opponent sampling system
                 if config["OPPONENT_AGENT"] is not None:
                     opponent_obs_batch = batchify_main_agent(last_obs, config["OPPONENT_AGENT"], config["NUM_ENVS"])
                     rng, _rng_opp = jax.random.split(rng)
-                    pi_opp, _ = network.apply(train_state.params, opponent_obs_batch)  # Same network for now
+                    pi_opp, _ = network.apply(current_opponent_params, opponent_obs_batch)  # Use opponent parameters
                     opponent_action = pi_opp.sample(seed=_rng_opp)
                     
                     # Create full action dictionary for environment
