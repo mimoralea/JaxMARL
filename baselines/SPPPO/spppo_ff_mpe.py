@@ -2,58 +2,48 @@
 Based on the PureJaxRL Implementation of PPO
 """
 
+import logging
 import os
 import time
-import logging
+from typing import NamedTuple, Sequence
 
 # Configure logging to silence verbose output BEFORE importing JAX/Orbax
-logging.getLogger('absl').setLevel(logging.CRITICAL)
-logging.getLogger('orbax').setLevel(logging.CRITICAL)
-logging.getLogger('orbax.checkpoint').setLevel(logging.CRITICAL)
-logging.getLogger('jax').setLevel(logging.WARNING)
-logging.getLogger('jax._src').setLevel(logging.ERROR)
-logging.getLogger('tensorstore').setLevel(logging.ERROR)
+logging.getLogger("absl").setLevel(logging.CRITICAL)
+logging.getLogger("orbax").setLevel(logging.CRITICAL)
+logging.getLogger("orbax.checkpoint").setLevel(logging.CRITICAL)
+logging.getLogger("jax").setLevel(logging.WARNING)
+logging.getLogger("jax._src").setLevel(logging.ERROR)
+logging.getLogger("tensorstore").setLevel(logging.ERROR)
 
-import numpy as np
+import distrax
+import flax.linen as nn
 import hydra
-import jaxmarl
 import jax
 import jax.numpy as jnp
-import flax
-import flax.linen as nn
-import optax
-import distrax
+import jaxmarl
 import matplotlib.pyplot as plt
+import numpy as np
+import optax
 import wandb
-from tqdm import tqdm
-from jaxmarl.environments.mpe.default_params import MAX_STEPS
-from typing import Sequence, NamedTuple, Dict, Any, List
-from functools import partial
 from flax.linen.initializers import constant, orthogonal
 from flax.training.train_state import TrainState
+from jaxmarl.environments.mpe.default_params import MAX_STEPS
 from jaxmarl.environments.mpe.mpe_visualizer import MPEVisualizer
-import distrax
-import jaxmarl
 from jaxmarl.wrappers.baselines import MPELogWrapper as LogWrapper
-import matplotlib.pyplot as plt
-import hydra
 from omegaconf import OmegaConf
-import wandb
 
 # Import checkpoint manager
 try:
     from .orbax_checkpoint_manager import (
-        create_spppo_checkpoint_manager, 
-        SPPPOCheckpointCallback
+        create_spppo_checkpoint_manager,
+        SPPPOCheckpointCallback,
     )
 except ImportError:
     from baselines.SPPPO.orbax_checkpoint_manager import (
-        create_spppo_checkpoint_manager, 
-        SPPPOCheckpointCallback
+        create_spppo_checkpoint_manager,
+        SPPPOCheckpointCallback,
     )
 
-# At the top of your script
-# jax.config.update('jax_disable_jit', True)
 
 class ActorCritic(nn.Module):
     action_dim: Sequence[int]
@@ -74,7 +64,9 @@ class ActorCritic(nn.Module):
         )(actor_mean)
         actor_mean = activation(actor_mean)
         actor_mean = nn.Dense(
-            self.action_dim, kernel_init=orthogonal(0.01), bias_init=constant(0.0)
+            self.action_dim,
+            kernel_init=orthogonal(0.01),
+            bias_init=constant(0.0),
         )(actor_mean)
         pi = distrax.Categorical(logits=actor_mean)
 
@@ -86,11 +78,12 @@ class ActorCritic(nn.Module):
             64, kernel_init=orthogonal(np.sqrt(2)), bias_init=constant(0.0)
         )(critic)
         critic = activation(critic)
-        critic = nn.Dense(1, kernel_init=orthogonal(1.0), bias_init=constant(0.0))(
-            critic
-        )
+        critic = nn.Dense(
+            1, kernel_init=orthogonal(1.0), bias_init=constant(0.0)
+        )(critic)
 
         return pi, jnp.squeeze(critic, axis=-1)
+
 
 class Transition(NamedTuple):
     done: jnp.ndarray
@@ -101,17 +94,25 @@ class Transition(NamedTuple):
     obs: jnp.ndarray
     info: jnp.ndarray
 
+
 def batchify(x: dict, agent_list, num_actors):
     max_dim = max([x[a].shape[-1] for a in agent_list])
-    def pad(z, length):
-        return jnp.concatenate([z, jnp.zeros(z.shape[:-1] + [length - z.shape[-1]])], -1)
 
-    x = jnp.stack([x[a] if x[a].shape[-1] == max_dim else pad(x[a]) for a in agent_list])
+    def pad(z, length):
+        return jnp.concatenate(
+            [z, jnp.zeros(z.shape[:-1] + [length - z.shape[-1]])], -1
+        )
+
+    x = jnp.stack(
+        [x[a] if x[a].shape[-1] == max_dim else pad(x[a]) for a in agent_list]
+    )
     return x.reshape((num_actors, -1))
+
 
 def unbatchify(x: jnp.ndarray, agent_list, num_envs, num_actors):
     x = x.reshape((num_actors, num_envs, -1))
     return {a: x[i] for i, a in enumerate(agent_list)}
+
 
 def make_train(config):
     env = jaxmarl.make(config["ENV_NAME"], **config["ENV_KWARGS"])
@@ -126,13 +127,19 @@ def make_train(config):
     env = LogWrapper(env)
 
     def linear_schedule(count):
-        frac = 1.0 - (count // (config["NUM_MINIBATCHES"] * config["UPDATE_EPOCHS"])) / config["NUM_UPDATES"]
+        frac = (
+            1.0
+            - (count // (config["NUM_MINIBATCHES"] * config["UPDATE_EPOCHS"]))
+            / config["NUM_UPDATES"]
+        )
         return config["LR"] * frac
 
     def train(rng):
 
         # INIT NETWORK
-        network = ActorCritic(env.action_space(env.agents[0]).n, activation=config["ACTIVATION"])
+        network = ActorCritic(
+            env.action_space(env.agents[0]).n, activation=config["ACTIVATION"]
+        )
         rng, _rng = jax.random.split(rng)
         init_x = jnp.zeros(env.observation_space(env.agents[0]).shape)
         network_params = network.init(_rng, init_x)
@@ -142,7 +149,10 @@ def make_train(config):
                 optax.adam(learning_rate=linear_schedule, eps=1e-5),
             )
         else:
-            tx = optax.chain(optax.clip_by_global_norm(config["MAX_GRAD_NORM"]), optax.adam(config["LR"], eps=1e-5))
+            tx = optax.chain(
+                optax.clip_by_global_norm(config["MAX_GRAD_NORM"]),
+                optax.adam(config["LR"], eps=1e-5),
+            )
 
         train_state = TrainState.create(
             apply_fn=network.apply,
@@ -161,28 +171,38 @@ def make_train(config):
             def _env_step(runner_state, unused):
                 train_state, env_state, last_obs, rng = runner_state
 
-                obs_batch = batchify(last_obs, env.agents, config["NUM_ACTORS"])
+                obs_batch = batchify(
+                    last_obs, env.agents, config["NUM_ACTORS"]
+                )
                 # SELECT ACTION
                 rng, _rng = jax.random.split(rng)
 
                 pi, value = network.apply(train_state.params, obs_batch)
                 action = pi.sample(seed=_rng)
                 log_prob = pi.log_prob(action)
-                env_act = unbatchify(action, env.agents, config["NUM_ENVS"], env.num_agents)
+                env_act = unbatchify(
+                    action, env.agents, config["NUM_ENVS"], env.num_agents
+                )
 
                 # STEP ENV
                 rng, _rng = jax.random.split(rng)
                 rng_step = jax.random.split(_rng, config["NUM_ENVS"])
                 obsv, env_state, reward, done, info = jax.vmap(env.step)(
-                    rng_step, env_state, env_act,
+                    rng_step,
+                    env_state,
+                    env_act,
                 )
 
-                info = jax.tree_util.tree_map(lambda x: x.reshape((config["NUM_ACTORS"])), info)
+                info = jax.tree_util.tree_map(
+                    lambda x: x.reshape((config["NUM_ACTORS"])), info
+                )
                 transition = Transition(
                     batchify(done, env.agents, config["NUM_ACTORS"]).squeeze(),
                     action,
                     value,
-                    batchify(reward, env.agents, config["NUM_ACTORS"]).squeeze(),
+                    batchify(
+                        reward, env.agents, config["NUM_ACTORS"]
+                    ).squeeze(),
                     log_prob,
                     obs_batch,
                     info,
@@ -196,7 +216,9 @@ def make_train(config):
 
             # CALCULATE ADVANTAGE
             train_state, env_state, last_obs, rng = runner_state
-            last_obs_batch = batchify(last_obs, env.agents, config["NUM_ACTORS"])
+            last_obs_batch = batchify(
+                last_obs, env.agents, config["NUM_ACTORS"]
+            )
             _, last_val = network.apply(train_state.params, last_obs_batch)
 
             def _calculate_gae(traj_batch, last_val):
@@ -207,10 +229,17 @@ def make_train(config):
                         transition.value,
                         transition.reward,
                     )
-                    delta = reward + config["GAMMA"] * next_value * (1 - done) - value
+                    delta = (
+                        reward
+                        + config["GAMMA"] * next_value * (1 - done)
+                        - value
+                    )
                     gae = (
                         delta
-                        + config["GAMMA"] * config["GAE_LAMBDA"] * (1 - done) * gae
+                        + config["GAMMA"]
+                        * config["GAE_LAMBDA"]
+                        * (1 - done)
+                        * gae
                     )
                     return (gae, value), gae
 
@@ -240,9 +269,14 @@ def make_train(config):
                             value - traj_batch.value
                         ).clip(-config["CLIP_EPS"], config["CLIP_EPS"])
                         value_losses = jnp.square(value - targets)
-                        value_losses_clipped = jnp.square(value_pred_clipped - targets)
+                        value_losses_clipped = jnp.square(
+                            value_pred_clipped - targets
+                        )
                         value_loss = (
-                            0.5 * jnp.maximum(value_losses, value_losses_clipped).mean()
+                            0.5
+                            * jnp.maximum(
+                                value_losses, value_losses_clipped
+                            ).mean()
                         )
 
                         # CALCULATE ACTOR LOSS
@@ -266,7 +300,12 @@ def make_train(config):
                             + config["VF_COEF"] * value_loss
                             - config["ENT_COEF"] * entropy
                         )
-                        return total_loss, (value_loss, loss_actor, entropy, ratio)
+                        return total_loss, (
+                            value_loss,
+                            loss_actor,
+                            entropy,
+                            ratio,
+                        )
 
                     grad_fn = jax.value_and_grad(_loss_fn, has_aux=True)
                     total_loss, grads = grad_fn(
@@ -284,9 +323,13 @@ def make_train(config):
 
                     return train_state, loss_info
 
-                train_state, traj_batch, advantages, targets, rng = update_state
+                train_state, traj_batch, advantages, targets, rng = (
+                    update_state
+                )
                 rng, _rng = jax.random.split(rng)
-                batch_size = config["MINIBATCH_SIZE"] * config["NUM_MINIBATCHES"]
+                batch_size = (
+                    config["MINIBATCH_SIZE"] * config["NUM_MINIBATCHES"]
+                )
                 assert (
                     batch_size == config["NUM_STEPS"] * config["NUM_ACTORS"]
                 ), "batch size must be equal to number of steps * number of actors"
@@ -307,13 +350,17 @@ def make_train(config):
                 train_state, loss_info = jax.lax.scan(
                     _update_minbatch, train_state, minibatches
                 )
-                update_state = (train_state, traj_batch, advantages, targets, rng)
+                update_state = (
+                    train_state,
+                    traj_batch,
+                    advantages,
+                    targets,
+                    rng,
+                )
                 return update_state, loss_info
 
             def callback(metric):
-                wandb.log(
-                    metric
-                )
+                wandb.log(metric)
 
             update_state = (train_state, traj_batch, advantages, targets, rng)
             update_state, loss_info = jax.lax.scan(
@@ -323,14 +370,18 @@ def make_train(config):
             metric = traj_batch.info
 
             # Mean over time
-            step_average = traj_batch.info["returned_episode_returns"].mean(axis=0)
+            step_average = traj_batch.info["returned_episode_returns"].mean(
+                axis=0
+            )
             # Separate envs vs agents
-            per_agent = step_average.reshape((config["NUM_ENVS"], env.num_agents))
+            per_agent = step_average.reshape(
+                (config["NUM_ENVS"], env.num_agents)
+            )
             # Mean over envs
             env_average = per_agent.mean(axis=0) / env.num_agents
 
             rng = update_state[-1]
-            r0 = {"ratio0": loss_info["ratio"][0,0].mean()}
+            r0 = {"ratio0": loss_info["ratio"][0, 0].mean()}
             loss_info = jax.tree_util.tree_map(lambda x: x.mean(), loss_info)
             metric = jax.tree_util.tree_map(lambda x: x.mean(), metric)
             # Add per-agent returns after blanket mean
@@ -355,7 +406,9 @@ def make_train(config):
     return train
 
 
-@hydra.main(version_base=None, config_path="config", config_name="spppo_ff_mpe")
+@hydra.main(
+    version_base=None, config_path="config", config_name="spppo_ff_mpe"
+)
 def main(config):
     """Train with SPPPO then generate rollouts via eval_arena for demo."""
     config = OmegaConf.to_container(config)
@@ -370,30 +423,33 @@ def main(config):
 
     rng = jax.random.PRNGKey(config["SEED"])
     rngs = jax.random.split(rng, config["NUM_SEEDS"])
-    
+
     # Setup checkpoint management
     checkpoint_enabled = config.get("CHECKPOINT_FREQ", 0) > 0
     if checkpoint_enabled:
-        print(f"Checkpoint management enabled: save every {config['CHECKPOINT_FREQ']} iterations, save at end: {config['SAVE_AT_END']}")
-        
+        print(
+            f"Checkpoint management enabled: save every {config['CHECKPOINT_FREQ']} iterations, save at end: {config['SAVE_AT_END']}"
+        )
+
         # Generate base run ID for this training session
         import datetime
+
         base_run_id = datetime.datetime.now().strftime("run_%Y%m%d_%H%M%S")
-        
+
         # Create checkpoint managers for each seed
         checkpoint_managers = []
         checkpoint_callbacks = []
-        
+
         for seed_idx in range(config["NUM_SEEDS"]):
             manager = create_spppo_checkpoint_manager(
                 run_id=base_run_id,
                 seed=seed_idx,
-                max_to_keep=config.get("MAX_CHECKPOINTS_TO_KEEP", 10)
+                max_to_keep=config.get("MAX_CHECKPOINTS_TO_KEEP", 10),
             )
             callback = SPPPOCheckpointCallback(
                 checkpoint_manager=manager,
                 save_frequency=config["CHECKPOINT_FREQ"],
-                save_at_end=config["SAVE_AT_END"]
+                save_at_end=config["SAVE_AT_END"],
             )
             checkpoint_managers.append(manager)
             checkpoint_callbacks.append(callback)
@@ -405,7 +461,10 @@ def main(config):
 
     # compute NUM_UPDATES if not precomputed in config
     if "NUM_UPDATES" not in config:
-        config["NUM_UPDATES"] = int(config["TOTAL_TIMESTEPS"] // (config["NUM_ENVS"] * config["NUM_STEPS"]))
+        config["NUM_UPDATES"] = int(
+            config["TOTAL_TIMESTEPS"]
+            // (config["NUM_ENVS"] * config["NUM_STEPS"])
+        )
     else:
         # Ensure NUM_UPDATES is an integer
         config["NUM_UPDATES"] = int(config["NUM_UPDATES"])
@@ -414,8 +473,12 @@ def main(config):
         config["LOG_EVERY"] = 10
 
     # Simple progress message
-    print(f"Training with JIT enabled for {config['NUM_SEEDS']} seeds, {int(config['NUM_UPDATES'])} updates each")
-    print(f"(Total of {int(config['NUM_UPDATES'] * config['NUM_SEEDS'])} updates)")
+    print(
+        f"Training with JIT enabled for {config['NUM_SEEDS']} seeds, {int(config['NUM_UPDATES'])} updates each"
+    )
+    print(
+        f"(Total of {int(config['NUM_UPDATES'] * config['NUM_SEEDS'])} updates)"
+    )
 
     # Create JIT-compiled training function without a progress bar
     # that would interfere with JAX's transformations
@@ -426,7 +489,9 @@ def main(config):
     print("\nRunning training (first run includes compilation time)...")
     out = jax.vmap(train_jit)(rngs)
 
-    print(f"\nTraining complete! Processed {int(config['NUM_UPDATES'] * config['NUM_SEEDS'])} total updates")
+    print(
+        f"\nTraining complete! Processed {int(config['NUM_UPDATES'] * config['NUM_SEEDS'])} total updates"
+    )
     metrics = out["metrics"]
 
     # Save final checkpoints if enabled
@@ -434,16 +499,24 @@ def main(config):
         print("\nSaving final checkpoints...")
         for seed_idx in range(config["NUM_SEEDS"]):
             # Extract this seed's train state from vmap output
-            seed_runner_state = jax.tree_util.tree_map(lambda x: x[seed_idx], out["runner_state"])
-            train_state = seed_runner_state[0]  # Extract train_state from runner_state tuple
-            checkpoint_callbacks[seed_idx].save_final_checkpoint(train_state=train_state, step=config["NUM_UPDATES"])
+            seed_runner_state = jax.tree_util.tree_map(
+                lambda x: x[seed_idx], out["runner_state"]
+            )
+            train_state = seed_runner_state[
+                0
+            ]  # Extract train_state from runner_state tuple
+            checkpoint_callbacks[seed_idx].save_final_checkpoint(
+                train_state=train_state, step=config["NUM_UPDATES"]
+            )
             print(f"Final checkpoint saved for seed {seed_idx}")
 
     # Extract the trained model parameters from the first seed for rollout
     # With vmap: out["runner_state"] is a tuple (train_state, env_state, obsv, rng)
     # where each element has shape (num_seeds, ...)
     # We want train_state (index 0 of tuple) from seed 0 (index 0 of batch)
-    train_state = jax.tree_util.tree_map(lambda x: x[0], out["runner_state"][0])
+    train_state = jax.tree_util.tree_map(
+        lambda x: x[0], out["runner_state"][0]
+    )
 
     # Generate rollouts for different opponent types
     opponent_types = ["self_play", "noop", "random_walk"]
@@ -451,49 +524,64 @@ def main(config):
 
     # Use current time-based seeds to ensure different starting positions each run
     base_seed = int(time.time() * 1000) % 100000
-    
+
     # Get run_id for structured rollout folder organization
     if checkpoint_enabled:
         rollout_run_id = base_run_id
     else:
         import datetime
+
         rollout_run_id = datetime.datetime.now().strftime("run_%Y%m%d_%H%M%S")
 
     for i, opponent_type in enumerate(opponent_types):
         print(f"\nGenerating rollout against {opponent_type} opponent...")
         # Use different seed for each opponent type by adding the index
         rollout_seed = base_seed + i
-        get_rollout(train_state, config, opponent_type=opponent_type, seed=rollout_seed, 
-                   run_id=rollout_run_id, training_seed=0)
+        get_rollout(
+            train_state,
+            config,
+            opponent_type=opponent_type,
+            seed=rollout_seed,
+            run_id=rollout_run_id,
+            training_seed=0,
+        )
 
     # Get the environment name to check if it's a zero-sum game
-    env_name = config['ENV_NAME'].lower()
+    env_name = config["ENV_NAME"].lower()
 
     plt.figure(figsize=(10, 6))
 
     # For simple_sumo, we need to look at other metrics since returns are all zeros
-    if 'sumo' in env_name:
+    if "sumo" in env_name:
         # Create a figure with multiple subplots to show different metrics
         fig, axs = plt.subplots(2, 1, figsize=(12, 10), sharex=True)
 
         # Plot 1: Get per-agent returns from a rollout
         ax = axs[0]
         # Convert JAX arrays to NumPy and keep the seeds dimension to compute statistics
-        player_0 = np.asarray(out["metrics"]["player_0_returns"])  # shape (seeds, updates)
-        player_1 = np.asarray(out["metrics"]["player_1_returns"])  # shape (seeds, updates)
+        player_0 = np.asarray(
+            out["metrics"]["player_0_returns"]
+        )  # shape (seeds, updates)
+        player_1 = np.asarray(
+            out["metrics"]["player_1_returns"]
+        )  # shape (seeds, updates)
 
         # Average over seeds and compute standard deviation for error bars
         mean_0, std_0 = player_0.mean(0), player_0.std(0)
         mean_1, std_1 = player_1.mean(0), player_1.std(0)
 
-        x = np.arange(mean_0.shape[0])   # Updates on the x-axis
+        x = np.arange(mean_0.shape[0])  # Updates on the x-axis
 
         # Plot mean curve with shaded ±1 std region
-        ax.plot(x, mean_0, label="Player 0", color='green', linewidth=2)
-        ax.fill_between(x, mean_0 - std_0, mean_0 + std_0, color='green', alpha=0.2)
+        ax.plot(x, mean_0, label="Player 0", color="green", linewidth=2)
+        ax.fill_between(
+            x, mean_0 - std_0, mean_0 + std_0, color="green", alpha=0.2
+        )
 
-        ax.plot(x, mean_1, label="Player 1", color='red', linewidth=2)
-        ax.fill_between(x, mean_1 - std_1, mean_1 + std_1, color='red', alpha=0.2)
+        ax.plot(x, mean_1, label="Player 1", color="red", linewidth=2)
+        ax.fill_between(
+            x, mean_1 - std_1, mean_1 + std_1, color="red", alpha=0.2
+        )
 
         ax.set_title(f"Episode Returns in {config['ENV_NAME']}")
         ax.set_ylabel("Episode Returns")
@@ -502,17 +590,17 @@ def main(config):
 
         # Plot 2: Training metrics that might be more informative
         ax = axs[1]
-        if 'actor_loss' in out['metrics']:
-            actor_loss = out['metrics']['actor_loss'].mean(axis=0)
-            ax.plot(actor_loss, label="Actor Loss", color='gray')
+        if "actor_loss" in out["metrics"]:
+            actor_loss = out["metrics"]["actor_loss"].mean(axis=0)
+            ax.plot(actor_loss, label="Actor Loss", color="gray")
 
-        if 'critic_loss' in out['metrics']:
-            critic_loss = out['metrics']['critic_loss'].mean(axis=0)
-            ax.plot(critic_loss, label="Critic Loss", color='yellow')
+        if "critic_loss" in out["metrics"]:
+            critic_loss = out["metrics"]["critic_loss"].mean(axis=0)
+            ax.plot(critic_loss, label="Critic Loss", color="yellow")
 
-        if 'entropy' in out['metrics']:
-            entropy = out['metrics']['entropy'].mean(axis=0)
-            ax.plot(entropy, label="Entropy", color='purple')
+        if "entropy" in out["metrics"]:
+            entropy = out["metrics"]["entropy"].mean(axis=0)
+            ax.plot(entropy, label="Entropy", color="purple")
 
         ax.set_title("Training Metrics")
         ax.set_xlabel("Updates")
@@ -524,7 +612,14 @@ def main(config):
         plt.savefig(f"spppo_ff_{config['ENV_NAME']}.png")
 
 
-def get_rollout(train_state, config, opponent_type="self_play", seed=None, run_id=None, training_seed=0):
+def get_rollout(
+    train_state,
+    config,
+    opponent_type="self_play",
+    seed=None,
+    run_id=None,
+    training_seed=0,
+):
     """Generate a rollout of the environment for visualization
 
     Args:
@@ -586,7 +681,9 @@ def get_rollout(train_state, config, opponent_type="self_play", seed=None, run_i
 
         # Handle second agent (opponent) based on opponent_type
         if second_agent:
-            if opponent_type == "self_play":  # True self-play: both agents use the same shared policy
+            if (
+                opponent_type == "self_play"
+            ):  # True self-play: both agents use the same shared policy
                 agent_obs = obs[second_agent].flatten()
                 pi, _ = network.apply(network_params, agent_obs)
                 action = pi.sample(seed=key_a)
@@ -596,11 +693,15 @@ def get_rollout(train_state, config, opponent_type="self_play", seed=None, run_i
                 # 0 = NOOP in discrete action space
                 actions[second_agent] = jnp.array(0, dtype=jnp.int32)
 
-            elif opponent_type == "random_walk":  # Opponent takes random actions
+            elif (
+                opponent_type == "random_walk"
+            ):  # Opponent takes random actions
                 # Random action from 0-4 (NOOP, LEFT, RIGHT, DOWN, UP)
                 key_rand, key = jax.random.split(key)
                 random_action = jax.random.randint(key_rand, (), 0, 5)
-                actions[second_agent] = jnp.array(random_action, dtype=jnp.int32)
+                actions[second_agent] = jnp.array(
+                    random_action, dtype=jnp.int32
+                )
 
         # Step environment
         obs, next_state, reward, done, info = env.step(key_s, state, actions)
@@ -624,25 +725,30 @@ def get_rollout(train_state, config, opponent_type="self_play", seed=None, run_i
         # Break if episode is done
         if done["__all__"]:
             print(f"Episode done at step {step}")
-            print(f"\tCumulative rewards for {first_agent}: {np.sum(reward_seq[first_agent])}")
+            print(
+                f"\tCumulative rewards for {first_agent}: {np.sum(reward_seq[first_agent])}"
+            )
             if second_agent:
-                print(f"\tCumulative rewards for {second_agent}: {np.sum(reward_seq[second_agent])}")
+                print(
+                    f"\tCumulative rewards for {second_agent}: {np.sum(reward_seq[second_agent])}"
+                )
             break
 
     # Generate GIF in structured rollouts folder hierarchy
     import os
-    
+
     # Create structured folder path: rollouts/spppo/run_id/seed_X/
     if run_id is None:
         import datetime
+
         run_id = datetime.datetime.now().strftime("run_%Y%m%d_%H%M%S")
-    
+
     rollouts_base_dir = "rollouts"
     algorithm_dir = os.path.join(rollouts_base_dir, "spppo")
     run_dir = os.path.join(algorithm_dir, run_id)
     seed_dir = os.path.join(run_dir, f"seed_{training_seed}")
     os.makedirs(seed_dir, exist_ok=True)
-    
+
     viz = MPEVisualizer(env, state_seq, reward_seq=reward_seq)
     gif_filename = f"spppo_ff_{config['ENV_NAME']}_{opponent_type}.gif"
     gif_path = os.path.join(seed_dir, gif_filename)
@@ -650,6 +756,7 @@ def get_rollout(train_state, config, opponent_type="self_play", seed=None, run_i
     print(f"Animation saved to {gif_path}")
 
     return state_seq, reward_seq
+
 
 if __name__ == "__main__":
     main()
