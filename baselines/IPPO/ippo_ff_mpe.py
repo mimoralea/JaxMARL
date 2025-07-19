@@ -4,6 +4,7 @@ Based on the PureJaxRL Implementation of PPO
 
 import os
 import time
+import logging
 import numpy as np
 import hydra
 import jaxmarl
@@ -29,6 +30,25 @@ import matplotlib.pyplot as plt
 import hydra
 from omegaconf import OmegaConf
 import wandb
+
+# Configure logging levels to reduce verbose output
+logging.getLogger('absl').setLevel(logging.ERROR)
+logging.getLogger('orbax').setLevel(logging.ERROR)
+logging.getLogger('jax').setLevel(logging.WARNING)
+logging.getLogger('jax._src').setLevel(logging.ERROR)
+logging.getLogger('tensorstore').setLevel(logging.ERROR)
+
+# Import checkpoint manager
+try:
+    from .orbax_checkpoint_manager import (
+        create_ippo_checkpoint_manager, 
+        IPPOCheckpointCallback
+    )
+except ImportError:
+    from baselines.IPPO.orbax_checkpoint_manager import (
+        create_ippo_checkpoint_manager, 
+        IPPOCheckpointCallback
+    )
 
 # At the top of your script
 # jax.config.update('jax_disable_jit', True)
@@ -91,7 +111,7 @@ def unbatchify(x: jnp.ndarray, agent_list, num_envs, num_actors):
     x = x.reshape((num_actors, num_envs, -1))
     return {a: x[i] for i, a in enumerate(agent_list)}
 
-def make_train(config):
+def make_train(config, checkpoint_callback=None):
     env = jaxmarl.make(config["ENV_NAME"], **config["ENV_KWARGS"])
     config["NUM_ACTORS"] = env.num_agents * config["NUM_ENVS"]
     config["NUM_UPDATES"] = (
@@ -377,6 +397,39 @@ def main(config):
 
     rng = jax.random.PRNGKey(config["SEED"])
     rngs = jax.random.split(rng, config["NUM_SEEDS"])
+    
+    # Setup checkpoint management
+    checkpoint_enabled = config.get("CHECKPOINT_FREQ", 0) > 0
+    if checkpoint_enabled:
+        print(f"Checkpoint management enabled: save every {config['CHECKPOINT_FREQ']} iterations, save at end: {config['SAVE_AT_END']}")
+        
+        # Generate base run ID for this training session
+        import datetime
+        base_run_id = datetime.datetime.now().strftime("run_%Y%m%d_%H%M%S")
+        
+        # Create checkpoint managers for each seed
+        checkpoint_managers = []
+        checkpoint_callbacks = []
+        
+        for seed_idx in range(config["NUM_SEEDS"]):
+            manager = create_ippo_checkpoint_manager(
+                run_id=base_run_id,
+                seed=seed_idx,
+                max_to_keep=config.get("MAX_CHECKPOINTS_TO_KEEP", 10),
+                agent_names=["agent_0", "agent_1"]
+            )
+            callback = IPPOCheckpointCallback(
+                checkpoint_manager=manager,
+                save_frequency=config["CHECKPOINT_FREQ"],
+                save_at_end=config["SAVE_AT_END"]
+            )
+            checkpoint_managers.append(manager)
+            checkpoint_callbacks.append(callback)
+    else:
+        print("Checkpoint management disabled")
+        checkpoint_managers = None
+        checkpoint_callbacks = None
+        base_run_id = None
 
     # compute NUM_UPDATES if not precomputed in config
     if "NUM_UPDATES" not in config:
@@ -392,24 +445,38 @@ def main(config):
     print(f"Training with JIT enabled for {config['NUM_SEEDS']} seeds, {int(config['NUM_UPDATES'])} updates each")
     print(f"(Total of {int(config['NUM_UPDATES'] * config['NUM_SEEDS'])} updates)")
 
-    # Create JIT-compiled training function without a progress bar
-    # that would interfere with JAX's transformations
+    # Create JIT-compiled training function
     print("Compiling training function with JAX JIT...")
-    train_jit = jax.jit(make_train(config))
+    train_fn = make_train(config)
+    train_jit = jax.jit(train_fn)
 
-    # Run training across all seeds with JIT enabled
+    # Run training across all seeds in parallel (using vmap for speed)
     print("\nRunning training (first run includes compilation time)...")
     out = jax.vmap(train_jit)(rngs)
-
+    
+    # Save checkpoints after parallel training completes
+    if checkpoint_enabled:
+        print("\nSaving final checkpoints...")
+        for seed_idx in range(config["NUM_SEEDS"]):
+            # Extract train_state for this seed using the same pattern as original code
+            # out["runner_state"] shape: (num_seeds, 4) where 4 = (train_state, env_state, obsv, rng)
+            # We want train_state (index 0) for each seed
+            seed_runner_state = jax.tree_util.tree_map(lambda x: x[seed_idx], out["runner_state"])
+            train_state = seed_runner_state[0]  # train_state is at index 0 of the tuple
+            checkpoint_callbacks[seed_idx].save_final_checkpoint(
+                train_state=train_state,
+                step=config["NUM_UPDATES"]
+            )
+            print(f"Final checkpoint saved for seed {seed_idx}")
+    
     print(f"\nTraining complete! Processed {int(config['NUM_UPDATES'] * config['NUM_SEEDS'])} total updates")
     metrics = out["metrics"]
 
-    # ---- Delegated training ----
-    from baselines.IPPO.train_ippo import train_ippo
-    train_state, metrics = train_ippo(config)
-
     # Extract the trained model parameters from the first seed
-    train_state = jax.tree_util.tree_map(lambda x: x[0], out["runner_state"][0])
+    # With vmap: out["runner_state"] is a tuple (train_state, env_state, obsv, rng)
+    # where each element has shape (num_seeds, ...)
+    # We want train_state (index 0 of tuple) from seed 0 (index 0 of batch)
+    train_state = jax.tree.map(lambda x: x[0], out["runner_state"][0])
 
     # Generate rollouts for different opponent types
     opponent_types = ["self_play", "noop", "random_walk"]
@@ -417,12 +484,20 @@ def main(config):
 
     # Use current time-based seeds to ensure different starting positions each run
     base_seed = int(time.time() * 1000) % 100000
+    
+    # Get run_id for structured rollout folder organization
+    if checkpoint_enabled:
+        rollout_run_id = base_run_id
+    else:
+        import datetime
+        rollout_run_id = datetime.datetime.now().strftime("run_%Y%m%d_%H%M%S")
 
     for i, opponent_type in enumerate(opponent_types):
         print(f"\nGenerating rollout against {opponent_type} opponent...")
         # Use different seed for each opponent type by adding the index
         rollout_seed = base_seed + i
-        get_rollout(train_state, config, opponent_type=opponent_type, seed=rollout_seed)
+        get_rollout(train_state, config, opponent_type=opponent_type, seed=rollout_seed, 
+                   run_id=rollout_run_id, training_seed=0)
 
     # Get the environment name to check if it's a zero-sum game
     env_name = config['ENV_NAME'].lower()
@@ -482,7 +557,7 @@ def main(config):
         plt.savefig(f"ippo_ff_{config['ENV_NAME']}.png")
 
 
-def get_rollout(train_state, config, opponent_type="self_play", seed=None):
+def get_rollout(train_state, config, opponent_type="self_play", seed=None, run_id=None, training_seed=0):
     """Generate a rollout of the environment for visualization
 
     Args:
@@ -490,6 +565,8 @@ def get_rollout(train_state, config, opponent_type="self_play", seed=None):
         config: Configuration dictionary
         opponent_type: Type of opponent ('self_play', 'noop', or 'random_walk')
         seed: Random seed for reproducibility. If None, uses current time.
+        run_id: Run identifier for organized folder structure
+        training_seed: Training seed used for this rollout (for folder organization)
     """
     # Use current time as seed if not provided to ensure different starting positions
     if seed is None:
@@ -517,7 +594,9 @@ def get_rollout(train_state, config, opponent_type="self_play", seed=None):
     network.init(key_a, init_x)
 
     # Get trained parameters from training state
-    network_params = train_state.params
+    # IPPO has two agents, so train_state.params is (agent_0_params, agent_1_params)
+    # For rollout, we use the first agent's parameters
+    network_params = train_state.params[0]
 
     # Reset environment with unique seed
     key_reset = jax.random.PRNGKey(seed)
@@ -580,15 +659,30 @@ def get_rollout(train_state, config, opponent_type="self_play", seed=None):
         # Break if episode is done
         if done["__all__"]:
             print(f"Episode done at step {step}")
-            print(f"\tCumulative rewards for player 0: {np.sum(reward_seq['player_0'])}")
-            print(f"\tCumulative rewards for player 1: {np.sum(reward_seq['player_1'])}")
+            print(f"\tCumulative rewards for {first_agent}: {np.sum(reward_seq[first_agent])}")
+            if second_agent:
+                print(f"\tCumulative rewards for {second_agent}: {np.sum(reward_seq[second_agent])}")
             break
 
-    # Generate GIF
+    # Generate GIF in structured rollouts folder hierarchy
+    import os
+    
+    # Create structured folder path: rollouts/ippo/run_id/seed_X/
+    if run_id is None:
+        import datetime
+        run_id = datetime.datetime.now().strftime("run_%Y%m%d_%H%M%S")
+    
+    rollouts_base_dir = "rollouts"
+    algorithm_dir = os.path.join(rollouts_base_dir, "ippo")
+    run_dir = os.path.join(algorithm_dir, run_id)
+    seed_dir = os.path.join(run_dir, f"seed_{training_seed}")
+    os.makedirs(seed_dir, exist_ok=True)
+    
     viz = MPEVisualizer(env, state_seq, reward_seq=reward_seq)
     gif_filename = f"ippo_ff_{config['ENV_NAME']}_{opponent_type}.gif"
-    viz.animate(save_fname=gif_filename, view=False, loop=False)
-    print(f"Animation saved to {gif_filename}")
+    gif_path = os.path.join(seed_dir, gif_filename)
+    viz.animate(save_fname=gif_path, view=False, loop=False)
+    print(f"Animation saved to {gif_path}")
 
     return state_seq, reward_seq
 

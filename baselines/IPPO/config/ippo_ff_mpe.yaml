@@ -32,6 +32,11 @@
 "ENV_NAME":      "MPE_simple_sumo_v3"
 "ENV_KWARGS":    {}
 
+# Checkpoint Params
+"CHECKPOINT_FREQ": 325          # Save checkpoint every N training iterations
+"SAVE_AT_END": True             # Save final checkpoint
+"MAX_CHECKPOINTS_TO_KEEP": 10   # Keep N most recent checkpoints (None = keep all)
+
 # WandB Params
 "ENTITY": ""
 "PROJECT": "jaxmarl-mpe"

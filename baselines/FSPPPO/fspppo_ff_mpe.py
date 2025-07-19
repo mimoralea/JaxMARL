@@ -666,13 +666,14 @@ def get_rollout(train_state, config, opponent_type="self_play", seed=None, run_i
     # Generate GIF in structured rollouts folder hierarchy
     import os
     
-    # Create structured folder path: rollouts/run_id/seed_X/
+    # Create structured folder path: rollouts/fspppo/run_id/seed_X/
     if run_id is None:
         import datetime
         run_id = datetime.datetime.now().strftime("run_%Y%m%d_%H%M%S")
     
     rollouts_base_dir = "rollouts"
-    run_dir = os.path.join(rollouts_base_dir, run_id)
+    algorithm_dir = os.path.join(rollouts_base_dir, "fspppo")
+    run_dir = os.path.join(algorithm_dir, run_id)
     seed_dir = os.path.join(run_dir, f"seed_{training_seed}")
     os.makedirs(seed_dir, exist_ok=True)
     
