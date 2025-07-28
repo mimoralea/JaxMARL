@@ -655,8 +655,16 @@ def make_parallel_train_with_opponent_sampling(config):
         num_seeds = len(rngs)
         print(f"[fspppo_train] Training {num_seeds} seeds in PARALLEL CHUNKS with opponent sampling")
         
-        # Get sampling configuration
-        opponent_sampling_freq = config.get("OPPONENT_SAMPLING_FREQ", 200)
+        # Get sampling and checkpoint configuration
+        opponent_sampling_freq = config.get("OPPONENT_SAMPLING_FREQ", 100)
+        checkpoint_freq = config.get("CHECKPOINT_FREQ", 100)
+        
+        # Ensure opponent sampling frequency matches checkpoint frequency
+        if opponent_sampling_freq != checkpoint_freq:
+            print(f"[fspppo_train] WARNING: OPPONENT_SAMPLING_FREQ ({opponent_sampling_freq}) != CHECKPOINT_FREQ ({checkpoint_freq})")
+            print(f"[fspppo_train] Using CHECKPOINT_FREQ ({checkpoint_freq}) for both to ensure synchronization")
+            opponent_sampling_freq = checkpoint_freq
+        
         self_play_probability = config.get("SELF_PLAY_PROBABILITY", 0.5)
         recency_bias_alpha = config.get("RECENCY_BIAS_ALPHA", 0.8)
         total_updates = config["NUM_UPDATES"]
@@ -665,7 +673,7 @@ def make_parallel_train_with_opponent_sampling(config):
         timesteps_per_chunk = config["NUM_ENVS"] * config["NUM_STEPS"] * opponent_sampling_freq
         num_chunks = (total_updates + opponent_sampling_freq - 1) // opponent_sampling_freq
         
-        print(f"[fspppo_train] Opponent sampling frequency: {opponent_sampling_freq} updates")
+        print(f"[fspppo_train] Checkpoint & opponent sampling frequency: {opponent_sampling_freq} updates (synchronized)")
         print(f"[fspppo_train] Timesteps per chunk: {timesteps_per_chunk:,}")
         print(f"[fspppo_train] Total chunks: {num_chunks}")
         print(f"[fspppo_train] Self-play probability: {self_play_probability}")
@@ -757,31 +765,30 @@ def make_parallel_train_with_opponent_sampling(config):
             all_metrics.append(chunk_results["metrics"])
             current_iteration += chunk_size
             
-            # Save checkpoints for all seeds after each chunk
-            checkpoint_freq = config.get("CHECKPOINT_FREQ", 50)
-            if checkpoint_freq > 0:
-                for seed_idx in range(num_seeds):
-                    seed_config = config.copy()
-                    seed_config["SEED"] = config["SEED"] + seed_idx
-                    
-                    # Use consistent run_id for this seed
-                    run_id = seed_run_ids[seed_idx]
-                    agent_id = config.get("AGENT_ID", "main_agent")
-                    
-                    # Extract training state for this seed
-                    seed_train_state = jax.tree_util.tree_map(lambda x: x[seed_idx], current_runner_states[0])
-                    
-                    # Create checkpoint manager and save
-                    from baselines.FSPPPO.jax_checkpoint_utils import create_checkpoint_manager_for_training
-                    checkpoint_manager, _ = create_checkpoint_manager_for_training(seed_config)
-                    
-                    try:
-                        checkpoint_dir = checkpoint_manager.save_checkpoint(
-                            seed_train_state.params, current_iteration, run_id, agent_id
-                        )
-                        print(f"  - Saved checkpoint for seed {seed_idx} at iteration {current_iteration}: {checkpoint_dir}")
-                    except Exception as e:
-                        print(f"  - Warning: Failed to save checkpoint for seed {seed_idx}: {e}")
+            # Save checkpoints for all seeds after each chunk (synchronized with opponent sampling)
+            # Checkpoints are saved after every chunk (every opponent_sampling_freq iterations)
+            for seed_idx in range(num_seeds):
+                seed_config = config.copy()
+                seed_config["SEED"] = config["SEED"] + seed_idx
+                
+                # Use consistent run_id for this seed
+                run_id = seed_run_ids[seed_idx]
+                agent_id = config.get("AGENT_ID", "main_agent")
+                
+                # Extract training state for this seed
+                seed_train_state = jax.tree_util.tree_map(lambda x: x[seed_idx], current_runner_states[0])
+                
+                # Create checkpoint manager and save
+                from baselines.FSPPPO.jax_checkpoint_utils import create_checkpoint_manager_for_training
+                checkpoint_manager, _ = create_checkpoint_manager_for_training(seed_config)
+                
+                try:
+                    checkpoint_dir = checkpoint_manager.save_checkpoint(
+                        seed_train_state.params, current_iteration, run_id, agent_id
+                    )
+                    print(f"  - Saved checkpoint for seed {seed_idx} at iteration {current_iteration}: {checkpoint_dir}")
+                except Exception as e:
+                    print(f"  - Warning: Failed to save checkpoint for seed {seed_idx}: {e}")
             
             print(f"[fspppo_train] Chunk {chunk_idx + 1} completed. Total iterations: {current_iteration}")
         
