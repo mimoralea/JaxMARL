@@ -1,0 +1,51 @@
+# Configuration for Sequential Baseline Training
+# This file provides default parameters for training all baseline algorithms
+
+# Environment Configuration
+ENV_NAME: "MPE_simple_sumo_v3"
+ENV_KWARGS:
+  random_spawn: true
+
+# Training Parameters
+SEED: 42
+NUM_SEEDS: 5  # Multiple seeds for statistical robustness
+LR: 2.5e-4
+ANNEAL_LR: true
+NUM_ENVS: 16
+NUM_STEPS: 128
+UPDATE_EPOCHS: 4
+NUM_MINIBATCHES: 4
+GAMMA: 0.99
+GAE_LAMBDA: 0.95
+CLIP_EPS: 0.2
+VF_COEF: 0.5
+ENT_COEF: 0.01
+MAX_GRAD_NORM: 0.5
+
+# Network Configuration
+ACTIVATION: "tanh"
+
+# Checkpoint Configuration
+CHECKPOINT_FREQ: 100  # Save every 100 training iterations
+SAVE_AT_END: true
+MAX_CHECKPOINTS_TO_KEEP: 20
+
+# Training Duration
+TOTAL_TIMESTEPS: 2e6  # 2M timesteps (~976 iterations)
+
+# FSPPPO-Specific Parameters
+OPPONENT_SAMPLING_FREQ: 200  # Sample new opponent every 200 iterations
+SELF_PLAY_PROBABILITY: 0.3
+RECENCY_BIAS_ALPHA: 0.6
+
+# Logging Configuration
+WANDB_MODE: "disabled"  # Disable wandb for batch training
+LOG_EVERY: 10
+
+# Quick Test Override (used with --quick-test flag)
+QUICK_TEST:
+  TOTAL_TIMESTEPS: 50000  # ~39 iterations
+  NUM_SEEDS: 2
+  NUM_ENVS: 4
+  CHECKPOINT_FREQ: 20
+  MAX_CHECKPOINTS_TO_KEEP: 5
