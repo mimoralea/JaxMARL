@@ -4,6 +4,19 @@ Extracted from fspppo_ff_mpe.py for modular reuse.
 Functions
 ---------
 train_fspppo(config) -> (train_state, metrics)
+    Runs FSPPPO training script for SimpleSumoMPE environment.
+
+This script implements TRUE FICTITIOUS SELF-PLAY PPO training where each agent
+learns by playing against ONLY its own historical policies stored as checkpoints.
+
+IMPORTANT: This is NOT population-based training or cross-seed sampling:
+- Each seed samples opponents ONLY from its own checkpoint history
+- NO cross-seed sampling: seed0 cannot use seed1's checkpoints as opponents
+- NO cross-run sampling: only current run's checkpoints are used
+- Pure self-play: each agent vs its own past versions only
+
+For pure self-play without historical opponents, use SPPPO instead.
+
     Runs training using the same logic as the original script and returns the
     trained Flax train_state along with training metrics.
 
@@ -25,12 +38,12 @@ from omegaconf import OmegaConf
 
 try:
     # When executed via `python -m baselines.fspppo.train_fspppo`
-    from .fspppo_ff_mpe import make_train  # type: ignore
+    from .fspppo_ff_mpe import make_train, make_train_with_opponent_sampling, make_parallel_train_with_opponent_sampling  # type: ignore
 except ImportError:
     # Fallback when run as a stand-alone script with `python baselines/fspppo/train_fspppo.py`
     import sys, pathlib
     sys.path.append(str(pathlib.Path(__file__).resolve().parents[1].parents[0]))
-    from baselines.FSPPPO.fspppo_ff_mpe import make_train
+    from baselines.FSPPPO.fspppo_ff_mpe import make_train, make_train_with_opponent_sampling
 
 # -----------------------------------------------------------------------------
 # Core training logic
@@ -57,13 +70,13 @@ def train_fspppo(config: Dict[str, Any]):
         f"[train_fspppo] Training for {config['NUM_SEEDS']} seeds x {config['NUM_UPDATES']} updates"
     )
 
-    # JIT-compile the training function
-    train_jit = jax.jit(make_train(config))
-
-    out = jax.vmap(train_jit)(rngs)
-    # Return all train states instead of just the first one
-    train_states = out["runner_state"][0]
+    print("[train_fspppo] Using parallel FSPPPO training with opponent sampling")
+    # FSPPPO always uses opponent sampling - no fallback to self-play
+    train_fn = make_parallel_train_with_opponent_sampling(config)
+    out = train_fn(rngs)
+    train_states = out["runner_state"]  # Direct list of training states
     metrics = out["metrics"]
+    
     return train_states, metrics
 
 
@@ -86,7 +99,8 @@ def train_and_save(config: Dict[str, Any], save_dir: str = "checkpoints") -> Tup
     # Save each seed's model
     for seed_idx in range(config["NUM_SEEDS"]):
         # Extract this seed's train state
-        train_state = jax.tree_util.tree_map(lambda x: x[seed_idx], train_states)
+        # train_states is now a list of training states for each seed
+        train_state = train_states[seed_idx]
         params = train_state.params
 
         # Create a seed-specific directory
@@ -101,7 +115,7 @@ def train_and_save(config: Dict[str, Any], save_dir: str = "checkpoints") -> Tup
         print(f"[train_fspppo] Saved shared policy parameters for seed{seed_idx} -> {shared_policy_path}")
 
     # For backward compatibility, also save the first seed's model at the top level
-    first_seed_params = jax.tree_util.tree_map(lambda x: x[0], train_states).params
+    first_seed_params = train_states[0].params
 
     # Save the shared policy with timestamp at the top level for quick access
     shared_policy_path = os.path.join(save_dir, f"fspppo_{timestamp}_shared_policy.pkl")
@@ -110,7 +124,7 @@ def train_and_save(config: Dict[str, Any], save_dir: str = "checkpoints") -> Tup
     print(f"[train_fspppo] Saved default shared policy parameters -> {shared_policy_path}")
 
     # Return the first seed's train state for backward compatibility
-    first_seed_train_state = jax.tree_util.tree_map(lambda x: x[0], train_states)
+    first_seed_train_state = train_states[0]
     return first_seed_train_state, metrics
 
 
