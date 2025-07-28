@@ -6,6 +6,7 @@
 "TOTAL_TIMESTEPS": 1e7
 "UPDATE_EPOCHS": 4
 "NUM_MINIBATCHES": 4
+"MINIBATCH_SIZE": 512  # NUM_ENVS * NUM_STEPS / NUM_MINIBATCHES = 16 * 128 / 4
 "ENT_COEF": 0.01
 "SEED": 30
 "NUM_SEEDS": 10
@@ -38,7 +39,7 @@
 "WANDB_MODE" : "disabled"
 
 # Checkpoint Management
-"CHECKPOINT_FREQ": 325        # Save checkpoint every N training iterations (~15 checkpoints for full run)
+"CHECKPOINT_FREQ": 50         # Save checkpoint every N training iterations (more frequent than opponent sampling)
 "SAVE_CHECKPOINT_AT_END": true # Save final checkpoint at end of training
 "MAX_CHECKPOINTS": 10         # Keep last N checkpoints per agent
 "CHECKPOINT_BASE_DIR": "checkpoints"  # Base directory for checkpoints
@@ -46,7 +47,7 @@
 "AGENT_ID": "main_agent"      # Agent identifier
 
 # Opponent Sampling (Fictitious Self-Play)
-"SELF_PLAY_PROBABILITY": 0.5   # Probability of using current agent weights vs historical
-"RECENCY_BIAS_ALPHA": 0.8      # Recency bias for historical opponents (0=oldest, 0.5=uniform, 1=newest)
+"SELF_PLAY_PROBABILITY": 0.3   # Probability of using current agent weights vs historical
+"RECENCY_BIAS_ALPHA": 0.6      # Recency bias for historical opponents (0=oldest, 0.5=uniform, 1=newest)
 "OPPONENT_SAMPLING_FREQ": 200  # Sample new opponent every N training iterations
 "MAX_CHECKPOINT_AGE": null     # Maximum age of checkpoints to consider (null = no limit)
