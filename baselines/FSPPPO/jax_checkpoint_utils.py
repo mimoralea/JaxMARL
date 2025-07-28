@@ -29,6 +29,7 @@ Future Population Training Structure:
 """
 
 import logging
+import warnings
 import jax
 import jax.numpy as jnp
 from typing import Any, Callable, Optional
@@ -44,6 +45,12 @@ logging.getLogger('orbax').setLevel(logging.ERROR)
 logging.getLogger('jax').setLevel(logging.WARNING)
 logging.getLogger('jax._src').setLevel(logging.ERROR)
 logging.getLogger('tensorstore').setLevel(logging.ERROR)
+
+# Suppress specific Orbax checkpoint warnings
+warnings.filterwarnings('ignore', 
+                       message="Couldn't find sharding info under RestoreArgs.*",
+                       category=UserWarning,
+                       module='orbax.checkpoint.type_handlers')
 
 class TrainingCheckpointCallback:
     """
