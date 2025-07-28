@@ -57,8 +57,10 @@ class CheckpointInfo:
         # Extract seed and run_id
         run_seed_dir = [p for p in path_parts if p.startswith('run_') and 'seed' in p]
         if run_seed_dir:
+            # The full directory name is the run_id (e.g., "run_20250727_234127_seed30")
+            self.run_id = run_seed_dir[0]
+            # Extract just the seed number from the end
             parts = run_seed_dir[0].split('_seed')
-            self.run_id = parts[0]
             self.seed = int(parts[1])
         
         # Extract agent_id
@@ -68,11 +70,18 @@ class CheckpointInfo:
 
 
 class OpponentSampler:
-    """
-    Handles opponent sampling for Fictitious Self-Play PPO.
+    """Handles opponent sampling from historical checkpoints with recency bias.
     
-    Combines self-play (current weights) with historical opponent sampling
-    using recency-biased selection from saved checkpoints.
+    This class implements recency-biased opponent sampling for TRUE SELF-PLAY ONLY.
+    
+    IMPORTANT: This is NOT population-based training or cross-seed sampling.
+    Each seed samples ONLY from its own historical checkpoints within the current run:
+    - NO cross-seed sampling (seed0 cannot sample from seed1's history)
+    - NO cross-run sampling (current run cannot sample from previous runs)
+    - Each seed maintains its own independent self-play history
+    
+    This ensures true Fictitious Self-Play where each agent learns against
+    its own past versions, not against other agents or external populations.
     """
     
     def __init__(self, 
@@ -108,25 +117,29 @@ class OpponentSampler:
         # Checkpoint manager for loading
         self.checkpoint_manager = None
     
-    def discover_available_checkpoints(self, 
-                                     current_run_id: str,
-                                     current_seed: int) -> List[CheckpointInfo]:
-        """
-        Discover available opponent checkpoints from the current run only.
+    def discover_available_checkpoints(self, current_run_id, current_seed):
+        """Discover available opponent checkpoints with recency bias filtering.
+        
+        SELF-PLAY ONLY: This method discovers checkpoints ONLY from the current
+        seed's own history within the current run. It explicitly filters out:
+        - Checkpoints from other seeds (no cross-seed sampling)
+        - Checkpoints from other runs (no cross-run sampling)
+        
+        This ensures true Fictitious Self-Play behavior.
         
         Args:
-            current_run_id: Current training run ID (e.g., "run_20250718_145204")
-            current_seed: Current training seed
+            current_run_id: ID of the current training run
+            current_seed: Seed of the current training agent
             
         Returns:
-            List of available checkpoint information from current run
+            List of CheckpointInfo objects from current seed only, sorted by recency bias
         """
         checkpoints = []
         
-        # Search pattern: checkpoints/fspppo/{current_run_id}_seed{current_seed}/main_agent/step_*/
+        # Search pattern: checkpoints/fspppo/{current_run_id}/main_agent/step_*/
         # This ensures we only sample from the current run's checkpoints
-        run_seed_dir = f"{current_run_id}_seed{current_seed}"
-        search_pattern = str(self.checkpoint_base_dir / "fspppo" / run_seed_dir / "main_agent" / "step_*")
+        # Note: current_run_id already includes the seed (e.g., "run_20250727_234127_seed30")
+        search_pattern = str(self.checkpoint_base_dir / "fspppo" / current_run_id / "main_agent" / "step_*")
         
         for checkpoint_path in glob.glob(search_pattern):
             if os.path.isdir(checkpoint_path):
@@ -144,7 +157,7 @@ class OpponentSampler:
                 except Exception as e:
                     print(f"Warning: Could not parse checkpoint path {checkpoint_path}: {e}")
                     continue
-        
+            
         # Sort by update step (oldest first)
         checkpoints.sort(key=lambda x: x.update_step)
         
@@ -233,15 +246,32 @@ class OpponentSampler:
             )
         
         try:
-            # Load checkpoint
-            loaded_state = self.checkpoint_manager.load_checkpoint(
-                checkpoint_path=checkpoint_info.path
+            # Create abstract parameters for loading
+            from .jax_checkpoint_utils import create_abstract_train_state
+            from jaxmarl import make
+            from .fspppo_ff_mpe import ActorCritic
+            
+            # Create environment and network for abstract params
+            env = make("MPE_simple_sumo_v3")
+            network = ActorCritic(env.action_space(env.agents[0]).n, activation="tanh")
+            
+            # Create abstract train state
+            abstract_train_state = create_abstract_train_state(
+                {"ACTIVATION": "tanh", "LR": 1e-3, "ANNEAL_LR": False, "MAX_GRAD_NORM": 0.5},
+                env, network
             )
             
-            if loaded_state is None:
+            # Load checkpoint using correct API (Orbax requires absolute paths)
+            import os
+            absolute_checkpoint_path = os.path.abspath(checkpoint_info.path)
+            loaded_params = self.checkpoint_manager.load_checkpoint(
+                absolute_checkpoint_path, abstract_train_state.params
+            )
+            
+            if loaded_params is None:
                 raise ValueError(f"Failed to load checkpoint from {checkpoint_info.path}")
             
-            return loaded_state['params']
+            return loaded_params
             
         except Exception as e:
             print(f"Error loading opponent checkpoint {checkpoint_info.path}: {e}")
