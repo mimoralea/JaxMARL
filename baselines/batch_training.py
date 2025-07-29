@@ -42,19 +42,20 @@ def run_algorithm_training(algorithm: str, log_file: Optional[str] = None) -> bo
     print(f"🚀 Starting {algorithm} Training")
     print(f"{'='*60}")
     
-    # Map algorithms to their training scripts and standardized configs
+    # Map algorithms to their training scripts and actual configs
+    # Use renamed Orbax-based training scripts (train.py)
     training_configs = {
         "IPPO": {
-            "script": "baselines.IPPO.ippo_ff_mpe",
-            "config_name": "ippo_batch_training"
+            "script": "baselines.IPPO.train",  # Renamed Orbax-based script
+            "config_name": "ippo_ff_mpe"
         },
         "SPPPO": {
-            "script": "baselines.SPPPO.spppo_ff_mpe", 
-            "config_name": "spppo_batch_training"
+            "script": "baselines.SPPPO.train",  # Renamed Orbax-based script
+            "config_name": "spppo_ff_mpe"
         },
         "FSPPPO": {
-            "script": "baselines.FSPPPO.fspppo_ff_mpe",
-            "config_name": "fspppo_batch_training"
+            "script": "baselines.FSPPPO.train",  # Renamed Orbax-based script
+            "config_name": "fspppo_ff_mpe"
         },
     }
     
@@ -115,10 +116,11 @@ def discover_recent_checkpoints(algorithm: str, hours_back: int = 2) -> List[str
     
     # Checkpoint discovery patterns for different algorithms
     # All follow: checkpoints/{algorithm}/run_*_seed*/{agent_type}/{checkpoint_files}
+    # Updated for standardized structure: main/opponent agent folders
     patterns = {
-        "IPPO": "checkpoints/ippo/run_*_seed*/agent_*/*/",  # Two agents: agent_0, agent_1
-        "SPPPO": "checkpoints/spppo/run_*_seed*/shared_agent/*/",  # One shared agent
-        "FSPPPO": "checkpoints/fspppo/run_*_seed*/main_agent/step_*/",  # One main agent
+        "IPPO": "checkpoints/ippo/run_*_seed*/main/step_*/",  # Main agent checkpoints
+        "SPPPO": "checkpoints/spppo/run_*_seed*/main/step_*/",  # Main agent checkpoints
+        "FSPPPO": "checkpoints/fspppo/run_*_seed*/main/step_*/",  # Main agent checkpoints
     }
     
     pattern = patterns.get(algorithm, "")

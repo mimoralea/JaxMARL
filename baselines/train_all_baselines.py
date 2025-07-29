@@ -129,15 +129,15 @@ def run_training(
     # Determine the training script path (use standalone training scripts)
     script_configs = {
         "IPPO": {
-            "script": "baselines.IPPO.train_ippo",
+            "script": "baselines.IPPO.train",
             "standalone": True  # Uses internal config, no external config needed
         },
         "SPPPO": {
-            "script": "baselines.SPPPO.train_spppo",
+            "script": "baselines.SPPPO.train",
             "standalone": True  # Uses internal config, no external config needed
         },
         "FSPPPO": {
-            "script": "baselines.FSPPPO.train_fspppo",
+            "script": "baselines.FSPPPO.train",
             "standalone": True  # Uses internal config, no external config needed
         },
     }
