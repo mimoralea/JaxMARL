@@ -198,10 +198,14 @@ def run_training(
 def check_checkpoints(algorithm: str, run_timestamp: str) -> List[str]:
     """Check what checkpoints were created for an algorithm."""
     
+    # Use flexible timestamp matching since individual training scripts
+    # may create checkpoints with slightly different timestamps
+    today = run_timestamp[:8]  # Extract YYYYMMDD part
+    
     checkpoint_patterns = {
-        "IPPO": f"checkpoints/ippo/run_{run_timestamp}_seed*/agent_*/*/",
-        "SPPPO": f"checkpoints/spppo/run_{run_timestamp}_seed*/*/",
-        "FSPPPO": f"checkpoints/fspppo/run_{run_timestamp}_seed*/main_agent/step_*/",
+        "IPPO": f"checkpoints/ippo/run_{today}_*_seed*/main/*/",
+        "SPPPO": f"checkpoints/spppo/run_{today}_*_seed*/main/*/",
+        "FSPPPO": f"checkpoints/fspppo/run_{today}_*_seed*/main/*/",
     }
     
     import glob
