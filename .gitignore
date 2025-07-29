@@ -21,9 +21,9 @@ checkpoints/
 
 # Batch training and evaluation logs
 batch_training_logs/
-demo_evaluation/
 
 # Temporary test directories
+test_*/
 test_training/
 test_training_v2/
 test_training_v3/
