@@ -32,8 +32,11 @@ from omegaconf import OmegaConf
 import wandb
 
 # Configure logging levels to reduce verbose output
-logging.getLogger("absl").setLevel(logging.ERROR)
-logging.getLogger("orbax").setLevel(logging.ERROR)
+logging.getLogger("absl").setLevel(logging.CRITICAL)
+logging.getLogger("orbax").setLevel(logging.CRITICAL)
+# Suppress specific Orbax checkpoint manager warnings
+import warnings
+warnings.filterwarnings("ignore", message=".*CheckpointManager.*asynchronous.*")
 logging.getLogger("jax").setLevel(logging.WARNING)
 logging.getLogger("jax._src").setLevel(logging.ERROR)
 logging.getLogger("tensorstore").setLevel(logging.ERROR)
@@ -482,12 +485,10 @@ def main(config):
     rng = jax.random.PRNGKey(config["SEED"])
     rngs = jax.random.split(rng, config["NUM_SEEDS"])
 
-    # Setup checkpoint management
-    checkpoint_enabled = config.get("CHECKPOINT_FREQ", 0) > 0
+    # Setup checkpoint management (end-only for speed)
+    checkpoint_enabled = config.get("SAVE_AT_END", True)
     if checkpoint_enabled:
-        print(
-            f"Checkpoint management enabled: save every {config['CHECKPOINT_FREQ']} iterations, save at end: {config['SAVE_AT_END']}"
-        )
+        print("Checkpoint management enabled: save at end only (for speed)")
 
         # Generate base run ID for this training session
         import datetime
@@ -503,11 +504,11 @@ def main(config):
                 run_id=base_run_id,
                 seed=seed_idx,
                 max_to_keep=config.get("MAX_CHECKPOINTS_TO_KEEP", 10),
-                agent_names=["agent_0", "agent_1"],
+                agent_names=["main", "opponent"],
             )
             callback = IPPOCheckpointCallback(
                 checkpoint_manager=manager,
-                save_frequency=config["CHECKPOINT_FREQ"],
+                save_frequency=999999,  # Large number to disable intermediate saves
                 save_at_end=config["SAVE_AT_END"],
             )
             checkpoint_managers.append(manager)

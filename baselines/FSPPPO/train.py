@@ -201,7 +201,7 @@ def make_train(config):
         checkpoint_freq = config.get("CHECKPOINT_FREQ", 100)
         max_checkpoints = config.get("MAX_CHECKPOINTS", 10)
         checkpoint_base_dir = config.get("CHECKPOINT_BASE_DIR", "checkpoints")
-        agent_id = config.get("AGENT_ID", "main_agent")
+        agent_id = config.get("AGENT_ID", "main")
 
         # OPPONENT SAMPLING DISABLED FOR NOW
         # TODO: Implement opponent sampling outside JIT compilation
@@ -569,7 +569,7 @@ def make_train_with_opponent_sampling(config):
         # Save checkpoint if needed
         if checkpoint_manager is not None and current_iteration % checkpoint_freq == 0:
             train_state = current_runner_state[0]  # Extract train_state from runner_state
-            agent_id = config.get("AGENT_ID", "main_agent")
+            agent_id = config.get("AGENT_ID", "main")
             checkpoint_manager.save_checkpoint(train_state.params, current_iteration, run_id, agent_id)
             print(f"  - Saved checkpoint at iteration {current_iteration}")
         
@@ -615,7 +615,7 @@ def make_train_with_opponent_sampling(config):
             # Save checkpoint if needed
             if checkpoint_manager is not None and current_iteration % checkpoint_freq == 0:
                 train_state = current_runner_state[0]  # Extract train_state from runner_state
-                agent_id = config.get("AGENT_ID", "main_agent")
+                agent_id = config.get("AGENT_ID", "main")
                 checkpoint_manager.save_checkpoint(train_state.params, current_iteration, run_id, agent_id)
                 print(f"  - Saved checkpoint at iteration {current_iteration}")
         
@@ -773,7 +773,7 @@ def make_parallel_train_with_opponent_sampling(config):
                 
                 # Use consistent run_id for this seed
                 run_id = seed_run_ids[seed_idx]
-                agent_id = config.get("AGENT_ID", "main_agent")
+                agent_id = config.get("AGENT_ID", "main")
                 
                 # Extract training state for this seed
                 seed_train_state = jax.tree_util.tree_map(lambda x: x[seed_idx], current_runner_states[0])
