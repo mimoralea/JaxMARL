@@ -11,7 +11,6 @@ import time
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
 
-import jax
 import orbax.checkpoint as ocp
 from flax.training.train_state import TrainState
 
@@ -28,8 +27,10 @@ class SPPPOCheckpointManager:
         """Initialize checkpoint manager.
 
         Args:
-            checkpoint_dir: Base directory for checkpoints (e.g., "checkpoints/spppo/run_xyz_seed0")
-            max_to_keep: Maximum number of checkpoints to keep (None = keep all)
+            checkpoint_dir: Base directory for checkpoints
+                (e.g., "checkpoints/spppo/run_xyz_seed0")
+            max_to_keep: Maximum number of checkpoints to keep
+                (None = keep all)
             agent_name: Name of the agent directory (default: "main")
         """
         self.checkpoint_dir = Path(
@@ -79,7 +80,8 @@ class SPPPOCheckpointManager:
             {
                 "step": step,
                 "timestamp": time.time(),
-                # Note: 'algorithm' and 'agent_type' strings removed for StandardCheckpointer compatibility
+                # Note: 'algorithm' and 'agent_type' strings removed for
+                # StandardCheckpointer compatibility
             }
         )
 
@@ -91,13 +93,14 @@ class SPPPOCheckpointManager:
 
         # Convert step to int to handle float values from JAX
         step_int = int(step)
-        
+
         # Orbax creates directory with just the step number (no step_ prefix)
         actual_checkpoint_path = self.agent_dir / str(step_int)
-        
+
         # Log the actual checkpoint path that Orbax will create
-        print(f"[SPPPO] Saving main checkpoint to: {actual_checkpoint_path.resolve()}")
-        
+        print(f"[SPPPO] Saving main checkpoint to: "
+              f"{actual_checkpoint_path.resolve()}")
+
         self.manager.save(step_int, save_args)
         return str(actual_checkpoint_path.resolve())
 
@@ -262,9 +265,7 @@ class SPPPOCheckpointCallback:
         if should_save and step not in self.saved_steps:
             metadata = {
                 "training_step": step,
-                "is_final": int(
-                    is_final
-                ),  # Convert bool to int for StandardCheckpointer
+                "is_final": int(is_final),  # Convert bool to int
                 # Note: 'algorithm' string removed for StandardCheckpointer compatibility
             }
 

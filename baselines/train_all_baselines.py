@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Sequential Training Script for All Baseline Algorithms.
 
-This script trains IPPO, SPPPO, and FSPPPO sequentially with consistent configurations
+This script trains IPPO, SPPPO, and FSPPPO sequentially with consistent
+configurations
 to generate fresh checkpoints for comprehensive tournament evaluation.
 
 Features:
@@ -39,7 +40,7 @@ def create_training_config(
     quick_test: bool = False
 ) -> Dict:
     """Create training configuration for specific algorithm."""
-    
+
     # Base configuration for all algorithms
     config = {
         "ENV_NAME": "MPE_simple_sumo_v3",
@@ -47,7 +48,7 @@ def create_training_config(
         "ACTIVATION": "tanh",
         "SEED": 42,
         "NUM_SEEDS": 5,  # Multiple seeds for statistical robustness
-        
+
         # Training parameters
         "LR": 2.5e-4,
         "ANNEAL_LR": True,
@@ -61,21 +62,21 @@ def create_training_config(
         "VF_COEF": 0.5,
         "ENT_COEF": 0.01,
         "MAX_GRAD_NORM": 0.5,
-        
+
         # Checkpoint configuration
         "CHECKPOINT_FREQ": 100,  # Save every 100 iterations
         "SAVE_AT_END": True,
         "MAX_CHECKPOINTS_TO_KEEP": 20,
-        
+
         # Logging
         "WANDB_MODE": "disabled",
         "LOG_EVERY": 10,
     }
-    
+
     # Override with base config if provided
     if base_config:
         config.update(base_config)
-    
+
     # Quick test configuration
     if quick_test:
         config.update({
@@ -90,7 +91,7 @@ def create_training_config(
         config.update({
             "TOTAL_TIMESTEPS": 2e6,  # 2M timesteps (~976 iterations)
         })
-    
+
     # Algorithm-specific configurations
     if algorithm == "IPPO":
         config.update({
@@ -103,7 +104,7 @@ def create_training_config(
             "SELF_PLAY_PROBABILITY": 0.3,
             "RECENCY_BIAS_ALPHA": 0.6,
         })
-    
+
     return config
 
 
@@ -120,12 +121,12 @@ def run_training(
     log_file: Optional[str] = None
 ) -> bool:
     """Run training for specific algorithm."""
-    
-    print(f"\n{'='*60}")
-    print(f"🚀 Starting {algorithm} Training")
-    print(f"{'='*60}")
-    print(f"Log file: {log_file or 'stdout'}")
-    
+
+    print("\n{'='*60}")
+    print("🚀 Starting {algorithm} Training")
+    print("{'='*60}")
+    print("Log file: {log_file or 'stdout'}")
+
     # Determine the training script path (use standalone training scripts)
     script_configs = {
         "IPPO": {
@@ -141,22 +142,22 @@ def run_training(
             "standalone": True  # Uses internal config, no external config needed
         },
     }
-    
+
     if algorithm not in script_configs:
-        print(f"❌ Unknown algorithm: {algorithm}")
+        print("❌ Unknown algorithm: {algorithm}")
         return False
-    
+
     script_info = script_configs[algorithm]
-    
+
     # Build command (standalone scripts don't need external config files)
     cmd = ["python", "-m", script_info["script"]]
-    
-    print(f"Command: {' '.join(cmd)}")
-    print(f"Note: {algorithm} uses standalone training script with internal config")
-    
+
+    print("Command: {' '.join(cmd)}")
+    print("Note: {algorithm} uses standalone training script with internal config")
+
     # Run training
     start_time = time.time()
-    
+
     try:
         if log_file:
             with open(log_file, 'w') as f:
@@ -173,24 +174,24 @@ def run_training(
                 text=True,
                 cwd="/share/code/src/JaxMARL"
             )
-        
+
         end_time = time.time()
         duration = end_time - start_time
-        
+
         # No cleanup needed for standalone scripts
-        
+
         if result.returncode == 0:
-            print(f"✅ {algorithm} training completed successfully!")
-            print(f"⏱️  Duration: {duration:.1f} seconds ({duration/60:.1f} minutes)")
+            print("✅ {algorithm} training completed successfully!")
+            print("⏱️  Duration: {duration:.1f} seconds ({duration/60:.1f} minutes)")
             return True
         else:
-            print(f"❌ {algorithm} training failed with return code {result.returncode}")
+            print("❌ {algorithm} training failed with return code {result.returncode}")
             if log_file:
-                print(f"Check log file for details: {log_file}")
+                print("Check log file for details: {log_file}")
             return False
-            
+
     except Exception as e:
-        print(f"❌ Error running {algorithm} training: {e}")
+        print("❌ Error running {algorithm} training: {e}")
         # No cleanup needed for standalone scripts
         return False
 
@@ -200,15 +201,15 @@ def find_recent_run_ids(algorithm: str, since_time: str) -> List[str]:
     import glob
     from pathlib import Path
     import os
-    
+
     # Find all run directories for this algorithm
     pattern = f"checkpoints/{algorithm.lower()}/run_*_seed*"
     all_runs = glob.glob(pattern)
-    
+
     # Filter by creation time (since batch training started)
     recent_runs = []
     since_timestamp = float(since_time)
-    
+
     for run_path in all_runs:
         try:
             # Check if directory was created after batch training started
@@ -221,23 +222,24 @@ def find_recent_run_ids(algorithm: str, since_time: str) -> List[str]:
                     recent_runs.append(run_id)
         except (OSError, ValueError):
             continue
-    
+
     return sorted(recent_runs)
+
 
 def check_checkpoints_for_run(algorithm: str, run_id: str) -> List[str]:
     """Check what checkpoints were created for a specific run ID."""
     import glob
-    
+
     # Use the specific run_id to find checkpoints
     checkpoint_patterns = {
         "IPPO": f"checkpoints/ippo/{run_id}_seed*/main/*/",
         "SPPPO": f"checkpoints/spppo/{run_id}_seed*/main/*/",
         "FSPPPO": f"checkpoints/fspppo/{run_id}_seed*/main/*/",
     }
-    
+
     pattern = checkpoint_patterns.get(algorithm, "")
     checkpoints = glob.glob(pattern)
-    
+
     return sorted(checkpoints)
 
 
@@ -245,41 +247,41 @@ def main():
     parser = argparse.ArgumentParser(description="Train all baseline algorithms sequentially")
     parser.add_argument("--config", help="Base configuration YAML file")
     parser.add_argument("--quick-test", action="store_true", help="Run quick test with reduced parameters")
-    parser.add_argument("--algorithms", nargs="+", default=["IPPO", "SPPPO", "FSPPPO"], 
+    parser.add_argument("--algorithms", nargs="+", default=["IPPO", "SPPPO", "FSPPPO"],
                        help="Algorithms to train")
     parser.add_argument("--output-dir", default="training_runs", help="Output directory for configs and logs")
     parser.add_argument("--skip-training", action="store_true", help="Skip training, just check existing checkpoints")
-    
+
     args = parser.parse_args()
-    
+
     # Load base configuration if provided
     base_config = {}
     if args.config:
         with open(args.config, 'r') as f:
             base_config = yaml.safe_load(f)
-    
+
     # Create output directory
     output_dir = Path(args.output_dir)
     output_dir.mkdir(exist_ok=True)
-    
+
     # Generate run timestamp
     run_timestamp = get_timestamp()
-    
+
     print("🎯 Sequential Baseline Algorithm Training")
     print("=" * 60)
-    print(f"Run timestamp: {run_timestamp}")
-    print(f"Algorithms: {args.algorithms}")
-    print(f"Quick test mode: {args.quick_test}")
-    print(f"Output directory: {output_dir}")
-    
+    print("Run timestamp: {run_timestamp}")
+    print("Algorithms: {args.algorithms}")
+    print("Quick test mode: {args.quick_test}")
+    print("Output directory: {output_dir}")
+
     # Training results
     results = {}
-    
+
     if not args.skip_training:
         # Train each algorithm sequentially
         for algorithm in args.algorithms:
-            print(f"\n🔄 Preparing {algorithm} training...")
-            
+            print("\n🔄 Preparing {algorithm} training...")
+
             # Create algorithm-specific config
             config = create_training_config(
                 algorithm=algorithm,
@@ -287,14 +289,14 @@ def main():
                 run_timestamp=run_timestamp,
                 quick_test=args.quick_test
             )
-            
+
             # Save config file for reference
             config_file = output_dir / f"{algorithm.lower()}_config_{run_timestamp}.yaml"
             save_config_file(config, str(config_file))
-            
+
             # Set up log file
             log_file = output_dir / f"{algorithm.lower()}_training_{run_timestamp}.log"
-            
+
             # Run training
             success = run_training(
                 algorithm=algorithm,
@@ -302,78 +304,78 @@ def main():
                 run_timestamp=run_timestamp,
                 log_file=str(log_file)
             )
-            
+
             results[algorithm] = {
                 "success": success,
                 "config_file": str(config_file),
                 "log_file": str(log_file),
             }
-            
+
             if not success:
-                print(f"⚠️  {algorithm} training failed, continuing with next algorithm...")
-    
+                print("⚠️  {algorithm} training failed, continuing with next algorithm...")
+
     # Check generated checkpoints using actual run IDs created during training
-    print(f"\n📊 Checkpoint Summary")
+    print("\n📊 Checkpoint Summary")
     print("=" * 40)
-    
+
     # Record batch training start time for filtering
     batch_start_time = str(time.time() - 600)  # 10 minutes ago to be safe
-    
+
     for algorithm in args.algorithms:
         # Find run IDs created during this batch training session
         recent_run_ids = find_recent_run_ids(algorithm, batch_start_time)
-        
+
         total_checkpoints = 0
         for run_id in recent_run_ids:
             checkpoints = check_checkpoints_for_run(algorithm, run_id)
             total_checkpoints += len(checkpoints)
-        
-        print(f"📁 {algorithm} checkpoints found: {total_checkpoints}")
+
+        print("📁 {algorithm} checkpoints found: {total_checkpoints}")
         if recent_run_ids:
-            print(f"   Run IDs: {', '.join(recent_run_ids)}")
+            print("   Run IDs: {', '.join(recent_run_ids)}")
             for run_id in recent_run_ids[:2]:  # Show first 2 run IDs
                 checkpoints = check_checkpoints_for_run(algorithm, run_id)
                 if checkpoints:
-                    print(f"   {run_id}: {len(checkpoints)} checkpoints")
+                    print("   {run_id}: {len(checkpoints)} checkpoints")
                     for cp in sorted(checkpoints)[:3]:  # Show first 3
-                        print(f"     {cp}")
-        
+                        print("     {cp}")
+
         if algorithm in results:
             results[algorithm]["checkpoints"] = total_checkpoints
             results[algorithm]["run_ids"] = recent_run_ids
-    
+
     # Generate summary
-    print(f"\n📋 Training Summary")
+    print("\n📋 Training Summary")
     print("=" * 40)
-    
+
     if not args.skip_training:
         for algorithm, result in results.items():
             status = "✅ SUCCESS" if result["success"] else "❌ FAILED"
             checkpoint_count = result.get("checkpoints", 0)
-            print(f"{algorithm:8} {status:10} {checkpoint_count:3d} checkpoints")
-    
+            print("{algorithm:8} {status:10} {checkpoint_count:3d} checkpoints")
+
     # Generate next steps
-    print(f"\n🎯 Next Steps")
+    print("\n🎯 Next Steps")
     print("=" * 30)
     print("1. Run tournament evaluation:")
-    print(f"   python -m baselines.tournament_eval --config tournament_config.yaml")
+    print("   python -m baselines.tournament_eval --config tournament_config.yaml")
     print("\n2. Update tournament_config.yaml with new checkpoint paths:")
-    
+
     for algorithm in args.algorithms:
         # Find run IDs created during this batch training session
         recent_run_ids = find_recent_run_ids(algorithm, batch_start_time)
-        
+
         all_checkpoints = []
         for run_id in recent_run_ids:
             checkpoints = check_checkpoints_for_run(algorithm, run_id)
             all_checkpoints.extend(checkpoints)
-        
+
         if all_checkpoints:
             example_checkpoint = sorted(all_checkpoints)[0]
-            print(f"   - \"{algorithm}:{example_checkpoint}\"")
-    
-    print(f"\n3. Analyze results and generate research artifacts")
-    
+            print("   - \"{algorithm}:{example_checkpoint}\"")
+
+    print("\n3. Analyze results and generate research artifacts")
+
     # Save run summary
     summary_file = output_dir / f"training_summary_{run_timestamp}.yaml"
     summary = {
@@ -382,22 +384,22 @@ def main():
         "quick_test": args.quick_test,
         "results": results,
     }
-    
+
     with open(summary_file, 'w') as f:
         yaml.dump(summary, f, default_flow_style=False, indent=2)
-    
-    print(f"\n💾 Training summary saved to: {summary_file}")
-    
+
+    print("\n💾 Training summary saved to: {summary_file}")
+
     # Exit code based on results
     if not args.skip_training:
         failed_algorithms = [alg for alg, result in results.items() if not result["success"]]
         if failed_algorithms:
-            print(f"\n⚠️  Some algorithms failed: {failed_algorithms}")
+            print("\n⚠️  Some algorithms failed: {failed_algorithms}")
             sys.exit(1)
         else:
-            print(f"\n🎉 All algorithms trained successfully!")
-    
-    print(f"\n🚀 Ready for comprehensive tournament evaluation!")
+            print("\n🎉 All algorithms trained successfully!")
+
+    print("\n🚀 Ready for comprehensive tournament evaluation!")
 
 
 if __name__ == "__main__":
