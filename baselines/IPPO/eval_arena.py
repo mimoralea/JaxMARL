@@ -345,6 +345,10 @@ def run_arena(
     use_tqdm: bool = True,
 ):
     """Run a single rollout given two policies/baselines and export a gif."""
+    # Use fixed starting positions for consistent evaluation
+    if env_name == "MPE_simple_sumo_v3":
+        env_kwargs = env_kwargs.copy()
+        env_kwargs["random_spawn"] = False
     env = jaxmarl.make(env_name, **env_kwargs)
     print(f'Created environment {env_name} with kwargs {env_kwargs}')
 

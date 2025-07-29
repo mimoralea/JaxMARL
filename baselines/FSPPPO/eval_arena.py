@@ -213,7 +213,10 @@ def run_arena(
     print(f"[arena] Green: {green}")
     print(f"[arena] Red: {red}")
     
-    # Create environment
+    # Create environment with fixed starting positions
+    if env_name == "MPE_simple_sumo_v3":
+        env_kwargs = env_kwargs.copy()
+        env_kwargs["random_spawn"] = False
     env = jaxmarl.make(env_name, **env_kwargs)
     print(f"Created environment {env_name} with kwargs {env_kwargs}")
     
