@@ -10,8 +10,8 @@ Current Structure (CORRECT):
     checkpoints/fspppo/run_xyz_seed[0-9]/agent_id/step_xxxxxx/
 
 Example:
-    checkpoints/fspppo/run_20250717_231055_seed0/main_agent/step_000012/
-    checkpoints/fspppo/run_20250717_231055_seed1/main_agent/step_000012/
+    checkpoints/fspppo/run_20250717_231055_seed0/main/step_000012/
+    checkpoints/fspppo/run_20250717_231055_seed1/main/step_000012/
 
 Why This Structure is Optimal:
 
@@ -22,7 +22,7 @@ Why This Structure is Optimal:
 
 2. **Future Population Training Support**:
    - Same seed controls both agents in training run (shared randomness)
-   - Structure: run_xyz_seed0/main_agent/ AND run_xyz_seed0/opponent_agent/
+   - Structure: run_xyz_seed0/main/ AND run_xyz_seed0/opponent/
    - Easy to load consistent agent pairs from same seed
 
 3. **Opponent Sampling Benefits**:
@@ -100,7 +100,7 @@ class FSPPPOCheckpointManager:
             / self.algorithm
             / run_id
             / agent_id
-            / f"step_{step_int:06d}"
+            / str(step_int)
         )
         return checkpoint_dir.resolve()  # Convert to absolute path
 
@@ -109,7 +109,7 @@ class FSPPPOCheckpointManager:
         params: Any,
         update_step: int,
         run_id: Optional[str] = None,
-        agent_id: str = "main_agent",
+        agent_id: str = "main",
     ) -> str:
         """
         Save checkpoint using Orbax.
@@ -131,6 +131,9 @@ class FSPPPOCheckpointManager:
 
         checkpoint_dir = self.get_checkpoint_dir(run_id, agent_id, step_int)
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+        # Log the checkpoint path before saving
+        print(f"[FSPPPO] Saving {agent_id} checkpoint to: {checkpoint_dir.resolve()}")
 
         # Save checkpoint using Orbax (force=True allows overwriting)
         self.checkpointer.save(checkpoint_dir, params, force=True)
@@ -224,7 +227,7 @@ class FSPPPOCheckpointManager:
         return sorted(runs)
 
     def get_agent_checkpoints(
-        self, run_id: str, agent_id: str = "main_agent"
+        self, run_id: str, agent_id: str = "main"
     ) -> List[Dict]:
         """Get all checkpoints for a specific agent in a run."""
         agent_dir = self.base_dir / self.algorithm / run_id / agent_id
@@ -241,7 +244,7 @@ class FSPPPOCheckpointManager:
     def cleanup_old_checkpoints(
         self,
         run_id: str,
-        agent_id: str = "main_agent",
+        agent_id: str = "main",
         max_checkpoints: int = 10,
     ) -> int:
         """
@@ -285,7 +288,7 @@ class FSPPPOCheckpointManager:
         return removed_count
 
     def get_latest_checkpoint(
-        self, run_id: str, agent_id: str = "main_agent"
+        self, run_id: str, agent_id: str = "main"
     ) -> Optional[Dict]:
         """Get the most recent checkpoint for an agent."""
         checkpoints = self.get_agent_checkpoints(run_id, agent_id)
@@ -302,7 +305,7 @@ class FSPPPOCheckpointManager:
         return None
 
     def print_checkpoint_summary(
-        self, run_id: str, agent_id: str = "main_agent"
+        self, run_id: str, agent_id: str = "main"
     ):
         """Print a summary of checkpoints for debugging."""
         checkpoints = self.get_agent_checkpoints(run_id, agent_id)
@@ -332,7 +335,7 @@ def save_checkpoint(
     update_step: int,
     algorithm: str = "fspppo",
     run_id: Optional[str] = None,
-    agent_id: str = "main_agent",
+    agent_id: str = "main",
     base_dir: str = "checkpoints",
 ) -> str:
     """
@@ -362,7 +365,7 @@ def load_checkpoint(checkpoint_dir: str, abstract_params: Any) -> Any:
 def cleanup_old_checkpoints(
     algorithm: str = "fspppo",
     run_id: str = None,
-    agent_id: str = "main_agent",
+    agent_id: str = "main",
     max_checkpoints: int = 10,
     base_dir: str = "checkpoints",
 ) -> int:
@@ -386,7 +389,7 @@ def cleanup_old_checkpoints(
 def get_agent_checkpoints(
     algorithm: str = "fspppo",
     run_id: str = None,
-    agent_id: str = "main_agent",
+    agent_id: str = "main",
     base_dir: str = "checkpoints",
 ) -> List[Dict]:
     """Get all checkpoints for a specific agent in a run (convenience function)."""

@@ -39,15 +39,15 @@
 "WANDB_MODE" : "disabled"
 
 # Checkpoint Management
-"CHECKPOINT_FREQ": 50         # Save checkpoint every N training iterations (more frequent than opponent sampling)
+"CHECKPOINT_FREQ": 250         # Save checkpoint every N training iterations (more frequent than opponent sampling)
 "SAVE_CHECKPOINT_AT_END": true # Save final checkpoint at end of training
 "MAX_CHECKPOINTS": 10         # Keep last N checkpoints per agent
 "CHECKPOINT_BASE_DIR": "checkpoints"  # Base directory for checkpoints
 "RUN_ID": null                # Auto-generate if null
-"AGENT_ID": "main_agent"      # Agent identifier
+"AGENT_ID": "main"           # Agent identifier (standardized)
 
 # Opponent Sampling (Fictitious Self-Play)
 "SELF_PLAY_PROBABILITY": 0.3   # Probability of using current agent weights vs historical
 "RECENCY_BIAS_ALPHA": 0.6      # Recency bias for historical opponents (0=oldest, 0.5=uniform, 1=newest)
-"OPPONENT_SAMPLING_FREQ": 200  # Sample new opponent every N training iterations
+"OPPONENT_SAMPLING_FREQ": 250  # Sample new opponent every N training iterations
 "MAX_CHECKPOINT_AGE": null     # Maximum age of checkpoints to consider (null = no limit)

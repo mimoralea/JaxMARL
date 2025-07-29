@@ -37,7 +37,7 @@ class CheckpointInfo:
     update_step: int
     seed: int
     run_id: str
-    agent_id: str = "main_agent"
+    agent_id: str = "main"
     
     def __post_init__(self):
         """Extract metadata from checkpoint path if not provided."""
@@ -46,7 +46,7 @@ class CheckpointInfo:
     
     def _parse_path(self):
         """Parse checkpoint path to extract metadata."""
-        # Expected path: checkpoints/fspppo/run_xyz_seed0/main_agent/step_000123/
+        # Expected path: checkpoints/fspppo/run_xyz_seed0/main/000123/
         path_parts = Path(self.path).parts
         
         # Extract step number
@@ -136,10 +136,10 @@ class OpponentSampler:
         """
         checkpoints = []
         
-        # Search pattern: checkpoints/fspppo/{current_run_id}/main_agent/step_*/
+        # Search pattern: checkpoints/fspppo/{current_run_id}/main/*/
         # This ensures we only sample from the current run's checkpoints
         # Note: current_run_id already includes the seed (e.g., "run_20250727_234127_seed30")
-        search_pattern = str(self.checkpoint_base_dir / "fspppo" / current_run_id / "main_agent" / "step_*")
+        search_pattern = str(self.checkpoint_base_dir / "fspppo" / current_run_id / "main" / "*")
         
         for checkpoint_path in glob.glob(search_pattern):
             if os.path.isdir(checkpoint_path):
@@ -227,7 +227,15 @@ class OpponentSampler:
         
         # Sample checkpoint
         selected_idx = jrandom.choice(key, len(available_checkpoints), p=weights)
-        return available_checkpoints[selected_idx]
+        selected_checkpoint = available_checkpoints[selected_idx]
+        
+        # Log sampling decision
+        print(f"🎯 FSPPPO Opponent Sampling:")
+        print(f"   Available checkpoints: {len(available_checkpoints)}")
+        print(f"   Selected: step_{selected_checkpoint.update_step} (idx {selected_idx})")
+        print(f"   Sampling weights: {weights.round(3).tolist()}")
+        
+        return selected_checkpoint
     
     def load_opponent_parameters(self, checkpoint_info: CheckpointInfo) -> Dict[str, Any]:
         """
@@ -314,7 +322,8 @@ class OpponentSampler:
         use_self_play = jrandom.uniform(key1) < self.self_play_probability
         
         if use_self_play:
-            # Use current agent weights (self-play)
+            # Use current agent parameters (self-play)
+            print(f"🔄 FSPPPO: Using SELF-PLAY at iteration {current_iteration}")
             self.current_opponent_params = current_params
             self.current_opponent_info = f"self_play_iter_{current_iteration}"
             return current_params, "self_play"
@@ -351,6 +360,8 @@ class OpponentSampler:
                 return current_params, "self_play"
             
             # Success - using historical opponent
+            print(f"✅ FSPPPO: Loaded HISTORICAL opponent from step_{selected_checkpoint.update_step}")
+            print(f"   Checkpoint path: {selected_checkpoint.path}")
             self.current_opponent_params = opponent_params
             self.current_opponent_info = f"historical_step_{selected_checkpoint.update_step}"
             return opponent_params, "historical"

@@ -29,11 +29,11 @@ class IPPOCheckpointManager:
         Args:
             checkpoint_dir: Base directory for checkpoints (e.g., "checkpoints/ippo/run_xyz_seed0")
             max_to_keep: Maximum number of checkpoints to keep (None = keep all)
-            agent_names: Names of the agents (default: ["agent_0", "agent_1"])
+            agent_names: Names of the agents (default: ["main", "opponent"])
         """
         # Convert to absolute path to satisfy Orbax requirements
         self.checkpoint_dir = Path(checkpoint_dir).resolve()
-        self.agent_names = agent_names or ["agent_0", "agent_1"]
+        self.agent_names = agent_names or ["main", "opponent"]
         self.max_to_keep = max_to_keep
 
         # Create agent directories and managers
@@ -98,7 +98,7 @@ class IPPOCheckpointManager:
             # Convert metadata to supported types (no strings)
             clean_metadata = {
                 "step": step,
-                "agent_id": 0 if agent_name == "agent_0" else 1,
+                "agent_id": 0 if agent_name == "main" else 1,
                 "training_step": metadata.get("training_step", step),
                 "is_final": int(metadata.get("is_final", False)),
             }
@@ -108,16 +108,17 @@ class IPPOCheckpointManager:
                 "metadata": clean_metadata,
             }
 
-            self.managers[agent_name].save(step, save_args)
-
             # Convert step to int to handle float values from JAX
             step_int = int(step)
-            checkpoint_path = (
-                self.agent_dirs[agent_name] / f"step_{step_int:06d}"
-            )
-            # Ensure absolute path for Orbax
-            checkpoint_path = checkpoint_path.resolve()
-            checkpoint_paths[agent_name] = str(checkpoint_path)
+        
+            # Orbax creates directory with just the step number (no step_ prefix)
+            actual_checkpoint_path = self.agent_dirs[agent_name] / str(step_int)
+        
+            # Log the actual checkpoint path that Orbax will create
+            print(f"[IPPO] Saving {agent_name} checkpoint to: {actual_checkpoint_path.resolve()}")
+        
+            self.managers[agent_name].save(step_int, save_args)
+            checkpoint_paths[agent_name] = str(actual_checkpoint_path.resolve())
 
         return checkpoint_paths
 
@@ -255,7 +256,7 @@ def create_ippo_checkpoint_manager(
         seed: Seed number
         base_dir: Base checkpoint directory
         max_to_keep: Maximum checkpoints to keep
-        agent_names: Names of the agents (default: ["agent_0", "agent_1"])
+        agent_names: Names of the agents (default: ["main", "opponent"])
 
     Returns:
         Configured IPPOCheckpointManager
@@ -264,7 +265,7 @@ def create_ippo_checkpoint_manager(
     return IPPOCheckpointManager(
         checkpoint_dir=checkpoint_dir,
         max_to_keep=max_to_keep,
-        agent_names=agent_names or ["agent_0", "agent_1"],
+        agent_names=agent_names or ["main", "opponent"],
     )
 
 
@@ -342,8 +343,8 @@ class IPPOCheckpointCallback:
         """
         # Extract individual agent states from the combined train_state
         train_states = {
-            "agent_0": train_state.replace(params=train_state.params[0]),
-            "agent_1": train_state.replace(params=train_state.params[1]),
+            "main": train_state.replace(params=train_state.params[0]),
+            "opponent": train_state.replace(params=train_state.params[1]),
         }
 
         return self.__call__(

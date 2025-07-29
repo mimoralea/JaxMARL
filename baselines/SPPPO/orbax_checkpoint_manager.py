@@ -3,7 +3,7 @@
 Provides unified checkpoint saving/loading for SPPPO using the same structure
 as FSPPPO to enable cross-algorithm evaluation and comparison.
 
-Structure: checkpoints/spppo/run_{run_id}_seed{X}/shared_agent/step_{step}/
+Structure: checkpoints/spppo/run_{run_id}_seed{X}/main/step_{step}/
 """
 
 import os
@@ -23,14 +23,14 @@ class SPPPOCheckpointManager:
         self,
         checkpoint_dir: str,
         max_to_keep: Optional[int] = 10,
-        agent_name: str = "shared_agent",
+        agent_name: str = "main",
     ):
         """Initialize checkpoint manager.
 
         Args:
             checkpoint_dir: Base directory for checkpoints (e.g., "checkpoints/spppo/run_xyz_seed0")
             max_to_keep: Maximum number of checkpoints to keep (None = keep all)
-            agent_name: Name of the agent directory (default: "shared_agent")
+            agent_name: Name of the agent directory (default: "main")
         """
         self.checkpoint_dir = Path(
             checkpoint_dir
@@ -89,10 +89,17 @@ class SPPPOCheckpointManager:
             "metadata": metadata,
         }
 
-        self.manager.save(step, save_args)
-
-        checkpoint_path = self.agent_dir / f"step_{int(step):06d}"
-        return str(checkpoint_path)
+        # Convert step to int to handle float values from JAX
+        step_int = int(step)
+        
+        # Orbax creates directory with just the step number (no step_ prefix)
+        actual_checkpoint_path = self.agent_dir / str(step_int)
+        
+        # Log the actual checkpoint path that Orbax will create
+        print(f"[SPPPO] Saving main checkpoint to: {actual_checkpoint_path.resolve()}")
+        
+        self.manager.save(step_int, save_args)
+        return str(actual_checkpoint_path.resolve())
 
     def load_checkpoint(self, step: int) -> Tuple[TrainState, Dict[str, Any]]:
         """Load a checkpoint from the given step.
@@ -207,7 +214,7 @@ def create_spppo_checkpoint_manager(
     return SPPPOCheckpointManager(
         checkpoint_dir=checkpoint_dir,
         max_to_keep=max_to_keep,
-        agent_name="shared_agent",
+        agent_name="main",
     )
 
 
