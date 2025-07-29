@@ -195,31 +195,50 @@ def run_training(
         return False
 
 
-def check_checkpoints(algorithm: str, run_timestamp: str) -> List[str]:
-    """Check what checkpoints were created for an algorithm."""
+def find_recent_run_ids(algorithm: str, since_time: str) -> List[str]:
+    """Find run IDs created since a specific time for an algorithm."""
+    import glob
+    from pathlib import Path
+    import os
     
-    # Use flexible timestamp matching since individual training scripts
-    # may create checkpoints with slightly different timestamps
-    today = run_timestamp[:8]  # Extract YYYYMMDD part
+    # Find all run directories for this algorithm
+    pattern = f"checkpoints/{algorithm.lower()}/run_*_seed*"
+    all_runs = glob.glob(pattern)
     
+    # Filter by creation time (since batch training started)
+    recent_runs = []
+    since_timestamp = float(since_time)
+    
+    for run_path in all_runs:
+        try:
+            # Check if directory was created after batch training started
+            creation_time = os.path.getctime(run_path)
+            if creation_time >= since_timestamp:
+                # Extract run_id from path (e.g., run_20250728_233625 from run_20250728_233625_seed0)
+                run_dir = Path(run_path).name  # e.g., run_20250728_233625_seed0
+                run_id = "_".join(run_dir.split("_")[:-1])  # Remove _seedX part
+                if run_id not in recent_runs:
+                    recent_runs.append(run_id)
+        except (OSError, ValueError):
+            continue
+    
+    return sorted(recent_runs)
+
+def check_checkpoints_for_run(algorithm: str, run_id: str) -> List[str]:
+    """Check what checkpoints were created for a specific run ID."""
+    import glob
+    
+    # Use the specific run_id to find checkpoints
     checkpoint_patterns = {
-        "IPPO": f"checkpoints/ippo/run_{today}_*_seed*/main/*/",
-        "SPPPO": f"checkpoints/spppo/run_{today}_*_seed*/main/*/",
-        "FSPPPO": f"checkpoints/fspppo/run_{today}_*_seed*/main/*/",
+        "IPPO": f"checkpoints/ippo/{run_id}_seed*/main/*/",
+        "SPPPO": f"checkpoints/spppo/{run_id}_seed*/main/*/",
+        "FSPPPO": f"checkpoints/fspppo/{run_id}_seed*/main/*/",
     }
     
-    import glob
     pattern = checkpoint_patterns.get(algorithm, "")
     checkpoints = glob.glob(pattern)
     
-    print(f"📁 {algorithm} checkpoints found: {len(checkpoints)}")
-    if checkpoints:
-        for cp in sorted(checkpoints)[:5]:  # Show first 5
-            print(f"   {cp}")
-        if len(checkpoints) > 5:
-            print(f"   ... and {len(checkpoints) - 5} more")
-    
-    return checkpoints
+    return sorted(checkpoints)
 
 
 def main():
@@ -293,14 +312,35 @@ def main():
             if not success:
                 print(f"⚠️  {algorithm} training failed, continuing with next algorithm...")
     
-    # Check generated checkpoints
+    # Check generated checkpoints using actual run IDs created during training
     print(f"\n📊 Checkpoint Summary")
     print("=" * 40)
     
+    # Record batch training start time for filtering
+    batch_start_time = str(time.time() - 600)  # 10 minutes ago to be safe
+    
     for algorithm in args.algorithms:
-        checkpoints = check_checkpoints(algorithm, run_timestamp)
+        # Find run IDs created during this batch training session
+        recent_run_ids = find_recent_run_ids(algorithm, batch_start_time)
+        
+        total_checkpoints = 0
+        for run_id in recent_run_ids:
+            checkpoints = check_checkpoints_for_run(algorithm, run_id)
+            total_checkpoints += len(checkpoints)
+        
+        print(f"📁 {algorithm} checkpoints found: {total_checkpoints}")
+        if recent_run_ids:
+            print(f"   Run IDs: {', '.join(recent_run_ids)}")
+            for run_id in recent_run_ids[:2]:  # Show first 2 run IDs
+                checkpoints = check_checkpoints_for_run(algorithm, run_id)
+                if checkpoints:
+                    print(f"   {run_id}: {len(checkpoints)} checkpoints")
+                    for cp in sorted(checkpoints)[:3]:  # Show first 3
+                        print(f"     {cp}")
+        
         if algorithm in results:
-            results[algorithm]["checkpoints"] = len(checkpoints)
+            results[algorithm]["checkpoints"] = total_checkpoints
+            results[algorithm]["run_ids"] = recent_run_ids
     
     # Generate summary
     print(f"\n📋 Training Summary")
@@ -320,9 +360,16 @@ def main():
     print("\n2. Update tournament_config.yaml with new checkpoint paths:")
     
     for algorithm in args.algorithms:
-        checkpoints = check_checkpoints(algorithm, run_timestamp)
-        if checkpoints:
-            example_checkpoint = sorted(checkpoints)[0]
+        # Find run IDs created during this batch training session
+        recent_run_ids = find_recent_run_ids(algorithm, batch_start_time)
+        
+        all_checkpoints = []
+        for run_id in recent_run_ids:
+            checkpoints = check_checkpoints_for_run(algorithm, run_id)
+            all_checkpoints.extend(checkpoints)
+        
+        if all_checkpoints:
+            example_checkpoint = sorted(all_checkpoints)[0]
             print(f"   - \"{algorithm}:{example_checkpoint}\"")
     
     print(f"\n3. Analyze results and generate research artifacts")
