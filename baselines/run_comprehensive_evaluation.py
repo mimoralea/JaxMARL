@@ -108,7 +108,7 @@ def create_tournament_config(checkpoints: Dict[str, List[str]], output_file: str
     # Tournament configuration
     config = {
         "env_name": "MPE_simple_sumo_v3",
-        "env_kwargs": {"random_spawn": True},
+        "env_kwargs": {"random_spawn": False},
         
         "agents": agents,
         

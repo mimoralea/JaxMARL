@@ -16,7 +16,7 @@ Features:
 
 Usage:
     python -m baselines.tournament_eval --config tournament_config.yaml
-    python -m baselines.tournament_eval --single-match --green IPPO:checkpoints/ippo/run_xyz_seed0/agent_0/step_1000/ --red seek
+    python -m baselines.tournament_eval --single-match --green IPPO:checkpoints/ippo/run_xyz_seed0/main/step_1000/ --red seek
 """
 
 from __future__ import annotations
@@ -61,7 +61,7 @@ def load_ippo_policy(checkpoint_path: str, env, agent_name: str, activation: str
     print(f"Loading IPPO checkpoint '{checkpoint_path}' for {agent_name}")
     
     # Use direct Orbax loading for IPPO checkpoints
-    # Path format: checkpoints/ippo/run_xyz_seed0/agent_0/4882.0/
+    # Path format: checkpoints/ippo/run_xyz_seed0/main/4882.0/
     import orbax.checkpoint as ocp
     
     checkpoint_path = Path(checkpoint_path).resolve()
@@ -92,19 +92,27 @@ def load_spppo_policy(checkpoint_path: str, env, agent_name: str, activation: st
     """Load SPPPO policy from Orbax checkpoint."""
     print(f"Loading SPPPO checkpoint '{checkpoint_path}' for {agent_name}")
     
-    # Create abstract train state for loading
-    config = {
-        "LR": 2.5e-4,
-        "ANNEAL_LR": True,
-        "MAX_GRAD_NORM": 0.5,
-    }
+    # Use direct Orbax loading for SPPPO checkpoints
+    # Path format: checkpoints/spppo/run_xyz_seed0/main/4882.0/
+    import orbax.checkpoint as ocp
     
+    checkpoint_path = Path(checkpoint_path).resolve()
+    
+    # Create checkpointer
+    checkpointer = ocp.PyTreeCheckpointer()
+    
+    # Load train_state
+    train_state = checkpointer.restore(checkpoint_path / "train_state")
+    
+    # Extract parameters (train_state might be a dict or TrainState object)
+    if hasattr(train_state, 'params'):
+        params = train_state.params
+    else:
+        params = train_state['params']  # If it's a dict
+    
+    # Create network
     action_space_n = env.action_space(agent_name).n
     network = SPPPOActorCritic(action_space_n, activation=activation)
-    
-    # Create abstract train state and load checkpoint
-    abstract_train_state = create_abstract_train_state(config, env, network)
-    params = load_checkpoint_for_opponent(str(Path(checkpoint_path).resolve()), abstract_train_state)
     
     def policy(_, obs):
         pi, _ = network.apply(params, obs.flatten())
@@ -246,9 +254,9 @@ def parse_agent_spec(agent_spec: str) -> Tuple[str, str]:
     
     Format: ALGORITHM:PATH or BASELINE_NAME
     Examples:
-        - IPPO:checkpoints/ippo/run_123_seed0/agent_0/step_1000/
+        - IPPO:checkpoints/ippo/run_123_seed0/main/step_1000/
         - SPPPO:checkpoints/spppo/run_123_seed0/step_1000/
-        - FSPPPO:checkpoints/fspppo/run_123_seed0/main_agent/step_1000/
+        - FSPPPO:checkpoints/fspppo/run_123_seed0/main/step_1000/
         - seek
         - centaur
     """
@@ -291,7 +299,10 @@ def run_single_match(
 ) -> Dict[str, Any]:
     """Run a single match between two agents."""
     
-    # Create environment
+    # Create environment with fixed starting positions
+    if env_name == "MPE_simple_sumo_v3":
+        env_kwargs = env_kwargs.copy()
+        env_kwargs["random_spawn"] = False
     env = jaxmarl.make(env_name, **env_kwargs)
     
     # Load policies
