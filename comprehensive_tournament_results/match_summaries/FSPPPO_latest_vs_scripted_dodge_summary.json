@@ -1,0 +1,16 @@
+{
+  "match_id": "FSPPPO_latest_vs_scripted_dodge",
+  "player1_name": "FSPPPO_latest",
+  "player2_name": "scripted_dodge",
+  "total_episodes": 10,
+  "player1_wins": 4,
+  "player2_wins": 5,
+  "draws": 1,
+  "player1_win_rate": 0.4,
+  "player2_win_rate": 0.5,
+  "draw_rate": 0.1,
+  "avg_episode_length": 10.6,
+  "player1_avg_reward": 0.5,
+  "player2_avg_reward": -0.5,
+  "episodes": "10 episodes (see raw data)"
+}

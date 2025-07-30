@@ -26,9 +26,9 @@ import sys
 import glob
 import csv
 import time
-import argparse
 import itertools
 import re
+import json
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
@@ -37,10 +37,15 @@ from dataclasses import dataclass
 import jax
 import jax.numpy as jnp
 import numpy as np
+from jaxmarl import make
+from jaxmarl.environments.mpe import MPEVisualizer
+import orbax.checkpoint as ocp
+from flax.training import orbax_utils
 from flax.training.train_state import TrainState
 
+from baselines.scripted_behaviors import get_scripted_action, list_scripted_behaviors
+
 # Environment and visualization imports
-from jaxmarl import make
 from jaxmarl.environments.mpe.mpe_visualizer import MPEVisualizer
 from jaxmarl.wrappers.baselines import MPELogWrapper as LogWrapper
 
@@ -164,8 +169,8 @@ class TournamentEvaluator:
         return players
     
     def _get_latest_ippo_checkpoint(self):
-        """Get the most recent IPPO checkpoint (one agent only)."""
-        ippo_pattern = "checkpoints/ippo/run_*_seed*/agent_*/"
+        """Get the most recent IPPO checkpoint."""
+        ippo_pattern = "checkpoints/ippo/run_*_seed*/main/"
         ippo_paths = glob.glob(ippo_pattern)
         
         if not ippo_paths:
@@ -208,7 +213,7 @@ class TournamentEvaluator:
     
     def _get_latest_spppo_checkpoint(self):
         """Get the most recent SPPPO checkpoint."""
-        spppo_pattern = "checkpoints/spppo/run_*_seed*/shared_agent/*/"
+        spppo_pattern = "checkpoints/spppo/run_*_seed*/main/*/"
         spppo_paths = glob.glob(spppo_pattern)
         
         if not spppo_paths:
@@ -251,7 +256,7 @@ class TournamentEvaluator:
     
     def _get_latest_fspppo_checkpoint(self):
         """Get the most recent FSPPPO checkpoint."""
-        fspppo_pattern = "checkpoints/fspppo/run_*_seed*/main_agent/step_*/"
+        fspppo_pattern = "checkpoints/fspppo/run_*_seed*/main/*/"
         fspppo_paths = glob.glob(fspppo_pattern)
         
         if not fspppo_paths:
@@ -288,15 +293,17 @@ class TournamentEvaluator:
     def _get_all_ippo_checkpoints(self):
         """Get all IPPO checkpoints (original behavior)."""
         players = []
-        ippo_pattern = "checkpoints/ippo/run_*_seed*/agent_*/"
-        ippo_paths = glob.glob(ippo_pattern)
-        
-        for path in ippo_paths:
-            if os.path.isdir(path):
-                # Extract run info
-                parts = path.split('/')
-                run_seed = parts[-2]  # e.g., "run_20250728_105631_seed0"
-                agent_id = parts[-1]   # e.g., "agent_0"
+        # Check both main and opponent directories for IPPO
+        for agent_type in ['main', 'opponent']:
+            ippo_pattern = f"checkpoints/ippo/run_*_seed*/{agent_type}/"
+            ippo_paths = glob.glob(ippo_pattern)
+            
+            for path in ippo_paths:
+                if os.path.isdir(path):
+                    # Extract run info
+                    parts = path.split('/')
+                    run_seed = parts[-2]  # e.g., "run_20250728_105631_seed0"
+                    agent_id = agent_type  # "main" or "opponent"
                 
                 # Extract seed number
                 seed_match = re.search(r'seed(\d+)', run_seed)
@@ -330,8 +337,8 @@ class TournamentEvaluator:
         """
         training_players = []
         
-        # IPPO Training Setting: agent_0 vs agent_1 from same run
-        ippo_pattern = "checkpoints/ippo/run_*_seed*/agent_*/"
+        # IPPO Training Setting: main vs opponent from same run
+        ippo_pattern = "checkpoints/ippo/run_*_seed*/*/"
         ippo_paths = glob.glob(ippo_pattern)
         
         # Group by run_seed to find agent pairs
@@ -423,7 +430,7 @@ class TournamentEvaluator:
     def _get_all_spppo_checkpoints(self):
         """Get all SPPPO checkpoints (original behavior)."""
         players = []
-        spppo_pattern = "checkpoints/spppo/run_*_seed*/shared_agent/*/"
+        spppo_pattern = "checkpoints/spppo/run_*_seed*/main/*/"
         spppo_checkpoints = glob.glob(spppo_pattern)
         for checkpoint_path in spppo_checkpoints:
             # Extract seed info from path
@@ -445,7 +452,7 @@ class TournamentEvaluator:
     def _get_all_fspppo_checkpoints(self):
         """Get all FSPPPO checkpoints (original behavior)."""
         players = []
-        fspppo_pattern = "checkpoints/fspppo/run_*_seed*/main_agent/"
+        fspppo_pattern = "checkpoints/fspppo/run_*_seed*/main/"
         fspppo_dirs = glob.glob(fspppo_pattern)
         for checkpoint_dir in fspppo_dirs:
             # Find latest checkpoint in this seed directory
@@ -470,12 +477,13 @@ class TournamentEvaluator:
         return players
     
     def create_scripted_players(self) -> List[TournamentPlayer]:
-        """Create scripted opponent players."""
-        scripted_types = ['noop', 'random', 'seek', 'dodge', 'centaur']
+        """Create scripted opponent players using standardized behaviors."""
+        # Get all available scripted behaviors from the standardized module
+        available_behaviors = list_scripted_behaviors()
         players = []
         
-        for script_type in scripted_types:
-            name = f"scripted_{script_type}"
+        for behavior_name in available_behaviors.keys():
+            name = f"scripted_{behavior_name}"
             players.append(TournamentPlayer(
                 name=name,
                 player_type='scripted',
@@ -514,8 +522,7 @@ class TournamentEvaluator:
                     # For IPPO, we need to recreate the network to get apply_fn
                     import sys
                     import jax.numpy as jnp
-                    sys.path.append('/share/code/src/JaxMARL/baselines')
-                    from IPPO.ippo_ff_mpe import ActorCritic
+                    from baselines.IPPO.train import ActorCritic
                     import jaxmarl
                     
                     # Recreate the network (same as in IPPO training)
@@ -602,8 +609,30 @@ class TournamentEvaluator:
                         raise ValueError(f"No SPPPO checkpoint found in {checkpoint_dir}")
                 else:
                     train_state, _ = result
-                    player.params = train_state.params
-                    player.apply_fn = train_state.apply_fn
+                    
+                    # For SPPPO, we need to recreate the network to get apply_fn
+                    from baselines.SPPPO.train import ActorCritic
+                    import jaxmarl
+                    
+                    # Recreate the network (same as in SPPPO training)
+                    env = jaxmarl.make("MPE_simple_sumo_v3")
+                    network = ActorCritic(env.action_space(env.agents[0]).n, activation="tanh")
+                    
+                    # Handle different checkpoint structures
+                    if hasattr(train_state, 'params'):
+                        # TrainState object
+                        player.params = train_state.params
+                        player.apply_fn = network.apply
+                    elif isinstance(train_state, dict) and 'params' in train_state:
+                        # Dictionary with params
+                        player.params = train_state['params']
+                        player.apply_fn = network.apply
+                    else:
+                        # Assume train_state is the params directly
+                        player.params = train_state
+                        player.apply_fn = network.apply
+                    
+                    print(f"✅ Loaded SPPPO checkpoint from {checkpoint_dir}")
                 
             elif player.algorithm == 'FSPPPO':
                 # Load FSPPPO checkpoint
@@ -628,7 +657,10 @@ class TournamentEvaluator:
                 checkpoint_dir = checkpoint_info["checkpoint_dir"]
                 
                 # Create network and abstract params structure for FSPPPO
-                from FSPPPO.fspppo_ff_mpe import ActorCritic
+                try:
+                    from baselines.FSPPPO.train import ActorCritic
+                except ImportError:
+                    from FSPPPO.train import ActorCritic
                 network = ActorCritic(action_dim=5, activation='tanh')
                 
                 # Create dummy input to initialize network params
@@ -650,33 +682,13 @@ class TournamentEvaluator:
             raise
     
     def get_scripted_action(self, obs, player_name: str, rng_key):
-        """Get action from scripted opponent.
+        """Get action from scripted opponent using standardized behaviors.
         
         Returns discrete action indices for simple_sumo environment:
         0: no-op, 1: up, 2: down, 3: right, 4: left
         """
         script_type = player_name.split('_')[1]  # Extract type from 'scripted_noop'
-        
-        if script_type == 'noop':
-            return 0  # No action
-        elif script_type == 'random':
-            return jax.random.randint(rng_key, (), 0, 5)  # Random action 0-4
-        elif script_type == 'seek':
-            # Simple seeking behavior - move towards opponent
-            # For now, just move up (could be enhanced with opponent position)
-            return 1  # Move up
-        elif script_type == 'dodge':
-            # Simple dodging behavior - move away from opponent
-            return 2  # Move down
-        elif script_type == 'centaur':
-            # Mixed strategy: alternate between seeking and dodging
-            # Use observation to determine strategy (simple heuristic)
-            if jnp.sum(obs) % 2 < 1:
-                return 1  # Seek (move up)
-            else:
-                return 2  # Dodge (move down)
-        else:
-            return 0  # Default to noop
+        return get_scripted_action(obs, script_type, rng_key)
     
     def run_single_episode(self, player1: TournamentPlayer, player2: TournamentPlayer, 
                           rng_key, episode_id: int) -> Dict[str, Any]:

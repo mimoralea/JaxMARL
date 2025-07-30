@@ -1,0 +1,16 @@
+{
+  "match_id": "IPPO_latest__vs_scripted_centaur",
+  "player1_name": "IPPO_latest_",
+  "player2_name": "scripted_centaur",
+  "total_episodes": 10,
+  "player1_wins": 5,
+  "player2_wins": 4,
+  "draws": 1,
+  "player1_win_rate": 0.5,
+  "player2_win_rate": 0.4,
+  "draw_rate": 0.1,
+  "avg_episode_length": 29.0,
+  "player1_avg_reward": 0.9,
+  "player2_avg_reward": -0.9,
+  "episodes": "10 episodes (see raw data)"
+}

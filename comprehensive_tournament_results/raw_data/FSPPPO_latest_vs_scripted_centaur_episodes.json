@@ -1,0 +1,2068 @@
+[
+  {
+    "episode_id": 0,
+    "match_id": "FSPPPO_latest_vs_scripted_centaur",
+    "player1_name": "FSPPPO_latest",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": "FSPPPO_latest",
+    "episode_length": 18,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T21:01:07.443015",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 3,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 1
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 1.0,
+        "red": -1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 1,
+    "match_id": "FSPPPO_latest_vs_scripted_centaur",
+    "player1_name": "FSPPPO_latest",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": "FSPPPO_latest",
+    "episode_length": 14,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T21:01:07.909568",
+    "observations": null,
+    "actions": [
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 4,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 3,
+        "red": 1
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 1.0,
+        "red": -1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 2,
+    "match_id": "FSPPPO_latest_vs_scripted_centaur",
+    "player1_name": "FSPPPO_latest",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": "FSPPPO_latest",
+    "episode_length": 25,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T21:01:08.767061",
+    "observations": null,
+    "actions": [
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 4,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 2
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 1.0,
+        "red": -1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 3,
+    "match_id": "FSPPPO_latest_vs_scripted_centaur",
+    "player1_name": "FSPPPO_latest",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": "FSPPPO_latest",
+    "episode_length": 23,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T21:01:09.532462",
+    "observations": null,
+    "actions": [
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 1.0,
+        "red": -1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 4,
+    "match_id": "FSPPPO_latest_vs_scripted_centaur",
+    "player1_name": "FSPPPO_latest",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": "FSPPPO_latest",
+    "episode_length": 15,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T21:01:10.010391",
+    "observations": null,
+    "actions": [
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 4,
+        "red": 2
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 1.0,
+        "red": -1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 5,
+    "match_id": "FSPPPO_latest_vs_scripted_centaur",
+    "player1_name": "FSPPPO_latest",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": "scripted_centaur",
+    "episode_length": 38,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T21:01:11.232570",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": -1.0,
+        "red": 1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 6,
+    "match_id": "FSPPPO_latest_vs_scripted_centaur",
+    "player1_name": "FSPPPO_latest",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": "scripted_centaur",
+    "episode_length": 28,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T21:01:12.183875",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": -1.0,
+        "red": 1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 7,
+    "match_id": "FSPPPO_latest_vs_scripted_centaur",
+    "player1_name": "FSPPPO_latest",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": "scripted_centaur",
+    "episode_length": 16,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T21:01:12.673734",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": -1.0,
+        "red": 1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 8,
+    "match_id": "FSPPPO_latest_vs_scripted_centaur",
+    "player1_name": "FSPPPO_latest",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": "scripted_centaur",
+    "episode_length": 18,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T21:01:13.194292",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": -1.0,
+        "red": 1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 9,
+    "match_id": "FSPPPO_latest_vs_scripted_centaur",
+    "player1_name": "FSPPPO_latest",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": "scripted_centaur",
+    "episode_length": 37,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T21:01:14.324767",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 4
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": -1.0,
+        "red": 1.0
+      }
+    ]
+  }
+]

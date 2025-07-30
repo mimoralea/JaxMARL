@@ -1,0 +1,11 @@
+episode_id,match_id,player1_name,player2_name,player1_position,player2_position,winner,episode_length,player1_total_reward,player2_total_reward,player1_final_reward,player2_final_reward,termination_reason,timestamp
+0,SPPPO_latest_vs_scripted_random,SPPPO_latest,scripted_random,agent_0,agent_1,SPPPO_latest,16,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:12.281094
+1,SPPPO_latest_vs_scripted_random,SPPPO_latest,scripted_random,agent_0,agent_1,SPPPO_latest,33,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:13.261423
+2,SPPPO_latest_vs_scripted_random,SPPPO_latest,scripted_random,agent_0,agent_1,SPPPO_latest,59,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:14.940303
+3,SPPPO_latest_vs_scripted_random,SPPPO_latest,scripted_random,agent_0,agent_1,SPPPO_latest,54,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:16.476378
+4,SPPPO_latest_vs_scripted_random,SPPPO_latest,scripted_random,agent_0,agent_1,SPPPO_latest,25,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:17.281221
+5,SPPPO_latest_vs_scripted_random,SPPPO_latest,scripted_random,agent_1,agent_0,scripted_random,19,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:17.859652
+6,SPPPO_latest_vs_scripted_random,SPPPO_latest,scripted_random,agent_1,agent_0,scripted_random,23,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:18.515684
+7,SPPPO_latest_vs_scripted_random,SPPPO_latest,scripted_random,agent_1,agent_0,scripted_random,43,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:19.714745
+8,SPPPO_latest_vs_scripted_random,SPPPO_latest,scripted_random,agent_1,agent_0,scripted_random,15,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:20.131331
+9,SPPPO_latest_vs_scripted_random,SPPPO_latest,scripted_random,agent_1,agent_0,scripted_random,10,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:20.398661

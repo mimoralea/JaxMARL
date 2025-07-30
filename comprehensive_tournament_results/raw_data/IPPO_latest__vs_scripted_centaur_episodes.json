@@ -1,0 +1,2532 @@
+[
+  {
+    "episode_id": 0,
+    "match_id": "IPPO_latest__vs_scripted_centaur",
+    "player1_name": "IPPO_latest_",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": "IPPO_latest_",
+    "episode_length": 15,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T20:58:55.240230",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 3,
+        "red": 1
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 1.0,
+        "red": -1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 1,
+    "match_id": "IPPO_latest__vs_scripted_centaur",
+    "player1_name": "IPPO_latest_",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": "IPPO_latest_",
+    "episode_length": 14,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T20:58:55.729500",
+    "observations": null,
+    "actions": [
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 1.0,
+        "red": -1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 2,
+    "match_id": "IPPO_latest__vs_scripted_centaur",
+    "player1_name": "IPPO_latest_",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": "IPPO_latest_",
+    "episode_length": 17,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T20:58:56.296164",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 3,
+        "red": 1
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 1
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 1
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 1.0,
+        "red": -1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 3,
+    "match_id": "IPPO_latest__vs_scripted_centaur",
+    "player1_name": "IPPO_latest_",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": "IPPO_latest_",
+    "episode_length": 18,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T20:58:56.879472",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 3,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 2
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 1.0,
+        "red": -1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 4,
+    "match_id": "IPPO_latest__vs_scripted_centaur",
+    "player1_name": "IPPO_latest_",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": "IPPO_latest_",
+    "episode_length": 16,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T20:58:57.425706",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 4,
+        "red": 1
+      },
+      {
+        "green": 3,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      },
+      {
+        "green": 3,
+        "red": 2
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 1.0,
+        "red": -1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 5,
+    "match_id": "IPPO_latest__vs_scripted_centaur",
+    "player1_name": "IPPO_latest_",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": null,
+    "episode_length": 100,
+    "player1_total_reward": 0.0,
+    "player2_total_reward": 0.0,
+    "player1_final_reward": 0.0,
+    "player2_final_reward": 0.0,
+    "termination_reason": "max_steps",
+    "timestamp": "2025-07-29T20:59:00.829555",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 3
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      }
+    ]
+  },
+  {
+    "episode_id": 6,
+    "match_id": "IPPO_latest__vs_scripted_centaur",
+    "player1_name": "IPPO_latest_",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": "scripted_centaur",
+    "episode_length": 32,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T20:59:01.872386",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 3
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": -1.0,
+        "red": 1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 7,
+    "match_id": "IPPO_latest__vs_scripted_centaur",
+    "player1_name": "IPPO_latest_",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": "scripted_centaur",
+    "episode_length": 13,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T20:59:02.307024",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 2
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": -1.0,
+        "red": 1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 8,
+    "match_id": "IPPO_latest__vs_scripted_centaur",
+    "player1_name": "IPPO_latest_",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": "scripted_centaur",
+    "episode_length": 52,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T20:59:04.130871",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 3
+      },
+      {
+        "green": 2,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 4
+      },
+      {
+        "green": 1,
+        "red": 2
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": -1.0,
+        "red": 1.0
+      }
+    ]
+  },
+  {
+    "episode_id": 9,
+    "match_id": "IPPO_latest__vs_scripted_centaur",
+    "player1_name": "IPPO_latest_",
+    "player2_name": "scripted_centaur",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": "scripted_centaur",
+    "episode_length": 13,
+    "player1_total_reward": 1.0,
+    "player2_total_reward": -1.0,
+    "player1_final_reward": 1.0,
+    "player2_final_reward": -1.0,
+    "termination_reason": "winner",
+    "timestamp": "2025-07-29T20:59:04.596405",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 1
+      },
+      {
+        "green": 2,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      },
+      {
+        "green": 1,
+        "red": 2
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": -1.0,
+        "red": 1.0
+      }
+    ]
+  }
+]

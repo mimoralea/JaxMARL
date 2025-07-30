@@ -1,0 +1,11 @@
+episode_id,match_id,player1_name,player2_name,player1_position,player2_position,winner,episode_length,player1_total_reward,player2_total_reward,player1_final_reward,player2_final_reward,termination_reason,timestamp
+0,scripted_random_vs_scripted_seek,scripted_random,scripted_seek,agent_0,agent_1,scripted_random,6,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:33.116800
+1,scripted_random_vs_scripted_seek,scripted_random,scripted_seek,agent_0,agent_1,scripted_random,6,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:33.167811
+2,scripted_random_vs_scripted_seek,scripted_random,scripted_seek,agent_0,agent_1,scripted_random,6,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:33.217147
+3,scripted_random_vs_scripted_seek,scripted_random,scripted_seek,agent_0,agent_1,scripted_random,6,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:33.285309
+4,scripted_random_vs_scripted_seek,scripted_random,scripted_seek,agent_0,agent_1,scripted_random,6,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:33.345496
+5,scripted_random_vs_scripted_seek,scripted_random,scripted_seek,agent_1,agent_0,scripted_seek,12,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:33.459937
+6,scripted_random_vs_scripted_seek,scripted_random,scripted_seek,agent_1,agent_0,scripted_seek,6,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:33.517413
+7,scripted_random_vs_scripted_seek,scripted_random,scripted_seek,agent_1,agent_0,scripted_seek,6,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:33.581397
+8,scripted_random_vs_scripted_seek,scripted_random,scripted_seek,agent_1,agent_0,scripted_seek,12,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:33.699943
+9,scripted_random_vs_scripted_seek,scripted_random,scripted_seek,agent_1,agent_0,scripted_seek,6,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:33.758719

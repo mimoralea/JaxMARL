@@ -1,0 +1,8212 @@
+[
+  {
+    "episode_id": 0,
+    "match_id": "SPPPO_latest_vs_scripted_noop",
+    "player1_name": "SPPPO_latest",
+    "player2_name": "scripted_noop",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": null,
+    "episode_length": 100,
+    "player1_total_reward": 0.0,
+    "player2_total_reward": 0.0,
+    "player1_final_reward": 0.0,
+    "player2_final_reward": 0.0,
+    "termination_reason": "max_steps",
+    "timestamp": "2025-07-29T20:59:47.357122",
+    "observations": null,
+    "actions": [
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      }
+    ]
+  },
+  {
+    "episode_id": 1,
+    "match_id": "SPPPO_latest_vs_scripted_noop",
+    "player1_name": "SPPPO_latest",
+    "player2_name": "scripted_noop",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": null,
+    "episode_length": 100,
+    "player1_total_reward": 0.0,
+    "player2_total_reward": 0.0,
+    "player1_final_reward": 0.0,
+    "player2_final_reward": 0.0,
+    "termination_reason": "max_steps",
+    "timestamp": "2025-07-29T20:59:50.044934",
+    "observations": null,
+    "actions": [
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      }
+    ]
+  },
+  {
+    "episode_id": 2,
+    "match_id": "SPPPO_latest_vs_scripted_noop",
+    "player1_name": "SPPPO_latest",
+    "player2_name": "scripted_noop",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": null,
+    "episode_length": 100,
+    "player1_total_reward": 0.0,
+    "player2_total_reward": 0.0,
+    "player1_final_reward": 0.0,
+    "player2_final_reward": 0.0,
+    "termination_reason": "max_steps",
+    "timestamp": "2025-07-29T20:59:52.891711",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      }
+    ]
+  },
+  {
+    "episode_id": 3,
+    "match_id": "SPPPO_latest_vs_scripted_noop",
+    "player1_name": "SPPPO_latest",
+    "player2_name": "scripted_noop",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": null,
+    "episode_length": 100,
+    "player1_total_reward": 0.0,
+    "player2_total_reward": 0.0,
+    "player1_final_reward": 0.0,
+    "player2_final_reward": 0.0,
+    "termination_reason": "max_steps",
+    "timestamp": "2025-07-29T20:59:55.606723",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      }
+    ]
+  },
+  {
+    "episode_id": 4,
+    "match_id": "SPPPO_latest_vs_scripted_noop",
+    "player1_name": "SPPPO_latest",
+    "player2_name": "scripted_noop",
+    "player1_position": "agent_0",
+    "player2_position": "agent_1",
+    "winner": null,
+    "episode_length": 100,
+    "player1_total_reward": 0.0,
+    "player2_total_reward": 0.0,
+    "player1_final_reward": 0.0,
+    "player2_final_reward": 0.0,
+    "termination_reason": "max_steps",
+    "timestamp": "2025-07-29T20:59:58.264138",
+    "observations": null,
+    "actions": [
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      },
+      {
+        "green": 1,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 4,
+        "red": 0
+      },
+      {
+        "green": 3,
+        "red": 0
+      },
+      {
+        "green": 2,
+        "red": 0
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      }
+    ]
+  },
+  {
+    "episode_id": 5,
+    "match_id": "SPPPO_latest_vs_scripted_noop",
+    "player1_name": "SPPPO_latest",
+    "player2_name": "scripted_noop",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": null,
+    "episode_length": 100,
+    "player1_total_reward": 0.0,
+    "player2_total_reward": 0.0,
+    "player1_final_reward": 0.0,
+    "player2_final_reward": 0.0,
+    "termination_reason": "max_steps",
+    "timestamp": "2025-07-29T21:00:00.823891",
+    "observations": null,
+    "actions": [
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      }
+    ]
+  },
+  {
+    "episode_id": 6,
+    "match_id": "SPPPO_latest_vs_scripted_noop",
+    "player1_name": "SPPPO_latest",
+    "player2_name": "scripted_noop",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": null,
+    "episode_length": 100,
+    "player1_total_reward": 0.0,
+    "player2_total_reward": 0.0,
+    "player1_final_reward": 0.0,
+    "player2_final_reward": 0.0,
+    "termination_reason": "max_steps",
+    "timestamp": "2025-07-29T21:00:03.481071",
+    "observations": null,
+    "actions": [
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      }
+    ]
+  },
+  {
+    "episode_id": 7,
+    "match_id": "SPPPO_latest_vs_scripted_noop",
+    "player1_name": "SPPPO_latest",
+    "player2_name": "scripted_noop",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": null,
+    "episode_length": 100,
+    "player1_total_reward": 0.0,
+    "player2_total_reward": 0.0,
+    "player1_final_reward": 0.0,
+    "player2_final_reward": 0.0,
+    "termination_reason": "max_steps",
+    "timestamp": "2025-07-29T21:00:06.345924",
+    "observations": null,
+    "actions": [
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      }
+    ]
+  },
+  {
+    "episode_id": 8,
+    "match_id": "SPPPO_latest_vs_scripted_noop",
+    "player1_name": "SPPPO_latest",
+    "player2_name": "scripted_noop",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": null,
+    "episode_length": 100,
+    "player1_total_reward": 0.0,
+    "player2_total_reward": 0.0,
+    "player1_final_reward": 0.0,
+    "player2_final_reward": 0.0,
+    "termination_reason": "max_steps",
+    "timestamp": "2025-07-29T21:00:09.091097",
+    "observations": null,
+    "actions": [
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      }
+    ]
+  },
+  {
+    "episode_id": 9,
+    "match_id": "SPPPO_latest_vs_scripted_noop",
+    "player1_name": "SPPPO_latest",
+    "player2_name": "scripted_noop",
+    "player1_position": "agent_1",
+    "player2_position": "agent_0",
+    "winner": null,
+    "episode_length": 100,
+    "player1_total_reward": 0.0,
+    "player2_total_reward": 0.0,
+    "player1_final_reward": 0.0,
+    "player2_final_reward": 0.0,
+    "termination_reason": "max_steps",
+    "timestamp": "2025-07-29T21:00:11.764424",
+    "observations": null,
+    "actions": [
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 1
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 0
+      },
+      {
+        "green": 0,
+        "red": 4
+      },
+      {
+        "green": 0,
+        "red": 3
+      },
+      {
+        "green": 0,
+        "red": 2
+      },
+      {
+        "green": 0,
+        "red": 4
+      }
+    ],
+    "rewards_sequence": [
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      },
+      {
+        "green": 0.0,
+        "red": 0.0
+      }
+    ]
+  }
+]

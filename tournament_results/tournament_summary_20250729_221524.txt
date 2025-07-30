@@ -1,0 +1,52 @@
+🏆 TOURNAMENT SUMMARY
+==================================================
+
+Tournament Date: 2025-07-29 22:15:24
+Environment: MPE_simple_sumo_v3
+Episodes per matchup: 2
+Total players: 8
+Total matches: 28
+Total episodes: 56
+
+PLAYER STATISTICS
+------------------------------
+
+FSPPPO_latest:
+  Win Rate: 50.0% (7/14)
+  W/L/D: 7/4/3
+  Avg Reward: 0.643
+
+scripted_random:
+  Win Rate: 42.9% (6/14)
+  W/L/D: 6/8/0
+  Avg Reward: -0.286
+
+scripted_dodge:
+  Win Rate: 42.9% (6/14)
+  W/L/D: 6/6/2
+  Avg Reward: -0.857
+
+scripted_centaur:
+  Win Rate: 35.7% (5/14)
+  W/L/D: 5/3/6
+  Avg Reward: -0.143
+
+IPPO_latest_:
+  Win Rate: 28.6% (4/14)
+  W/L/D: 4/4/6
+  Avg Reward: 0.571
+
+scripted_noop:
+  Win Rate: 28.6% (4/14)
+  W/L/D: 4/4/6
+  Avg Reward: 0.286
+
+scripted_seek:
+  Win Rate: 28.6% (4/14)
+  W/L/D: 4/6/4
+  Avg Reward: -0.571
+
+SPPPO_latest:
+  Win Rate: 21.4% (3/14)
+  W/L/D: 3/4/7
+  Avg Reward: 0.357

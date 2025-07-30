@@ -1,0 +1,11 @@
+episode_id,match_id,player1_name,player2_name,player1_position,player2_position,winner,episode_length,player1_total_reward,player2_total_reward,player1_final_reward,player2_final_reward,termination_reason,timestamp
+0,FSPPPO_latest_vs_scripted_noop,FSPPPO_latest,scripted_noop,agent_0,agent_1,FSPPPO_latest,13,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:53.059101
+1,FSPPPO_latest_vs_scripted_noop,FSPPPO_latest,scripted_noop,agent_0,agent_1,FSPPPO_latest,13,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:53.391321
+2,FSPPPO_latest_vs_scripted_noop,FSPPPO_latest,scripted_noop,agent_0,agent_1,FSPPPO_latest,12,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:53.731708
+3,FSPPPO_latest_vs_scripted_noop,FSPPPO_latest,scripted_noop,agent_0,agent_1,FSPPPO_latest,13,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:54.058052
+4,FSPPPO_latest_vs_scripted_noop,FSPPPO_latest,scripted_noop,agent_0,agent_1,FSPPPO_latest,13,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:54.408857
+5,FSPPPO_latest_vs_scripted_noop,FSPPPO_latest,scripted_noop,agent_1,agent_0,scripted_noop,13,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:54.739801
+6,FSPPPO_latest_vs_scripted_noop,FSPPPO_latest,scripted_noop,agent_1,agent_0,scripted_noop,12,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:55.066462
+7,FSPPPO_latest_vs_scripted_noop,FSPPPO_latest,scripted_noop,agent_1,agent_0,scripted_noop,13,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:55.482552
+8,FSPPPO_latest_vs_scripted_noop,FSPPPO_latest,scripted_noop,agent_1,agent_0,scripted_noop,12,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:55.848927
+9,FSPPPO_latest_vs_scripted_noop,FSPPPO_latest,scripted_noop,agent_1,agent_0,scripted_noop,12,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:00:56.165477

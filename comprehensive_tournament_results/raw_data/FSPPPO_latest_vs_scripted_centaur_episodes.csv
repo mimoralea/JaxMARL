@@ -1,0 +1,11 @@
+episode_id,match_id,player1_name,player2_name,player1_position,player2_position,winner,episode_length,player1_total_reward,player2_total_reward,player1_final_reward,player2_final_reward,termination_reason,timestamp
+0,FSPPPO_latest_vs_scripted_centaur,FSPPPO_latest,scripted_centaur,agent_0,agent_1,FSPPPO_latest,18,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:07.443015
+1,FSPPPO_latest_vs_scripted_centaur,FSPPPO_latest,scripted_centaur,agent_0,agent_1,FSPPPO_latest,14,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:07.909568
+2,FSPPPO_latest_vs_scripted_centaur,FSPPPO_latest,scripted_centaur,agent_0,agent_1,FSPPPO_latest,25,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:08.767061
+3,FSPPPO_latest_vs_scripted_centaur,FSPPPO_latest,scripted_centaur,agent_0,agent_1,FSPPPO_latest,23,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:09.532462
+4,FSPPPO_latest_vs_scripted_centaur,FSPPPO_latest,scripted_centaur,agent_0,agent_1,FSPPPO_latest,15,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:10.010391
+5,FSPPPO_latest_vs_scripted_centaur,FSPPPO_latest,scripted_centaur,agent_1,agent_0,scripted_centaur,38,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:11.232570
+6,FSPPPO_latest_vs_scripted_centaur,FSPPPO_latest,scripted_centaur,agent_1,agent_0,scripted_centaur,28,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:12.183875
+7,FSPPPO_latest_vs_scripted_centaur,FSPPPO_latest,scripted_centaur,agent_1,agent_0,scripted_centaur,16,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:12.673734
+8,FSPPPO_latest_vs_scripted_centaur,FSPPPO_latest,scripted_centaur,agent_1,agent_0,scripted_centaur,18,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:13.194292
+9,FSPPPO_latest_vs_scripted_centaur,FSPPPO_latest,scripted_centaur,agent_1,agent_0,scripted_centaur,37,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:14.324767

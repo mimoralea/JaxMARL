@@ -1,0 +1,11 @@
+episode_id,match_id,player1_name,player2_name,player1_position,player2_position,winner,episode_length,player1_total_reward,player2_total_reward,player1_final_reward,player2_final_reward,termination_reason,timestamp
+0,IPPO_latest__vs_scripted_random,IPPO_latest_,scripted_random,agent_0,agent_1,IPPO_latest_,43,1.0,-1.0,1.0,-1.0,winner,2025-07-29T20:58:43.497769
+1,IPPO_latest__vs_scripted_random,IPPO_latest_,scripted_random,agent_0,agent_1,IPPO_latest_,25,1.0,-1.0,1.0,-1.0,winner,2025-07-29T20:58:44.255575
+2,IPPO_latest__vs_scripted_random,IPPO_latest_,scripted_random,agent_0,agent_1,IPPO_latest_,16,1.0,-1.0,1.0,-1.0,winner,2025-07-29T20:58:44.747668
+3,IPPO_latest__vs_scripted_random,IPPO_latest_,scripted_random,agent_0,agent_1,IPPO_latest_,27,1.0,-1.0,1.0,-1.0,winner,2025-07-29T20:58:45.543014
+4,IPPO_latest__vs_scripted_random,IPPO_latest_,scripted_random,agent_0,agent_1,IPPO_latest_,18,1.0,-1.0,1.0,-1.0,winner,2025-07-29T20:58:46.079363
+5,IPPO_latest__vs_scripted_random,IPPO_latest_,scripted_random,agent_1,agent_0,scripted_random,13,1.0,-1.0,1.0,-1.0,winner,2025-07-29T20:58:47.380851
+6,IPPO_latest__vs_scripted_random,IPPO_latest_,scripted_random,agent_1,agent_0,scripted_random,44,1.0,-1.0,1.0,-1.0,winner,2025-07-29T20:58:48.596004
+7,IPPO_latest__vs_scripted_random,IPPO_latest_,scripted_random,agent_1,agent_0,scripted_random,11,1.0,-1.0,1.0,-1.0,winner,2025-07-29T20:58:48.872330
+8,IPPO_latest__vs_scripted_random,IPPO_latest_,scripted_random,agent_1,agent_0,scripted_random,15,1.0,-1.0,1.0,-1.0,winner,2025-07-29T20:58:49.254631
+9,IPPO_latest__vs_scripted_random,IPPO_latest_,scripted_random,agent_1,agent_0,scripted_random,22,1.0,-1.0,1.0,-1.0,winner,2025-07-29T20:58:49.910289

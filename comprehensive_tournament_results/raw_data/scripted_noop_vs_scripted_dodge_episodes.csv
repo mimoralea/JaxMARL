@@ -1,0 +1,11 @@
+episode_id,match_id,player1_name,player2_name,player1_position,player2_position,winner,episode_length,player1_total_reward,player2_total_reward,player1_final_reward,player2_final_reward,termination_reason,timestamp
+0,scripted_noop_vs_scripted_dodge,scripted_noop,scripted_dodge,agent_0,agent_1,scripted_noop,6,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:18.432897
+1,scripted_noop_vs_scripted_dodge,scripted_noop,scripted_dodge,agent_0,agent_1,scripted_noop,13,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:18.532642
+2,scripted_noop_vs_scripted_dodge,scripted_noop,scripted_dodge,agent_0,agent_1,scripted_noop,13,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:18.632927
+3,scripted_noop_vs_scripted_dodge,scripted_noop,scripted_dodge,agent_0,agent_1,scripted_noop,6,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:18.679204
+4,scripted_noop_vs_scripted_dodge,scripted_noop,scripted_dodge,agent_0,agent_1,scripted_noop,13,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:18.793635
+5,scripted_noop_vs_scripted_dodge,scripted_noop,scripted_dodge,agent_1,agent_0,scripted_dodge,6,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:18.842173
+6,scripted_noop_vs_scripted_dodge,scripted_noop,scripted_dodge,agent_1,agent_0,scripted_dodge,6,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:18.877675
+7,scripted_noop_vs_scripted_dodge,scripted_noop,scripted_dodge,agent_1,agent_0,scripted_dodge,13,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:18.960498
+8,scripted_noop_vs_scripted_dodge,scripted_noop,scripted_dodge,agent_1,agent_0,scripted_dodge,6,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:18.982756
+9,scripted_noop_vs_scripted_dodge,scripted_noop,scripted_dodge,agent_1,agent_0,scripted_dodge,13,1.0,-1.0,1.0,-1.0,winner,2025-07-29T21:01:19.087002

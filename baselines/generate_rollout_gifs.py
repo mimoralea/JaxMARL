@@ -16,10 +16,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from PIL import Image
+import distrax
 
 from jaxmarl import make
 from jaxmarl.environments.mpe.simple_sumo import SimpleSumoMPE
 from jaxmarl.environments.mpe.mpe_visualizer import MPEVisualizer
+
+# Learned agent imports (loaded dynamically in load_learned_agent function)
+# No need for top-level imports since we load them when needed
+
+try:
+    from scripted_behaviors import get_scripted_action
+except ImportError:
+    try:
+        from baselines.scripted_behaviors import get_scripted_action
+    except ImportError:
+        print("Warning: scripted_behaviors import failed - using local implementation")
+        get_scripted_action = None
 
 def get_scripted_agent(agent_name, seed=0):
     """Get a scripted agent policy function - exact reimplementation from eval_arena.py."""
@@ -164,18 +177,107 @@ def get_scripted_agent(agent_name, seed=0):
         return dodge_policy
     
     else:
-        raise ValueError(f"Unknown scripted agent: {agent_name}")
+        raise ValueError(f"Unknown agent: {agent_name}")
+
+
+def load_learned_agent(algorithm, checkpoint_dir="checkpoints"):
+    """Load a learned agent from checkpoint using simple direct approach."""
+    if algorithm.upper() == "FSPPPO":
+        import glob
+        import orbax.checkpoint as ocp
+        
+        # Find latest FSPPPO checkpoint directory
+        fspppo_pattern = os.path.join(checkpoint_dir, "fspppo", "run_*_seed*", "main", "*")
+        checkpoint_dirs = glob.glob(fspppo_pattern)
+        
+        if not checkpoint_dirs:
+            raise FileNotFoundError(f"No FSPPPO checkpoints found in {checkpoint_dir}")
+        
+        # Filter to only numeric directories (actual checkpoints)
+        numeric_dirs = [d for d in checkpoint_dirs if os.path.basename(d).isdigit()]
+        
+        if not numeric_dirs:
+            raise FileNotFoundError(f"No valid FSPPPO checkpoint steps found in {checkpoint_dir}")
+        
+        # Get the latest checkpoint (highest step number)
+        latest_checkpoint = max(numeric_dirs, key=lambda x: int(os.path.basename(x)))
+        
+        # Convert to absolute path for Orbax compatibility
+        latest_checkpoint = os.path.abspath(latest_checkpoint)
+        
+        print(f"📥 Loading FSPPPO checkpoint from {latest_checkpoint}")
+        
+        try:
+            # Import FSPPPO network - try multiple import paths
+            from FSPPPO.train import ActorCritic
+        except ImportError:
+            try:
+                from baselines.FSPPPO.train import ActorCritic
+            except ImportError:
+                try:
+                    import sys
+                    sys.path.append(os.path.dirname(__file__))
+                    from FSPPPO.train import ActorCritic
+                except ImportError:
+                    raise ImportError("Cannot import FSPPPO ActorCritic - ensure FSPPPO is available")
+        
+        # Create dummy environment to get observation space
+        dummy_env = SimpleSumoMPE()
+        dummy_obs, _ = dummy_env.reset(jax.random.PRNGKey(0))
+        obs_shape = dummy_obs['green'].shape
+        
+        # Initialize network
+        network = ActorCritic(action_dim=5, activation="tanh")
+        
+        # Create dummy input for network initialization
+        dummy_input = jnp.zeros((1,) + obs_shape)
+        network_params = network.init(jax.random.PRNGKey(0), dummy_input)
+        
+        # Load checkpoint using Orbax
+        checkpointer = ocp.StandardCheckpointer()
+        loaded_params = checkpointer.restore(latest_checkpoint, network_params)
+        
+        print("✅ Successfully loaded FSPPPO checkpoint")
+        
+        # Create policy function
+        def learned_policy(obs):
+            # Ensure obs is properly shaped
+            if obs.ndim == 1:
+                obs = obs[None, ...]  # Add batch dimension
+            
+            # Get action distribution and value
+            pi, _ = network.apply(loaded_params, obs)
+            
+            # Sample action from distribution
+            action = pi.sample(seed=jax.random.PRNGKey(0))
+            
+            # Return scalar action (remove batch dimension)
+            return action[0] if action.ndim > 0 else action
+        
+        return learned_policy
+    
+    else:
+        raise ValueError(f"Unsupported learned algorithm: {algorithm}")
 
 def action_id_to_string(action_id):
     """Convert discrete action ID to readable action string."""
     action_map = {0: "NOOP", 1: "LEFT", 2: "RIGHT", 3: "DOWN", 4: "UP"}
     return action_map.get(int(action_id), "UNKNOWN")
 
-def run_scripted_rollout(env, agent1_name, agent2_name, key, max_steps=100):
-    """Run a rollout between two scripted agents."""
-    # Get scripted agent policies
-    agent1_policy = get_scripted_agent(agent1_name, seed=0)
-    agent2_policy = get_scripted_agent(agent2_name, seed=1)
+def run_rollout(env, agent1_name, agent2_name, key, max_steps=100, learned_agents=None):
+    """Run a rollout between two agents (scripted or learned)."""
+    learned_agents = learned_agents or {}
+    
+    # Get agent policies
+    if agent1_name in learned_agents:
+        agent1_policy = learned_agents[agent1_name]
+    else:
+        agent1_policy = get_scripted_agent(agent1_name, seed=0)
+    
+    if agent2_name in learned_agents:
+        agent2_policy = learned_agents[agent2_name]
+    else:
+        agent2_policy = get_scripted_agent(agent2_name, seed=1)
     
     # Reset environment
     obs, state = env.reset(key)
@@ -410,9 +512,21 @@ def analyze_rollout_outcome(trajectory):
         'terminated_early': final_dones['__all__']
     }
 
-def generate_multiple_rollouts(agent1_name, agent2_name, num_rollouts=10, output_dir='rollout_gifs'):
-    """Generate multiple rollout GIFs between two scripted agents."""
+def generate_multiple_rollouts(agent1_name, agent2_name, num_rollouts=10, output_dir='rollout_gifs', learned_algorithms=None):
+    """Generate multiple rollout GIFs between two agents (scripted or learned)."""
+    learned_algorithms = learned_algorithms or []
+    
     print(f"🎬 Generating {num_rollouts} rollout GIFs: {agent1_name} vs {agent2_name}")
+    
+    # Load learned agents if specified
+    learned_agents = {}
+    for algorithm in learned_algorithms:
+        if algorithm in [agent1_name, agent2_name]:
+            try:
+                learned_agents[algorithm] = load_learned_agent(algorithm)
+            except Exception as e:
+                print(f"❌ Failed to load {algorithm}: {e}")
+                return []
     
     # Create output directory
     output_path = Path(output_dir)
@@ -430,7 +544,7 @@ def generate_multiple_rollouts(agent1_name, agent2_name, num_rollouts=10, output
         
         # Generate rollout
         key, subkey = jax.random.split(key)
-        trajectory = run_scripted_rollout(env, agent1_name, agent2_name, subkey)
+        trajectory = run_rollout(env, agent1_name, agent2_name, subkey, learned_agents=learned_agents)
         
         # Analyze outcome
         outcome = analyze_rollout_outcome(trajectory)
@@ -468,26 +582,39 @@ def generate_multiple_rollouts(agent1_name, agent2_name, num_rollouts=10, output
     return outcomes
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate scripted agent rollout GIFs')
+    parser = argparse.ArgumentParser(description='Generate agent rollout GIFs (scripted or learned)')
     parser.add_argument('--agent1', type=str, default='seek',
-                       choices=['noop', 'random', 'seek', 'dodge', 'centaur'],
-                       help='First agent type')
-    parser.add_argument('--agent2', type=str, default='noop', 
-                       choices=['noop', 'random', 'seek', 'dodge', 'centaur'],
-                       help='Second agent type')
+                       help='First agent type (scripted: noop, random, seek, dodge, centaur; learned: FSPPPO, IPPO, SPPPO)')
+    parser.add_argument('--agent2', type=str, default='noop',
+                       help='Second agent type (scripted: noop, random, seek, dodge, centaur; learned: FSPPPO, IPPO, SPPPO)')
     parser.add_argument('--num-rollouts', type=int, default=10,
                        help='Number of rollouts to generate')
     parser.add_argument('--output-dir', type=str, default='rollout_gifs',
                        help='Output directory for GIF files')
+    parser.add_argument('--learned-algorithms', nargs='*', default=[],
+                       choices=['FSPPPO', 'IPPO', 'SPPPO'],
+                       help='Specify which agents are learned algorithms (default: all are scripted)')
     
     args = parser.parse_args()
+    
+    # Validate agent types
+    scripted_agents = ['noop', 'random', 'seek', 'dodge', 'centaur']
+    learned_agents = ['FSPPPO', 'IPPO', 'SPPPO']
+    
+    for agent_name in [args.agent1, args.agent2]:
+        if agent_name not in scripted_agents and agent_name not in learned_agents:
+            print(f"❌ Unknown agent type: {agent_name}")
+            print(f"Available scripted agents: {', '.join(scripted_agents)}")
+            print(f"Available learned agents: {', '.join(learned_agents)}")
+            return
     
     # Generate rollouts
     outcomes = generate_multiple_rollouts(
         args.agent1, 
         args.agent2, 
         args.num_rollouts, 
-        args.output_dir
+        args.output_dir,
+        args.learned_algorithms
     )
     
     print(f"\n🎉 Generated {args.num_rollouts} rollout GIFs!")

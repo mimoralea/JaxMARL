@@ -1,0 +1,11 @@
+episode_id,match_id,player1_name,player2_name,player1_position,player2_position,winner,episode_length,player1_total_reward,player2_total_reward,player1_final_reward,player2_final_reward,termination_reason,timestamp
+0,IPPO_latest__vs_SPPPO_latest,IPPO_latest_,SPPPO_latest,agent_0,agent_1,,100,0.0,0.0,0.0,0.0,max_steps,2025-07-29T20:56:50.938322
+1,IPPO_latest__vs_SPPPO_latest,IPPO_latest_,SPPPO_latest,agent_0,agent_1,,100,0.0,0.0,0.0,0.0,max_steps,2025-07-29T20:56:55.261797
+2,IPPO_latest__vs_SPPPO_latest,IPPO_latest_,SPPPO_latest,agent_0,agent_1,,100,0.0,0.0,0.0,0.0,max_steps,2025-07-29T20:56:59.636393
+3,IPPO_latest__vs_SPPPO_latest,IPPO_latest_,SPPPO_latest,agent_0,agent_1,,100,0.0,0.0,0.0,0.0,max_steps,2025-07-29T20:57:03.987655
+4,IPPO_latest__vs_SPPPO_latest,IPPO_latest_,SPPPO_latest,agent_0,agent_1,,100,0.0,0.0,0.0,0.0,max_steps,2025-07-29T20:57:08.275639
+5,IPPO_latest__vs_SPPPO_latest,IPPO_latest_,SPPPO_latest,agent_1,agent_0,,100,0.0,0.0,0.0,0.0,max_steps,2025-07-29T20:57:12.335686
+6,IPPO_latest__vs_SPPPO_latest,IPPO_latest_,SPPPO_latest,agent_1,agent_0,,100,0.0,0.0,0.0,0.0,max_steps,2025-07-29T20:57:16.562117
+7,IPPO_latest__vs_SPPPO_latest,IPPO_latest_,SPPPO_latest,agent_1,agent_0,,100,0.0,0.0,0.0,0.0,max_steps,2025-07-29T20:57:20.869412
+8,IPPO_latest__vs_SPPPO_latest,IPPO_latest_,SPPPO_latest,agent_1,agent_0,,100,0.0,0.0,0.0,0.0,max_steps,2025-07-29T20:57:25.186190
+9,IPPO_latest__vs_SPPPO_latest,IPPO_latest_,SPPPO_latest,agent_1,agent_0,,100,0.0,0.0,0.0,0.0,max_steps,2025-07-29T20:57:29.503626

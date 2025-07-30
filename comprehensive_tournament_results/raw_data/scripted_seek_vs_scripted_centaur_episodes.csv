@@ -1,0 +1,11 @@
+episode_id,match_id,player1_name,player2_name,player1_position,player2_position,winner,episode_length,player1_total_reward,player2_total_reward,player1_final_reward,player2_final_reward,termination_reason,timestamp
+0,scripted_seek_vs_scripted_centaur,scripted_seek,scripted_centaur,agent_0,agent_1,,15,0.0,0.0,0.0,0.0,draw,2025-07-29T21:01:43.009555
+1,scripted_seek_vs_scripted_centaur,scripted_seek,scripted_centaur,agent_0,agent_1,,6,0.0,0.0,0.0,0.0,draw,2025-07-29T21:01:43.097915
+2,scripted_seek_vs_scripted_centaur,scripted_seek,scripted_centaur,agent_0,agent_1,,15,0.0,0.0,0.0,0.0,draw,2025-07-29T21:01:43.293502
+3,scripted_seek_vs_scripted_centaur,scripted_seek,scripted_centaur,agent_0,agent_1,,15,0.0,0.0,0.0,0.0,draw,2025-07-29T21:01:43.466960
+4,scripted_seek_vs_scripted_centaur,scripted_seek,scripted_centaur,agent_0,agent_1,,6,0.0,0.0,0.0,0.0,draw,2025-07-29T21:01:43.542323
+5,scripted_seek_vs_scripted_centaur,scripted_seek,scripted_centaur,agent_1,agent_0,,6,0.0,0.0,0.0,0.0,draw,2025-07-29T21:01:43.616597
+6,scripted_seek_vs_scripted_centaur,scripted_seek,scripted_centaur,agent_1,agent_0,,15,0.0,0.0,0.0,0.0,draw,2025-07-29T21:01:43.809544
+7,scripted_seek_vs_scripted_centaur,scripted_seek,scripted_centaur,agent_1,agent_0,,6,0.0,0.0,0.0,0.0,draw,2025-07-29T21:01:43.869773
+8,scripted_seek_vs_scripted_centaur,scripted_seek,scripted_centaur,agent_1,agent_0,,15,0.0,0.0,0.0,0.0,draw,2025-07-29T21:01:44.070123
+9,scripted_seek_vs_scripted_centaur,scripted_seek,scripted_centaur,agent_1,agent_0,,15,0.0,0.0,0.0,0.0,draw,2025-07-29T21:01:44.260621

@@ -122,10 +122,10 @@ def run_training(
 ) -> bool:
     """Run training for specific algorithm."""
 
-    print("\n{'='*60}")
-    print("🚀 Starting {algorithm} Training")
-    print("{'='*60}")
-    print("Log file: {log_file or 'stdout'}")
+    print(f"\n{'='*60}")
+    print(f"🚀 Starting {algorithm} Training")
+    print(f"{'='*60}")
+    print(f"Log file: {log_file or 'stdout'}")
 
     # Determine the training script path (use standalone training scripts)
     script_configs = {
@@ -312,7 +312,7 @@ def main():
             }
 
             if not success:
-                print("⚠️  {algorithm} training failed, continuing with next algorithm...")
+                print(f"⚠️  {algorithm} training failed, continuing with next algorithm...")
 
     # Check generated checkpoints using actual run IDs created during training
     print("\n📊 Checkpoint Summary")
@@ -330,15 +330,15 @@ def main():
             checkpoints = check_checkpoints_for_run(algorithm, run_id)
             total_checkpoints += len(checkpoints)
 
-        print("📁 {algorithm} checkpoints found: {total_checkpoints}")
+        print(f"📁 {algorithm} checkpoints found: {total_checkpoints}")
         if recent_run_ids:
-            print("   Run IDs: {', '.join(recent_run_ids)}")
+            print(f"   Run IDs: {', '.join(recent_run_ids)}")
             for run_id in recent_run_ids[:2]:  # Show first 2 run IDs
                 checkpoints = check_checkpoints_for_run(algorithm, run_id)
                 if checkpoints:
-                    print("   {run_id}: {len(checkpoints)} checkpoints")
+                    print(f"   {run_id}: {len(checkpoints)} checkpoints")
                     for cp in sorted(checkpoints)[:3]:  # Show first 3
-                        print("     {cp}")
+                        print(f"     {cp}")
 
         if algorithm in results:
             results[algorithm]["checkpoints"] = total_checkpoints

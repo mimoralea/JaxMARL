@@ -1,0 +1,16 @@
+{
+  "match_id": "scripted_noop_vs_scripted_centaur",
+  "player1_name": "scripted_noop",
+  "player2_name": "scripted_centaur",
+  "total_episodes": 10,
+  "player1_wins": 0,
+  "player2_wins": 0,
+  "draws": 10,
+  "player1_win_rate": 0.0,
+  "player2_win_rate": 0.0,
+  "draw_rate": 1.0,
+  "avg_episode_length": 100.0,
+  "player1_avg_reward": 0.0,
+  "player2_avg_reward": 0.0,
+  "episodes": "10 episodes (see raw data)"
+}
