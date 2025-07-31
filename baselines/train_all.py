@@ -144,7 +144,7 @@ def run_training(
     }
 
     if algorithm not in script_configs:
-        print("❌ Unknown algorithm: {algorithm}")
+        print(f"❌ Unknown algorithm: {algorithm}")
         return False
 
     script_info = script_configs[algorithm]
@@ -152,8 +152,8 @@ def run_training(
     # Build command (standalone scripts don't need external config files)
     cmd = ["python", "-m", script_info["script"]]
 
-    print("Command: {' '.join(cmd)}")
-    print("Note: {algorithm} uses standalone training script with internal config")
+    print(f"Command: {' '.join(cmd)}")
+    print(f"Note: {algorithm} uses standalone training script with internal config")
 
     # Run training
     start_time = time.time()
@@ -181,17 +181,17 @@ def run_training(
         # No cleanup needed for standalone scripts
 
         if result.returncode == 0:
-            print("✅ {algorithm} training completed successfully!")
-            print("⏱️  Duration: {duration:.1f} seconds ({duration/60:.1f} minutes)")
+            print(f"✅ {algorithm} training completed successfully!")
+            print(f"⏱️  Duration: {duration:.1f} seconds ({duration/60:.1f} minutes)")
             return True
         else:
-            print("❌ {algorithm} training failed with return code {result.returncode}")
+            print(f"❌ {algorithm} training failed with return code {result.returncode}")
             if log_file:
-                print("Check log file for details: {log_file}")
+                print(f"Check log file for details: {log_file}")
             return False
 
     except Exception as e:
-        print("❌ Error running {algorithm} training: {e}")
+        print(f"❌ Error running {algorithm} training: {e}")
         # No cleanup needed for standalone scripts
         return False
 
@@ -269,10 +269,10 @@ def main():
 
     print("🎯 Sequential Baseline Algorithm Training")
     print("=" * 60)
-    print("Run timestamp: {run_timestamp}")
-    print("Algorithms: {args.algorithms}")
-    print("Quick test mode: {args.quick_test}")
-    print("Output directory: {output_dir}")
+    print(f"Run timestamp: {run_timestamp}")
+    print(f"Algorithms: {args.algorithms}")
+    print(f"Quick test mode: {args.quick_test}")
+    print(f"Output directory: {output_dir}")
 
     # Training results
     results = {}
@@ -280,7 +280,7 @@ def main():
     if not args.skip_training:
         # Train each algorithm sequentially
         for algorithm in args.algorithms:
-            print("\n🔄 Preparing {algorithm} training...")
+            print(f"\n🔄 Preparing {algorithm} training...")
 
             # Create algorithm-specific config
             config = create_training_config(
@@ -352,7 +352,7 @@ def main():
         for algorithm, result in results.items():
             status = "✅ SUCCESS" if result["success"] else "❌ FAILED"
             checkpoint_count = result.get("checkpoints", 0)
-            print("{algorithm:8} {status:10} {checkpoint_count:3d} checkpoints")
+            print(f"{algorithm:8} {status:10} {checkpoint_count:3d} checkpoints")
 
     # Generate next steps
     print("\n🎯 Next Steps")
@@ -372,7 +372,7 @@ def main():
 
         if all_checkpoints:
             example_checkpoint = sorted(all_checkpoints)[0]
-            print("   - \"{algorithm}:{example_checkpoint}\"")
+            print(f"   - \"{algorithm}:{example_checkpoint}\"")
 
     print("\n3. Analyze results and generate research artifacts")
 
@@ -388,13 +388,13 @@ def main():
     with open(summary_file, 'w') as f:
         yaml.dump(summary, f, default_flow_style=False, indent=2)
 
-    print("\n💾 Training summary saved to: {summary_file}")
+    print(f"\n💾 Training summary saved to: {summary_file}")
 
     # Exit code based on results
     if not args.skip_training:
         failed_algorithms = [alg for alg, result in results.items() if not result["success"]]
         if failed_algorithms:
-            print("\n⚠️  Some algorithms failed: {failed_algorithms}")
+            print(f"\n⚠️  Some algorithms failed: {failed_algorithms}")
             sys.exit(1)
         else:
             print("\n🎉 All algorithms trained successfully!")
