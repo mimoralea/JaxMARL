@@ -1,20 +1,12 @@
 #!/usr/bin/env python3
-"""Sequential Training Script for All Baseline Algorithms.
+"""Batch Training Script for All Baseline Algorithms.
 
-This script trains IPPO, SPPPO, and FSPPPO sequentially with consistent
-configurations
-to generate fresh checkpoints for comprehensive tournament evaluation.
-
-Features:
-- Sequential training of all three baseline algorithms
-- Consistent training parameters across algorithms
-- Automatic checkpoint generation at regular intervals
-- Progress tracking and logging
-- Configurable training duration and checkpoint frequency
+Trains IPPO, SPPPO, and FSPPPO sequentially with consistent configurations
+for comprehensive evaluation and comparison.
 
 Usage:
     python -m baselines.batch_train
-    python -m baselines.batch_train --quick-test  # For testing
+    python -m baselines.batch_train --quick-test
 """
 
 import argparse
