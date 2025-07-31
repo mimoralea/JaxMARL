@@ -226,9 +226,10 @@ def find_recent_run_ids(algorithm: str, since_time: str) -> List[str]:
     return sorted(recent_runs)
 
 
-def check_checkpoints_for_run(algorithm: str, run_id: str) -> List[str]:
+def check_checkpoints_for_run(algorithm, run_id):
     """Check what checkpoints were created for a specific run ID."""
     import glob
+    import re
 
     # Use the specific run_id to find checkpoints
     checkpoint_patterns = {
@@ -240,7 +241,13 @@ def check_checkpoints_for_run(algorithm: str, run_id: str) -> List[str]:
     pattern = checkpoint_patterns.get(algorithm, "")
     checkpoints = glob.glob(pattern)
 
-    return sorted(checkpoints)
+    # Sort numerically by step number (extract step number from path)
+    def extract_step_number(checkpoint_path):
+        # Extract step number from path like "checkpoints/fspppo/run_*/main/4882/"
+        match = re.search(r'/main/(\d+)/?$', checkpoint_path)
+        return int(match.group(1)) if match else 0
+    
+    return sorted(checkpoints, key=extract_step_number)
 
 
 def main():
@@ -371,7 +378,14 @@ def main():
             all_checkpoints.extend(checkpoints)
 
         if all_checkpoints:
-            example_checkpoint = sorted(all_checkpoints)[0]
+            # Sort numerically and take the most recent (last) checkpoint
+            def extract_step_number(checkpoint_path):
+                import re
+                match = re.search(r'/main/(\d+)/?$', checkpoint_path)
+                return int(match.group(1)) if match else 0
+            
+            sorted_checkpoints = sorted(all_checkpoints, key=extract_step_number)
+            example_checkpoint = sorted_checkpoints[-1]  # Take the most recent
             print(f"   - \"{algorithm}:{example_checkpoint}\"")
 
     print("\n3. Analyze results and generate research artifacts")
