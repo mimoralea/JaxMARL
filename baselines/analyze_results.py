@@ -15,8 +15,8 @@ Features:
 - Exportable artifacts for publication and sharing
 
 Usage:
-    python -m baselines.run_comprehensive_evaluation --run-timestamp 20250128_091120
-    python -m baselines.run_comprehensive_evaluation --auto-discover  # Find latest run
+    python -m baselines.analyze_results --run-timestamp 20250128_091120
+    python -m baselines.analyze_results --auto-discover  # Find latest run
 """
 
 import argparse
@@ -55,7 +55,7 @@ def discover_checkpoints(run_timestamp: Optional[str] = None) -> Dict[str, List[
             run_timestamp = max(all_runs)  # Latest timestamp
             print(f"🔍 Auto-discovered latest run: {run_timestamp}")
         else:
-            print("❌ No training runs found. Please run train_all.py first.")
+            print("❌ No training runs found. Please run batch_train.py first.")
             return {}
     
     print(f"🔍 Discovering checkpoints for run: {run_timestamp}")
@@ -586,7 +586,7 @@ def main():
         checkpoints = discover_checkpoints(run_timestamp)
         
         if not any(checkpoints.values()):
-            print("❌ No checkpoints found. Please run train_all.py first.")
+            print("❌ No checkpoints found. Please run batch_train.py first.")
             return
         
         # Create tournament configuration

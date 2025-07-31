@@ -13,8 +13,8 @@ Features:
 - Configurable training duration and checkpoint frequency
 
 Usage:
-    python -m baselines.train_all --config train_all_config.yaml
-    python -m baselines.train_all --quick-test  # For testing
+    python -m baselines.batch_train
+    python -m baselines.batch_train --quick-test  # For testing
 """
 
 import argparse
@@ -364,9 +364,14 @@ def main():
     # Generate next steps
     print("\n🎯 Next Steps")
     print("=" * 30)
-    print("1. Run tournament evaluation:")
-    print("   python -m baselines.tournament_eval --config tournament_config.yaml")
-    print("\n2. Update tournament_config.yaml with new checkpoint paths:")
+    print("1. Run tournament evaluation (auto-discovers latest checkpoints):")
+    print("   python -m baselines.run_tournament")
+    print("   python -m baselines.run_tournament --episodes-per-matchup 200")
+    print("\n2. Analyze tournament results with visualizations:")
+    print("   python -m baselines.analyze_results")
+    print("\n3. Generate rollout visualizations:")
+    print("   python -m baselines.generate_rollout_gifs --agent1 FSPPPO --agent2 seek --learned-algorithms FSPPPO")
+    print("\n📋 Latest Checkpoints Created:")
 
     for algorithm in args.algorithms:
         # Find run IDs created during this batch training session
@@ -386,9 +391,7 @@ def main():
             
             sorted_checkpoints = sorted(all_checkpoints, key=extract_step_number)
             example_checkpoint = sorted_checkpoints[-1]  # Take the most recent
-            print(f"   - \"{algorithm}:{example_checkpoint}\"")
-
-    print("\n3. Analyze results and generate research artifacts")
+            print(f"   {algorithm}: {example_checkpoint}")
 
     # Save run summary
     summary_file = output_dir / f"training_summary_{run_timestamp}.yaml"
