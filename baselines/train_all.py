@@ -13,8 +13,8 @@ Features:
 - Configurable training duration and checkpoint frequency
 
 Usage:
-    python -m baselines.train_all_baselines --config train_all_config.yaml
-    python -m baselines.train_all_baselines --quick-test  # For testing
+    python -m baselines.train_all --config train_all_config.yaml
+    python -m baselines.train_all --quick-test  # For testing
 """
 
 import argparse
