@@ -776,6 +776,134 @@ class TournamentEvaluator:
             'completed': done
         }
     
+    def _run_episode_with_positions(self, green_player: TournamentPlayer, red_player: TournamentPlayer, rng_key, episode_id: int, side: int) -> Dict[str, Any]:
+        """Run a single episode with explicit player position assignments.
+        
+        Args:
+            green_player: Player assigned to green position (agent_0)
+            red_player: Player assigned to red position (agent_1)
+            rng_key: Random key for episode
+            episode_id: Episode identifier
+            side: Side number (1 or 2) for tracking
+        
+        Returns:
+            Episode result dictionary with correct winner assignment
+        """
+        # Reset environment
+        rng_key, reset_key = jax.random.split(rng_key)
+        obs, state = self.env.reset(reset_key)
+        
+        episode_rewards = {agent: 0.0 for agent in self.env.agents}
+        episode_length = 0
+        done = False
+        
+        # Run episode
+        while not done and episode_length < self.max_episode_steps:
+            # Get actions from both players
+            actions = {}
+            
+            # Green player (agent_0) action
+            if green_player.player_type == 'scripted':
+                rng_key, action_key = jax.random.split(rng_key)
+                actions[self.env.agents[0]] = self.get_scripted_action(obs[self.env.agents[0]], green_player.name, action_key)
+            else:
+                # Checkpoint player
+                if green_player.params is None:
+                    self.load_checkpoint_player(green_player)
+                
+                # Get action from neural network
+                rng_key, action_key = jax.random.split(rng_key)
+                network_output = green_player.apply_fn(green_player.params, obs[self.env.agents[0]])
+                
+                if isinstance(network_output, tuple):
+                    # Handle different network output formats
+                    pi, value = network_output
+                    
+                    # Check if pi is a distribution object (SPPPO case)
+                    if hasattr(pi, 'sample'):
+                        # It's a distrax.Categorical distribution - sample directly
+                        actions[self.env.agents[0]] = pi.sample(seed=action_key)
+                    else:
+                        # It's raw logits - use categorical sampling
+                        actions[self.env.agents[0]] = jax.random.categorical(action_key, pi)
+                else:
+                    # Single output - assume it's logits
+                    actions[self.env.agents[0]] = jax.random.categorical(action_key, network_output)
+            
+            # Red player (agent_1) action
+            if red_player.player_type == 'scripted':
+                rng_key, action_key = jax.random.split(rng_key)
+                actions[self.env.agents[1]] = self.get_scripted_action(obs[self.env.agents[1]], red_player.name, action_key)
+            else:
+                # Checkpoint player
+                if red_player.params is None:
+                    self.load_checkpoint_player(red_player)
+                
+                # Get action from neural network
+                rng_key, action_key = jax.random.split(rng_key)
+                network_output = red_player.apply_fn(red_player.params, obs[self.env.agents[1]])
+                
+                if isinstance(network_output, tuple):
+                    # Handle different network output formats
+                    pi, value = network_output
+                    
+                    # Check if pi is a distribution object (SPPPO case)
+                    if hasattr(pi, 'sample'):
+                        # It's a distrax.Categorical distribution - sample directly
+                        actions[self.env.agents[1]] = pi.sample(seed=action_key)
+                    else:
+                        # It's raw logits - use categorical sampling
+                        actions[self.env.agents[1]] = jax.random.categorical(action_key, pi)
+                else:
+                    # Single output - assume it's logits
+                    actions[self.env.agents[1]] = jax.random.categorical(action_key, network_output)
+            
+            # Step environment
+            rng_key, step_key = jax.random.split(rng_key)
+            obs, state, rewards, dones, infos = self.env.step(step_key, state, actions)
+            
+            # Accumulate rewards
+            for agent in self.env.agents:
+                episode_rewards[agent] += rewards[agent]
+            
+            episode_length += 1
+            done = dones["__all__"]
+            
+            # Early termination check
+            if episode_length >= self.max_episode_steps:
+                break
+        
+        # Determine winner based on rewards
+        green_reward = episode_rewards[self.env.agents[0]]
+        red_reward = episode_rewards[self.env.agents[1]]
+        
+        if green_reward > red_reward:
+            winner = green_player.name
+            outcome = 1 if side == 1 else -1  # Adjust outcome based on which player is which
+        elif red_reward > green_reward:
+            winner = red_player.name
+            outcome = -1 if side == 1 else 1  # Adjust outcome based on which player is which
+        else:
+            winner = "draw"
+            outcome = 0
+        
+        return {
+            'episode_id': episode_id,
+            'player1': green_player.name if side == 1 else red_player.name,
+            'player2': red_player.name if side == 1 else green_player.name,
+            'player1_reward': float(green_reward if side == 1 else red_reward),
+            'player2_reward': float(red_reward if side == 1 else green_reward),
+            'winner': winner,
+            'outcome': outcome,
+            'episode_length': episode_length,
+            'completed': done,
+            'side': side,
+            'green_player': green_player.name,
+            'red_player': red_player.name,
+            'green_reward': float(green_reward),
+            'red_reward': float(red_reward)
+        }
+
     def run_match(self, match: TournamentMatch, rng_key) -> List[Dict[str, Any]]:
         """Run a complete match between two players (symmetrical)."""
         print(f"🥊 Running match: {match.player1.name} vs {match.player2.name}")
@@ -784,37 +912,28 @@ class TournamentEvaluator:
         match_results = []
         episode_id = 0
         
-        # First half: Player1 as agent_0, Player2 as agent_1
+        # Side 1: Player1 as green (agent_0), Player2 as red (agent_1)
         print(f"   Side 1: {match.player1.name} (green) vs {match.player2.name} (red)")
         for i in range(match.episodes_per_side):
             rng_key, episode_key = jax.random.split(rng_key)
-            result = self.run_single_episode(match.player1, match.player2, episode_key, episode_id)
-            result['side'] = 1
-            result['player1_color'] = 'green'
-            result['player2_color'] = 'red'
+            result = self._run_episode_with_positions(
+                green_player=match.player1, red_player=match.player2, 
+                rng_key=episode_key, episode_id=episode_id, side=1
+            )
             match_results.append(result)
             episode_id += 1
             
             if (i + 1) % 10 == 0:
                 print(f"     Completed {i + 1}/{match.episodes_per_side} episodes")
         
-        # Second half: Player2 as agent_0, Player1 as agent_1 (swap positions)
+        # Side 2: Player2 as green (agent_0), Player1 as red (agent_1)
         print(f"   Side 2: {match.player2.name} (green) vs {match.player1.name} (red)")
         for i in range(match.episodes_per_side):
             rng_key, episode_key = jax.random.split(rng_key)
-            result = self.run_single_episode(match.player2, match.player1, episode_key, episode_id)
-            # Swap the results to maintain consistent player naming
-            result['player1'], result['player2'] = result['player2'], result['player1']
-            result['player1_reward'], result['player2_reward'] = result['player2_reward'], result['player1_reward']
-            result['outcome'] = -result['outcome']  # Flip outcome since positions swapped
-            if result['winner'] == match.player2.name:
-                result['winner'] = match.player1.name
-            elif result['winner'] == match.player1.name:
-                result['winner'] = match.player2.name
-            
-            result['side'] = 2
-            result['player1_color'] = 'red'
-            result['player2_color'] = 'green'
+            result = self._run_episode_with_positions(
+                green_player=match.player2, red_player=match.player1,
+                rng_key=episode_key, episode_id=episode_id, side=2
+            )
             match_results.append(result)
             episode_id += 1
             
@@ -910,7 +1029,7 @@ class TournamentEvaluator:
         fieldnames = [
             'episode_id', 'player1', 'player2', 'player1_reward', 'player2_reward',
             'winner', 'outcome', 'episode_length', 'completed', 'side',
-            'player1_color', 'player2_color'
+            'green_player', 'red_player', 'green_reward', 'red_reward'
         ]
         
         with open(filepath, 'w', newline='') as csvfile:
