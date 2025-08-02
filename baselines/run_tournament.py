@@ -1120,10 +1120,8 @@ def main():
                        help="Output directory for results (default: tournament_results)")
     parser.add_argument("--seed", type=int, default=42,
                        help="Random seed (default: 42)")
-    parser.add_argument("--latest-only", action="store_true", default=True,
-                       help="Only use the most recent checkpoint from each algorithm type (default: True)")
-    parser.add_argument("--all-checkpoints", action="store_true",
-                       help="Use all available checkpoints (overrides --latest-only)")
+    parser.add_argument("--all-checkpoints", action="store_true", default=False,
+                       help="Use all available checkpoints instead of just the latest ones")
     
     args = parser.parse_args()
     
@@ -1139,10 +1137,8 @@ def main():
         max_episode_steps=args.max_episode_steps
     )
     
-    # Determine whether to use latest-only mode
-    latest_only = args.latest_only and not args.all_checkpoints
-    
-    # Setup and run tournament
+    # Setup and run tournament (use latest-only unless --all-checkpoints is specified)
+    latest_only = not args.all_checkpoints
     evaluator.setup_tournament(selected_players, latest_only=latest_only)
     
     # Run tournament
