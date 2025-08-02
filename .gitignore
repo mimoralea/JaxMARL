@@ -28,3 +28,9 @@ test_*/
 test_training/
 test_training_v2/
 test_training_v3/
+
+# Tournament evaluation results
+tournament_results/
+
+# Research documentation (generated)
+research_plan.md
