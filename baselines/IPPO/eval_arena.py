@@ -84,10 +84,10 @@ def _load_params_or_baseline(path_or_baseline: str, env, agent_name: str, seed: 
                 return jnp.array(4) if dy > 0 else jnp.array(3)
         return _seek
 
-    if path_or_baseline == "centaur":
-        print(f'Loading defensive CENTAUR policy for {agent_name}')
+    if path_or_baseline == "guardian":
+        print(f'Loading defensive GUARDIAN policy for {agent_name}')
         SAFE_RAD = 0.15  # stay very close (<=0.15) to centre (arena R≈0.4)
-        def _centaur(_, obs: jnp.ndarray):
+        def _guardian(_, obs: jnp.ndarray):
             sx, sy = obs[0], obs[1]
             ox, oy = obs[4], obs[5]
             self_dist = jnp.sqrt(sx ** 2 + sy ** 2)
@@ -101,7 +101,7 @@ def _load_params_or_baseline(path_or_baseline: str, env, agent_name: str, seed: 
                     return jnp.array(3) if sy > 0 else jnp.array(4)  # inward in y
             # Otherwise hold ground at centre; no aggressive pushing
             return jnp.array(0)
-        return _centaur
+        return _guardian
 
     if path_or_baseline == "dodge":
         print(f'Loading evasive DODGE policy for {agent_name}')
