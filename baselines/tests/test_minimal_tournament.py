@@ -69,10 +69,10 @@ def test_scripted_behaviors_basic():
         rng_key = jax.random.PRNGKey(42)
         dummy_obs = jax.numpy.zeros(4)  # Simple dummy observation
         
-        for behavior in behaviors[:3]:  # Test first 3 to save time
+        for behavior in list(behaviors.keys())[:3]:  # Test first 3 to save time
             try:
                 rng_key, action_key = jax.random.split(rng_key)
-                action, _ = get_scripted_action(dummy_obs, behavior, action_key)
+                action = get_scripted_action(dummy_obs, behavior, action_key)
                 assert action is not None
                 print(f"  ✓ {behavior} behavior works")
             except Exception as e:
@@ -107,17 +107,17 @@ def test_episode_execution():
         episode_length = 0
         max_steps = 50
         
-        while not state.done and episode_length < max_steps:
+        while episode_length < max_steps:
             actions = {}
             
             # Agent 0: seek behavior
             rng_key, action_key = jax.random.split(rng_key)
-            action, _ = get_scripted_action(obs[env.agents[0]], "seek", action_key)
+            action = get_scripted_action(obs[env.agents[0]], "seek", action_key)
             actions[env.agents[0]] = action
             
             # Agent 1: noop behavior
             rng_key, action_key = jax.random.split(rng_key)
-            action, _ = get_scripted_action(obs[env.agents[1]], "noop", action_key)
+            action = get_scripted_action(obs[env.agents[1]], "noop", action_key)
             actions[env.agents[1]] = action
             
             # Step environment
@@ -165,13 +165,13 @@ def test_determinism():
             episode_length = 0
             max_steps = 20
             
-            while not state.done and episode_length < max_steps:
+            while episode_length < max_steps:
                 actions = {}
                 
                 # Both agents use noop for deterministic behavior
                 for agent in env.agents:
                     rng_key, action_key = jax.random.split(rng_key)
-                    action, _ = get_scripted_action(obs[agent], "noop", action_key)
+                    action = get_scripted_action(obs[agent], "noop", action_key)
                     actions[agent] = action
                 
                 rng_key, step_key = jax.random.split(rng_key)
@@ -223,17 +223,17 @@ def test_different_behaviors_produce_different_results():
             episode_length = 0
             max_steps = 30
             
-            while not state.done and episode_length < max_steps:
+            while episode_length < max_steps:
                 actions = {}
                 
                 # Agent 0 uses behavior1
                 rng_key, action_key = jax.random.split(rng_key)
-                action, _ = get_scripted_action(obs[env.agents[0]], behavior1, action_key)
+                action = get_scripted_action(obs[env.agents[0]], behavior1, action_key)
                 actions[env.agents[0]] = action
                 
                 # Agent 1 uses behavior2
                 rng_key, action_key = jax.random.split(rng_key)
-                action, _ = get_scripted_action(obs[env.agents[1]], behavior2, action_key)
+                action = get_scripted_action(obs[env.agents[1]], behavior2, action_key)
                 actions[env.agents[1]] = action
                 
                 rng_key, step_key = jax.random.split(rng_key)
@@ -258,7 +258,7 @@ def test_different_behaviors_produce_different_results():
         
         # Results should be different (seek should be more aggressive)
         different_outcomes = (length1 != length2 or 
-                            abs(rewards1[env.agents[0]] - rewards2[env.agents[0]]) > 0.1)
+                            abs(rewards1['green'] - rewards2['green']) > 0.1)
         
         assert different_outcomes, "Different behaviors produced identical results"
         
