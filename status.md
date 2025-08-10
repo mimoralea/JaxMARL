@@ -34,7 +34,7 @@ Curriculum Effectiveness: Does opponent diversity during training (FSPPPO) impro
 Phase 1: Baseline vs. Scripted Behaviors
 
 Algorithms: [IPPO, SPPPO, FSPPPO] × Multiple checkpoints per algorithm
-Opponents: [seek, centaur, dodge, random, noop/static]
+Opponents: [seek, guardian, dodge, random, noop/static]
 Metrics: Win rate, average reward, consistency across seeds
 Phase 2: Algorithm vs. Algorithm
 
@@ -58,7 +58,7 @@ Expected Finding: Training algorithms may struggle against trivial opponents the
 python
 # Example experimental matrix
 training_opponents = ["self", "seek", "mixed_scripted"]
-evaluation_opponents = ["seek", "centaur", "dodge", "random", "noop"]
+evaluation_opponents = ["seek", "guardian", "dodge", "random", "noop"]
 # Measure performance drop when eval != training opponent
 3. Curriculum Learning Effectiveness
 
@@ -79,7 +79,7 @@ tournament_results = {
     'algorithm': str,           # IPPO, SPPPO, FSPPPO
     'checkpoint_step': int,     # Training iteration
     'seed': int,               # Training seed
-    'opponent_type': str,      # seek, centaur, etc.
+    'opponent_type': str,      # seek, guardian, etc.
     'match_seed': int,         # Evaluation seed
     'green_agent': str,        # Algorithm being tested
     'red_agent': str,          # Opponent
@@ -100,9 +100,9 @@ Experiment 1: "The Overfitting Hypothesis"
 
 python
 # Test each algorithm against opponents it was NOT trained against
-ippo_vs_unseen = test_algorithm("IPPO", opponents=["centaur", "dodge", "noop"])
-spppo_vs_unseen = test_algorithm("SPPPO", opponents=["seek", "centaur", "dodge", "noop"])
-fspppo_vs_unseen = test_algorithm("FSPPPO", opponents=["seek", "centaur", "dodge", "noop"])
+ippo_vs_unseen = test_algorithm("IPPO", opponents=["guardian", "dodge", "noop"])
+spppo_vs_unseen = test_algorithm("SPPPO", opponents=["seek", "guardian", "dodge", "noop"])
+fspppo_vs_unseen = test_algorithm("FSPPPO", opponents=["seek", "guardian", "dodge", "noop"])
 Experiment 2: "Training Curriculum Impact"
 
 python
@@ -131,7 +131,7 @@ checkpoints = [100, 500, 1000, 2000, 5000, 10000]  # iterations
 📈 Visualization & Analysis Plan:
 1. Performance Heatmaps
 
-        seek  centaur  dodge  random  noop
+        seek  guardian  dodge  random  noop
 IPPO    0.8    0.3     0.2    0.6    0.1  ← Reveals weaknesses
 SPPPO   0.6    0.7     0.4    0.5    0.2
 FSPPPO  0.9    0.8     0.7    0.8    0.6  ← Should be more robust
