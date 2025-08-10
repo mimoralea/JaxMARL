@@ -61,8 +61,8 @@ def create_generalization_heatmap(df):
     # Y-axis: More diversity at top, no diversity at bottom
     algorithms = ['FSPPPO\n(Historical Opponent Diversity)', 'IPPO\n(Minimal Opponent Diversity)', 'SPPPO\n(No Opponent Diversity)']
     algorithm_names = ['FSPPPO_latest', 'IPPO_latest_', 'SPPPO_latest']
-    # X-axis: Best FSPPPO performance left, worst performance right (Random, Noop, Dodge, Seek, Centaur)
-    scripted_opponents = ['scripted_random', 'scripted_noop', 'scripted_dodge', 'scripted_seek', 'scripted_centaur']
+    # X-axis: Best FSPPPO performance left, worst performance right (Random, Noop, Dodge, Seek, Guardian)
+    scripted_opponents = ['scripted_random', 'scripted_noop', 'scripted_dodge', 'scripted_seek', 'scripted_guardian']
     
     # Create matrix of win rates
     win_matrix = []
@@ -169,7 +169,7 @@ def create_robustness_radar_figure(df):
     
     algorithms = ['IPPO (Minimal)', 'SPPPO (None)', 'FSPPPO (Historical)']
     algorithm_names = ['IPPO_latest_', 'SPPPO_latest', 'FSPPPO_latest']
-    scripted_opponents = ['scripted_noop', 'scripted_random', 'scripted_seek', 'scripted_centaur', 'scripted_dodge']
+    scripted_opponents = ['scripted_noop', 'scripted_random', 'scripted_seek', 'scripted_guardian', 'scripted_dodge']
     
     # Calculate angles for radar chart
     angles = np.linspace(0, 2 * np.pi, len(scripted_opponents), endpoint=False).tolist()
@@ -226,7 +226,7 @@ def create_diversity_performance_correlation(df):
         overall_win_rates.append(wins / total * 100)
         
         # Generalization (vs scripted opponents)
-        scripted_opponents = ['scripted_noop', 'scripted_random', 'scripted_seek', 'scripted_centaur', 'scripted_dodge']
+        scripted_opponents = ['scripted_noop', 'scripted_random', 'scripted_seek', 'scripted_guardian', 'scripted_dodge']
         scripted_wins = 0
         scripted_total = 0
         for opponent in scripted_opponents:

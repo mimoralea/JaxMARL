@@ -124,7 +124,7 @@ def create_scripted_heatmap(win_rate_matrix, episode_count_matrix, output_dir):
     
     # Add a note about expected results
     plt.figtext(0.02, 0.02, 
-                "Expected: seek should dominate noop/random, dodge should avoid damage, centaur should be balanced",
+                "Expected: seek should dominate noop/random, dodge should avoid damage, guardian should be balanced",
                 fontsize=10, style='italic')
     
     plt.tight_layout()

@@ -73,7 +73,7 @@ def create_generalization_chart(df):
     
     algorithms = ['SPPPO', 'IPPO', 'FSPPPO']
     algorithm_names = ['SPPPO_latest', 'IPPO_latest_', 'FSPPPO_latest']
-    scripted_opponents = ['scripted_noop', 'scripted_random', 'scripted_seek', 'scripted_centaur', 'scripted_dodge']
+    scripted_opponents = ['scripted_noop', 'scripted_random', 'scripted_seek', 'scripted_guardian', 'scripted_dodge']
     
     # Create matrix of win rates
     win_matrix = []
@@ -198,7 +198,7 @@ def create_robustness_radar_chart(df):
     
     algorithms = ['IPPO', 'SPPPO', 'FSPPPO']
     algorithm_names = ['IPPO_latest_', 'SPPPO_latest', 'FSPPPO_latest']
-    scripted_opponents = ['scripted_noop', 'scripted_random', 'scripted_seek', 'scripted_centaur', 'scripted_dodge']
+    scripted_opponents = ['scripted_noop', 'scripted_random', 'scripted_seek', 'scripted_guardian', 'scripted_dodge']
     
     # Calculate angles for radar chart
     angles = np.linspace(0, 2 * np.pi, len(scripted_opponents), endpoint=False).tolist()
@@ -256,7 +256,7 @@ def create_diversity_correlation_chart(df):
         overall_win_rates.append(wins / total * 100)
         
         # Generalization (vs scripted opponents)
-        scripted_opponents = ['scripted_noop', 'scripted_random', 'scripted_seek', 'scripted_centaur', 'scripted_dodge']
+        scripted_opponents = ['scripted_noop', 'scripted_random', 'scripted_seek', 'scripted_guardian', 'scripted_dodge']
         scripted_wins = 0
         scripted_total = 0
         for opponent in scripted_opponents:
@@ -342,7 +342,7 @@ def create_summary_infographic(df):
         total = len(algo_matches)
         
         # Generalization
-        scripted_opponents = ['scripted_noop', 'scripted_random', 'scripted_seek', 'scripted_centaur', 'scripted_dodge']
+        scripted_opponents = ['scripted_noop', 'scripted_random', 'scripted_seek', 'scripted_guardian', 'scripted_dodge']
         scripted_wins = 0
         scripted_total = 0
         for opponent in scripted_opponents:
