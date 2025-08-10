@@ -114,7 +114,7 @@ def create_tournament_config(checkpoints: Dict[str, List[str]], output_file: str
         
         "scripted_baselines": [
             "seek",      # Aggressive chasing
-            "centaur",   # Defensive positioning  
+            "guardian",   # Defensive positioning  
             "dodge",     # Predictive evasion
             "random",    # Random actions
             "noop",      # Static behavior
@@ -573,12 +573,17 @@ def main():
     
     args = parser.parse_args()
     
-    # Create output directory
-    output_dir = Path(args.output_dir)
-    output_dir.mkdir(exist_ok=True)
+    # Create timestamped run folder
+    from datetime import datetime
+    run_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    base_output_dir = Path(args.output_dir)
+    output_dir = base_output_dir / f"run_{run_timestamp}"
+    output_dir.mkdir(parents=True, exist_ok=True)
     
     print("🎯 Comprehensive Baseline Algorithm Evaluation")
     print("=" * 60)
+    print(f"Run timestamp: {run_timestamp}")
+    print(f"Output directory: {output_dir}")
     
     if not args.skip_tournament:
         # Discover checkpoints

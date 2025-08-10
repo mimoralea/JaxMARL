@@ -97,10 +97,10 @@ def get_scripted_agent(agent_name, seed=0):
             return jnp.array(action)
         return seek_policy
     
-    elif agent_name == "centaur":
+    elif agent_name == "guardian":
         # Exact reimplementation from eval_arena.py
         SAFE_RAD = 0.15  # stay very close (<=0.15) to centre (arena R≈0.4)
-        def centaur_policy(obs):
+        def guardian_policy(obs):
             sx, sy = obs[0], obs[1]
             ox, oy = obs[4], obs[5]
             self_dist = jnp.sqrt(sx ** 2 + sy ** 2)
@@ -115,7 +115,7 @@ def get_scripted_agent(agent_name, seed=0):
                 return jnp.array(action)
             # Otherwise hold ground at centre; no aggressive pushing
             return jnp.array(0)
-        return centaur_policy
+        return guardian_policy
     
     elif agent_name == "dodge":
         # Exact reimplementation from eval_arena.py (simplified version for now)
@@ -584,9 +584,9 @@ def generate_multiple_rollouts(agent1_name, agent2_name, num_rollouts=10, output
 def main():
     parser = argparse.ArgumentParser(description='Generate agent rollout GIFs (scripted or learned)')
     parser.add_argument('--agent1', type=str, default='seek',
-                       help='First agent type (scripted: noop, random, seek, dodge, centaur; learned: FSPPPO, IPPO, SPPPO)')
+                       help='First agent type (scripted: noop, random, seek, dodge, guardian; learned: FSPPPO, IPPO, SPPPO)')
     parser.add_argument('--agent2', type=str, default='noop',
-                       help='Second agent type (scripted: noop, random, seek, dodge, centaur; learned: FSPPPO, IPPO, SPPPO)')
+                       help='Second agent type (scripted: noop, random, seek, dodge, guardian; learned: FSPPPO, IPPO, SPPPO)')
     parser.add_argument('--num-rollouts', type=int, default=10,
                        help='Number of rollouts to generate')
     parser.add_argument('--output-dir', type=str, default='rollout_gifs',
@@ -598,7 +598,7 @@ def main():
     args = parser.parse_args()
     
     # Validate agent types
-    scripted_agents = ['noop', 'random', 'seek', 'dodge', 'centaur']
+    scripted_agents = ['noop', 'random', 'seek', 'dodge', 'guardian']
     learned_agents = ['FSPPPO', 'IPPO', 'SPPPO']
     
     for agent_name in [args.agent1, args.agent2]:

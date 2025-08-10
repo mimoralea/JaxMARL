@@ -259,12 +259,13 @@ def main():
         with open(args.config, 'r') as f:
             base_config = yaml.safe_load(f)
 
-    # Create output directory
-    output_dir = Path(args.output_dir)
-    output_dir.mkdir(exist_ok=True)
-
     # Generate run timestamp
     run_timestamp = get_timestamp()
+    
+    # Create timestamped run folder
+    base_output_dir = Path(args.output_dir)
+    output_dir = base_output_dir / f"run_{run_timestamp}"
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     print("🎯 Sequential Baseline Algorithm Training")
     print("=" * 60)
