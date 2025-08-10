@@ -10,7 +10,7 @@ Supported Behaviors:
 - noop: No-operation (stationary)
 - random: Random action selection
 - seek: Complex FSM with chase/retreat modes and position/velocity analysis
-- centaur: Defensive strategy staying near center with safety radius
+- guardian: Defensive strategy staying near center with safety radius
 - dodge: Orbital movement with safety bounds and tangential motion
 
 Usage:
@@ -93,10 +93,10 @@ def get_scripted_agent(agent_name: str, seed: int = 0) -> Callable:
             return jnp.array(action)
         return seek_policy
     
-    elif agent_name == "centaur":
+    elif agent_name == "guardian":
         # Defensive strategy staying near center - exact reimplementation from eval_arena.py
         SAFE_RAD = 0.15  # stay very close (<=0.15) to centre (arena R≈0.4)
-        def centaur_policy(obs):
+        def guardian_policy(obs):
             sx, sy = obs[0], obs[1]
             ox, oy = obs[4], obs[5]
             self_dist = jnp.sqrt(sx ** 2 + sy ** 2)
@@ -111,7 +111,7 @@ def get_scripted_agent(agent_name: str, seed: int = 0) -> Callable:
                 return jnp.array(action)
             # Otherwise hold ground at centre; no aggressive pushing
             return jnp.array(0)
-        return centaur_policy
+        return guardian_policy
     
     elif agent_name == "dodge":
         # Orbital movement with safety bounds - exact reimplementation from eval_arena.py
@@ -186,7 +186,7 @@ def list_scripted_behaviors() -> Dict[str, str]:
         "noop": "No-operation (stationary)",
         "random": "Random action selection", 
         "seek": "Complex FSM with chase/retreat modes and position/velocity analysis",
-        "centaur": "Defensive strategy staying near center with safety radius",
+        "guardian": "Defensive strategy staying near center with safety radius",
         "dodge": "Orbital movement with safety bounds and tangential motion"
     }
 
@@ -221,7 +221,7 @@ def get_scripted_action(obs: jnp.ndarray, behavior_name: str,
         else:
             action = 4 if dy > 0 else 3
         return int(action)
-    elif behavior_name == "centaur":
+    elif behavior_name == "guardian":
         sx, sy = obs[0], obs[1]
         self_dist = jnp.sqrt(sx ** 2 + sy ** 2)
         SAFE_RAD = 0.15
