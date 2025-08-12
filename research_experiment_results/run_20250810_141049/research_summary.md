@@ -3,12 +3,12 @@
 Generated: 2025-08-10 14:11:09
 
 ## Experiment Overview
-This comprehensive research experiment evaluated the performance and robustness of 
+This comprehensive research experiment evaluated the performance and robustness of
 baseline multi-agent reinforcement learning algorithms implemented in JaxMARL.
 
 ### Algorithms Evaluated:
 - **IPPO**: Independent Proximal Policy Optimization
-- **SPPPO**: Self-Play Proximal Policy Optimization  
+- **SPPPO**: Self-Play Proximal Policy Optimization
 - **FSPPPO**: Fictitious Self-Play Proximal Policy Optimization
 
 ### Scripted Baselines:
@@ -53,7 +53,7 @@ Based on previous tournament evaluations and the validated infrastructure:
 5. **SPPPO**: 14.4% win rate (worst performance)
 
 #### Key Research Discoveries:
-- **Opponent Diversity is Critical**: FSPPPO (high diversity) significantly outperforms 
+- **Opponent Diversity is Critical**: FSPPPO (high diversity) significantly outperforms
   IPPO (minimal diversity) and SPPPO (zero diversity)
 - **Generalization Gap**: Learned algorithms struggle against unseen opponents
 - **Conservative Policies**: High draw rates indicate overly conservative learned behaviors
@@ -102,11 +102,11 @@ Based on previous tournament evaluations and the validated infrastructure:
 
 ## Conclusion
 
-This research experiment provides strong evidence that **opponent diversity during training 
+This research experiment provides strong evidence that **opponent diversity during training
 is crucial for developing robust, generalizable multi-agent reinforcement learning policies**.
 
-The comprehensive evaluation infrastructure developed enables reliable, reproducible 
-research into MARL algorithm performance and robustness. The findings motivate the need 
+The comprehensive evaluation infrastructure developed enables reliable, reproducible
+research into MARL algorithm performance and robustness. The findings motivate the need
 for improved training curricula that emphasize opponent diversity and generalization.
 
 ## Technical Validation

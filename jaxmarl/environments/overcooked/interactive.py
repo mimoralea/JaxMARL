@@ -42,7 +42,7 @@ def step(env, action, extras):
     extras['obs'] = obs
     extras['state'] = state
     print(f"t={state.time}: reward={reward['agent_0']}, agent_dir={state.agent_dir_idx}, agent_inv={state.agent_inv}, done = {done['__all__']}")
-    
+
     if extras["debug"]:
         layers = [f"player_{i}_loc" for i in range(2)]
         layers.extend([f"player_{i // 4}_orientation_{i % 4}" for i in range(8)])

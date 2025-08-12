@@ -2,7 +2,7 @@
 Short introduction to running the Overcooked environment and visualising it using random actions.
 """
 
-import jax 
+import jax
 from jaxmarl import make
 from jaxmarl.viz.overcooked_visualizer import OvercookedVisualizer
 from jaxmarl.environments.overcooked import Overcooked, overcooked_layouts, layout_grid_to_dict

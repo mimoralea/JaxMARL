@@ -331,7 +331,7 @@ class OvercookedVisualizer:
 
 		# Render the grid
 		for y in range(grid.shape[0]):
-			for x in range(grid.shape[1]):		
+			for x in range(grid.shape[1]):
 				obj = grid[y,x,:]
 				if obj[0] in [OBJECT_TO_INDEX['empty'], OBJECT_TO_INDEX['unseen']] \
 					and obj[2] == 0:

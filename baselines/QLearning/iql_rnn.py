@@ -665,7 +665,7 @@ def tune(default_config):
 
     default_config = {**default_config, **default_config["alg"]}  # merge the alg config with the main config
     env_name = default_config["ENV_NAME"]
-    alg_name = default_config.get("ALG_NAME", "iql_rnn") 
+    alg_name = default_config.get("ALG_NAME", "iql_rnn")
     env, env_name = env_from_config(default_config)
 
     def wrapped_make_train():

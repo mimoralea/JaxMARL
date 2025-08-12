@@ -25,7 +25,7 @@ The implementation aims to be as close as possible to the original Overcooked-AI
 
 #### A note on dynamics
 In the original Overcooked-AI environment and in this JAX implementation, the pot starts cooking as soon as 3 onions are placed in the pot.
-An update to Overcooked-AI has since changed the dynamics to require an additional pot interaction to start cooking. 
+An update to Overcooked-AI has since changed the dynamics to require an additional pot interaction to start cooking.
 Updating the Overcooked-JAX to implement the new pot dynamics is on the roadmap and should be done by the end of 2023.
 
 ## Action Space
@@ -34,7 +34,7 @@ There are 6 possible actions, comprised of 4 movement actions (right, down, left
 ## Observation Space
 The observations follow the featurization in the original Overcooked-AI environment, and is meant to be passed to a ConvNet.
 
-Each observation is a sparse, (mostly) binary encoding of size `layout_height x layout_width x n_channels`, where `n_channels = 26`. 
+Each observation is a sparse, (mostly) binary encoding of size `layout_height x layout_width x n_channels`, where `n_channels = 26`.
 For a detailed description of each channel, refer to the `get_obs(...)` method in [`overcooked.py`](overcooked.py).
 
 ## Reward
@@ -45,7 +45,7 @@ Additionally, we include a shaped reward as per the original Overcooked environm
 
 ```
 BASE_REW_SHAPING_PARAMS = {
-    "PLACEMENT_IN_POT_REW": 3, # reward for putting ingredients 
+    "PLACEMENT_IN_POT_REW": 3, # reward for putting ingredients
     "PLATE_PICKUP_REWARD": 3, # reward for picking up a plate
     "SOUP_PICKUP_REWARD": 5, # reward for picking up a ready soup
     "DISH_DISP_DISTANCE_REW": 0,

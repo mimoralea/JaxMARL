@@ -47,7 +47,7 @@ def _load_params_or_baseline(path_or_baseline: str, env, agent_name: str, seed: 
     if path_or_baseline == "noop":
         print(f'Loading noop policy for {agent_name}')
         return lambda *_: jnp.array(0)  # action 0 assumed to be noop
-    
+
     if path_or_baseline == "seek":
         print(f'Loading heuristic SEEK policy for {agent_name}')
         # Observation layout: [self_x, self_y, self_vx, self_vy, opp_x, opp_y, opp_vx, opp_vy]
@@ -123,16 +123,16 @@ def _load_params_or_baseline(path_or_baseline: str, env, agent_name: str, seed: 
             sx, sy = obs[0], obs[1]
             ox, oy = obs[4], obs[5]
             ovx, ovy = obs[6], obs[7]
-            
+
             # Predict opponent position in next few steps
             PREDICT_STEPS = 3
             pred_ox = ox + ovx * PREDICT_STEPS
             pred_oy = oy + ovy * PREDICT_STEPS
-            
+
             # Move away from predicted opponent position
             dx = pred_ox - sx
             dy = pred_oy - sy
-            
+
             # Stay near center while dodging
             self_dist = jnp.sqrt(sx ** 2 + sy ** 2)
             if self_dist > 0.3:  # if too far from center
@@ -141,7 +141,7 @@ def _load_params_or_baseline(path_or_baseline: str, env, agent_name: str, seed: 
                     return jnp.array(1) if sx > 0 else jnp.array(2)
                 else:
                     return jnp.array(3) if sy > 0 else jnp.array(4)
-            
+
             # Dodge opponent
             if jnp.abs(dx) > jnp.abs(dy):
                 return jnp.array(1) if dx > 0 else jnp.array(2)  # move away in x
@@ -162,26 +162,26 @@ def _load_params_or_baseline(path_or_baseline: str, env, agent_name: str, seed: 
     checkpoint_path = Path(path_or_baseline).resolve()  # Convert to absolute path
     if not checkpoint_path.exists():
         raise FileNotFoundError(f"Checkpoint path does not exist: {path_or_baseline}")
-    
+
     print(f"Loading FSPPPO checkpoint '{checkpoint_path}' for {agent_name}")
-    
+
     # Create abstract train state for loading
     config = {
         "LR": 2.5e-4,
         "ANNEAL_LR": True,
         "MAX_GRAD_NORM": 0.5,
     }
-    
+
     # Create network matching the one in fspppo_ff_mpe.py
     action_space_n = env.action_space(agent_name).n
     network = ActorCritic(action_space_n, activation=activation)
-    
+
     # Create abstract train state
     abstract_train_state = create_abstract_train_state(config, env, network)
-    
+
     # Load checkpoint parameters
     params = load_checkpoint_for_opponent(str(checkpoint_path), abstract_train_state)
-    
+
     def _policy(_, obs):
         pi, _ = network.apply(params, obs.flatten())
         # Use the same action selection as in get_rollout
@@ -208,55 +208,55 @@ def run_arena(
     """Run a single rollout given two policies/baselines and export a gif."""
     if seed is None:
         seed = int(time.time())
-    
+
     print(f"[arena] Running match with seed={seed}")
     print(f"[arena] Green: {green}")
     print(f"[arena] Red: {red}")
-    
+
     # Create environment with fixed starting positions
     if env_name == "MPE_simple_sumo_v3":
         env_kwargs = env_kwargs.copy()
         env_kwargs["random_spawn"] = False
     env = jaxmarl.make(env_name, **env_kwargs)
     print(f"Created environment {env_name} with kwargs {env_kwargs}")
-    
+
     # Load policies
     green_agent = env.agents[0]  # typically "agent_0"
     red_agent = env.agents[1]    # typically "agent_1"
-    
+
     green_policy = _load_params_or_baseline(green, env, green_agent, seed, activation)
     red_policy = _load_params_or_baseline(red, env, red_agent, seed + 1, activation)
-    
+
     # Run rollout
     key = jax.random.PRNGKey(seed)
     key, reset_key = jax.random.split(key)
-    
+
     obs, state = env.reset(reset_key)
     state_seq = [state]
     reward_seq = {agent: [] for agent in env.agents}
-    
+
     iterator = range(max_steps)
     if use_tqdm and _HAS_TQDM:
         iterator = tqdm(iterator, desc="Arena rollout")
-    
+
     for step in iterator:
         # Get actions from both policies
         green_action = green_policy(state, obs[green_agent])
         red_action = red_policy(state, obs[red_agent])
-        
+
         actions = {
             green_agent: green_action,
             red_agent: red_action,
         }
-        
+
         # Step environment
         key, step_key = jax.random.split(key)
         obs, next_state, rewards, dones, infos = env.step(step_key, state, actions)
-        
+
         # Log rewards
         for agent in env.agents:
             reward_seq[agent].append(rewards[agent])
-        
+
         # Save state for visualisation (freeze final frame on termination)
         if dones["__all__"]:
             # Use snap state to show the actual match outcome before auto-reset
@@ -271,30 +271,30 @@ def run_arena(
             break
         else:
             state_seq.append(next_state)
-        
+
         state = next_state
-    
+
     print(f"[arena] Rollout completed in {len(state_seq)-1} steps")
-    
+
     # Calculate action distribution similarity (KL divergence)
     # This is a placeholder - would need to collect action probabilities for real KL
     print(f"[arena] KL divergence calculation not implemented for FSPPPO checkpoints")
-    
+
     # Create visualization
     viz = MPEVisualizer(env, state_seq, reward_seq)
     viz.animate(save_fname=save_path, view=False, loop=False)
     print(f"[arena] Saved rollout -> {save_path}")
-    
+
     # Convert agent names to colors for reward sequence output
     reward_dict = {}
     for i, agent in enumerate(env.agents):
         color = "green" if i == 0 else "red"
         reward_dict[color] = [r.item() for r in reward_seq[agent]]
-    
+
     # Prepare match outcome for later display
     green_final_reward = reward_dict["green"][-1] if reward_dict["green"] else 0
     red_final_reward = reward_dict["red"][-1] if reward_dict["red"] else 0
-    
+
     if green_final_reward > 0:
         result = "GREEN WINS"
         ascii_art = """
@@ -325,7 +325,7 @@ def run_arena(
 |                     |
 +---------------------+
 """
-    
+
     return state_seq, reward_dict, result, ascii_art
 
 

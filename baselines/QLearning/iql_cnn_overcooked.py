@@ -57,7 +57,7 @@ class CNN(nn.Module):
         x = x.reshape((x.shape[0], -1))  # Flatten
 
         x = nn.Dense(
-            features=64 
+            features=64
         )(x)
         x = activation(x)
 

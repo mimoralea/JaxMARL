@@ -110,13 +110,13 @@ class IPPOCheckpointManager:
 
             # Convert step to int to handle float values from JAX
             step_int = int(step)
-        
+
             # Orbax creates directory with just the step number (no step_ prefix)
             actual_checkpoint_path = self.agent_dirs[agent_name] / str(step_int)
-        
+
             # Log the actual checkpoint path that Orbax will create
             print(f"[IPPO] Saving {agent_name} checkpoint to: {actual_checkpoint_path.resolve()}")
-        
+
             self.managers[agent_name].save(step_int, save_args)
             checkpoint_paths[agent_name] = str(actual_checkpoint_path.resolve())
 

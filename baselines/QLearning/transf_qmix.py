@@ -5,9 +5,9 @@ End-to-End JAX Implementation of TransfQMix.
 
 The implementation closely follows the original one https://github.com/mttga/pymarl_transformers with some additional features:
 - The embeddings can be normalized with batch norm in order to stabilize the self-attention gradients.
-- It's added the possibility to perform $n$ training updates of the network at each update step. 
+- It's added the possibility to perform $n$ training updates of the network at each update step.
 
-Currently supports only MPE_spread and SMAX. Remember that to use the transformers in your environment you need 
+Currently supports only MPE_spread and SMAX. Remember that to use the transformers in your environment you need
 to reshape the observations and states to matrices. See: jaxmarl.wrappers.transformers
 """
 
@@ -119,7 +119,7 @@ class Embedder(nn.Module):
         return x
 
 class ScannedTransformer(nn.Module):
-    
+
     hidden_dim: int
     init_scale: float
     transf_num_layers: int
@@ -175,7 +175,7 @@ class ScannedTransformer(nn.Module):
     @staticmethod
     def initialize_carry(hidden_size, *batch_size):
         return jnp.zeros((*batch_size, hidden_size))
-    
+
 
 class TransformerAgent(nn.Module):
     action_dim: int
@@ -194,7 +194,7 @@ class TransformerAgent(nn.Module):
 
     @nn.compact
     def __call__(self, hs, x, train=True, return_all_hs=False):
-        
+
         ins, resets = x
         embeddings = Embedder(
             self.hidden_dim,
@@ -218,7 +218,7 @@ class TransformerAgent(nn.Module):
             return last_hs, (hidden_states, q_vals)
         else:
             return last_hs, q_vals
-        
+
 
 class TransformerAgentSmax(nn.Module):
     # variation of transformer agent which uses policy decomposition to
@@ -240,10 +240,10 @@ class TransformerAgentSmax(nn.Module):
 
     @nn.compact
     def __call__(self, hs, x, train=True, return_all_hs=False):
-        
+
         ins, resets = x
         # mask for the death/invisible agents, which are assumed to have obs==0
-        mask = jnp.all(ins==0, axis=-1).astype(bool) 
+        mask = jnp.all(ins==0, axis=-1).astype(bool)
         mask = jnp.concatenate((jnp.zeros((*mask.shape[:-1], 1)),mask), axis=-1) # add a positive mask for the agent internal hidden state that will be added later
         embeddings = Embedder(
             self.hidden_dim,
@@ -261,7 +261,7 @@ class TransformerAgentSmax(nn.Module):
             deterministic=True,
             return_embeddings=True,
         )(hs, (embeddings, mask, resets))
-        
+
         # q_vals for the movement actions are computed from agents hidden states
         hidden_states = embeddings[..., 0:1, :]
         q_mov = nn.Dense(
@@ -269,7 +269,7 @@ class TransformerAgentSmax(nn.Module):
             kernel_init=orthogonal(self.init_scale_q),
             bias_init=constant(0.0),
         )(hidden_states) # time_step, batch_size, 1, 5
-        
+
         # q_vals for attacking an enemy is computed from attacking that enemy
         n_enemies = self.action_dim-self.num_movement_actions
         enemy_embeddings = embeddings[..., -n_enemies-1:-1, :] # last embedding is 'self', just before are the enemies
@@ -280,12 +280,12 @@ class TransformerAgentSmax(nn.Module):
             bias_init=constant(0.0)
         )(enemy_embeddings) # time_step, batch_size, n_enemies, 1
         q_vals = jnp.concatenate((q_mov,jnp.swapaxes(q_attack, -1, -2)), axis=-1)
-        
+
         if return_all_hs:
             return last_hs, (hidden_states, q_vals)
         else:
             return last_hs, q_vals
-    
+
 
 class TransformerMixer(nn.Module):
 
@@ -297,10 +297,10 @@ class TransformerMixer(nn.Module):
     scale_inputs: bool = True
     use_fast_attention: bool = True
     relu_emb: bool = True
-    
+
     @nn.compact
     def __call__(self, q_vals, hs_agents, states, done, train=True):
-        
+
         n_agents, time_steps, batch_size = q_vals.shape
         q_vals = jnp.transpose(q_vals, (1, 2, 0)) # (time_steps, batch_size, n_agents)
 
@@ -327,7 +327,7 @@ class TransformerMixer(nn.Module):
             return_embeddings=True,
             use_fast_attention=self.use_fast_attention,
         )(hs_mixer, (mixer_embs, None, done)) # for now the mixer doesn't mask the embeddings
-        
+
         # monotonicity and reshaping
         main_emb = hyp_emb[..., 0:1, :] # main embedding is the hs of the mixer
         w_1 = jnp.abs(hyp_emb[..., -n_agents:, :].reshape(time_steps, batch_size, n_agents, self.hidden_dim)) # w1 is a transformation of the agents' hs
@@ -335,13 +335,13 @@ class TransformerMixer(nn.Module):
         w_2 = jnp.abs(main_emb.reshape(time_steps, batch_size, self.hidden_dim, 1))
         b_2 = nn.Dense(1, kernel_init=orthogonal(self.init_scale), bias_init=constant(0.))(nn.relu(main_emb))
         b_2 = b_2.reshape(time_steps, batch_size, 1, 1)
-    
+
         # mix
         hidden = nn.elu(jnp.matmul(q_vals[:, :, None, :], w_1) + b_1)
         q_tot  = jnp.matmul(hidden, w_2) + b_2
-        
+
         return q_tot.squeeze() # (time_steps, batch_size)
-    
+
 
 class EpsilonGreedy:
     """Epsilon Greedy action selection"""
@@ -351,23 +351,23 @@ class EpsilonGreedy:
         self.end_e    = end_e
         self.duration = duration
         self.slope    = (end_e - start_e) / duration
-        
+
     @partial(jax.jit, static_argnums=0)
     def get_epsilon(self, t: int):
         e = self.slope*t + self.start_e
         return jnp.clip(e, self.end_e)
-    
+
     @partial(jax.jit, static_argnums=0)
     def choose_actions(self, q_vals: dict, t: int, rng: chex.PRNGKey):
-        
+
         def explore(q, eps, key):
             key_a, key_e   = jax.random.split(key, 2) # a key for sampling random actions and one for picking
-            greedy_actions = jnp.argmax(q, axis=-1) # get the greedy actions 
+            greedy_actions = jnp.argmax(q, axis=-1) # get the greedy actions
             random_actions = jax.random.randint(key_a, shape=greedy_actions.shape, minval=0, maxval=q.shape[-1]) # sample random actions
             pick_random    = jax.random.uniform(key_e, greedy_actions.shape)<eps # pick which actions should be random
             chosen_actions = jnp.where(pick_random, random_actions, greedy_actions)
             return chosen_actions
-        
+
         eps = self.get_epsilon(t)
         keys = dict(zip(q_vals.keys(), jax.random.split(rng, len(q_vals)))) # get a key for each agent
         chosen_actions = jax.tree.map(lambda q, k: explore(q, eps, k), q_vals, keys)
@@ -424,11 +424,11 @@ def make_train(config, env):
             sample_sequence_length=1,
             period=1,
         )
-        buffer_state = buffer.init(sample_traj_unbatched) 
+        buffer_state = buffer.init(sample_traj_unbatched)
 
         # INIT NETWORK
         # init agent
-        if 'smax' in env.name.lower(): # smax agent 
+        if 'smax' in env.name.lower(): # smax agent
             agent_class = TransformerAgentSmax
             n_entities = wrapped_env._env.num_allies+wrapped_env._env.num_enemies # must be explicit for the n_entities if using policy decoupling
             init_x = (
@@ -490,15 +490,15 @@ def make_train(config, env):
         agent_params = sum(x.size for x in jax.tree_leaves(network_params['agent']))
         mixer_params = sum(x.size for x in jax.tree_leaves(network_params['mixer']))
         jax.debug.print("Number of agent params: {x}", x=agent_params)
-        jax.debug.print("Number of mixer params: {x}", x=mixer_params) 
-        
+        jax.debug.print("Number of mixer params: {x}", x=mixer_params)
+
         # INIT TRAIN STATE AND OPTIMIZER
         def linear_schedule(count):
             frac = 1.0 - (count / config["NUM_UPDATES"]*config['N_MINI_UPDATES'])
             return config["LR"] * frac
         def exponential_schedule(count):
             return config["LR"] * (1-config['LR_EXP_DECAY_RATE'])**count
-        
+
         decay_type = config.get('LR_DECAY_TYPE', False)
 
         if decay_type == 'cos':
@@ -551,7 +551,7 @@ def make_train(config, env):
                 jnp.concatenate(flatten_agents_obs, axis=1), # (time_step, n_agents*n_envs, n_entities, obs_size)
                 jnp.concatenate([dones[agent] for agent in agents], axis=1), # ensure to not pass other keys (like __all__)
             )
-            
+
             # if train, the outs contain the update of the batch norm
             if train:
                 outs, batch_norm_update = agent.apply(
@@ -608,7 +608,7 @@ def make_train(config, env):
                 dones_ = jax.tree.map(lambda x: x[np.newaxis, :], last_dones)
                 # get the q_values from the agent netwoek
                 _, hstate, q_vals = homogeneous_pass(env_params, env_batch_norm, hstate, obs_, dones_, train=False)
-                # remove the dummy time_step dimension and index qs by the valid actions of each agent 
+                # remove the dummy time_step dimension and index qs by the valid actions of each agent
                 valid_q_vals = jax.tree.map(lambda q, valid_idx: q.squeeze(0)[..., valid_idx], q_vals, wrapped_env.valid_actions)
                 # explore with epsilon greedy_exploration
                 actions = explorer.choose_actions(valid_q_vals, t, key_a)
@@ -631,7 +631,7 @@ def make_train(config, env):
                 env_state,
                 init_obs,
                 init_dones,
-                hstate, 
+                hstate,
                 _rng,
                 time_state['timesteps'] # t is needed to compute epsilon
             )
@@ -652,7 +652,7 @@ def make_train(config, env):
                 """index the q_values with action indices"""
                 q_u = jnp.take_along_axis(q, jnp.expand_dims(u, axis=-1), axis=-1)
                 return jnp.squeeze(q_u, axis=-1)
-            
+
 
             def _network_update(carry, unused):
 
@@ -670,7 +670,7 @@ def make_train(config, env):
                 def _loss_fn(params, init_hs, learn_traj):
 
                     obs_ = {a:learn_traj.obs[a] for a in env.agents} # ensure to not pass the global state (obs["__all__"]) to the network
-                    
+
                     updates_agent, _, hs_agents, q_vals = homogeneous_pass(
                         params['agent'],
                         train_state.batch_stats['agent'],
@@ -711,7 +711,7 @@ def make_train(config, env):
 
                     # compute q_tot with the mixer network
                     chosen_action_qvals_mix, updates_mixer = mixer.apply(
-                        {'params':params['mixer'],'batch_stats':train_state.batch_stats['mixer']}, 
+                        {'params':params['mixer'],'batch_stats':train_state.batch_stats['mixer']},
                         jnp.stack(list(chosen_action_qvals.values())),
                         hs_agents[:-1], # hs of agents, avoiding last timestep
                         learn_traj.obs['__all__'][:-1], # avoid last timestep
@@ -720,7 +720,7 @@ def make_train(config, env):
                         mutable=['batch_stats'],
                     )
                     target_max_qvals_mix = mixer.apply(
-                        {'params':target_network_state['params']['mixer'],'batch_stats':train_state.batch_stats['mixer']}, 
+                        {'params':target_network_state['params']['mixer'],'batch_stats':train_state.batch_stats['mixer']},
                         jnp.stack(list(target_max_qvals.values())),
                         hs_target_agents[1:], # hs of target agents, avoiding first timestep
                         learn_traj.obs['__all__'][1:], # avoid first timestep
@@ -757,7 +757,7 @@ def make_train(config, env):
                             + config['GAMMA']*(1-learn_traj.dones['__all__'][:-1])*target_max_qvals_mix
                         )
                         loss = jnp.mean((chosen_action_qvals_mix - jax.lax.stop_gradient(targets))**2)
-                    
+
                     batch_norm_update = {'agent':updates_agent['batch_stats'], 'mixer':updates_mixer['batch_stats']}
                     return loss, (targets, batch_norm_update)
 
@@ -820,7 +820,7 @@ def make_train(config, env):
                     'grad_mean':update_info['grad'].mean(),
                     'params_agent_mean':tree_mean(train_state.params['agent']),
                     'params_mixer_mean':tree_mean(train_state.params['mixer']),
-                }, 
+                },
                 'test_metrics': test_metrics
             }
 
@@ -880,7 +880,7 @@ def make_train(config, env):
                 env_state,
                 init_obs,
                 init_dones,
-                hstate, 
+                hstate,
                 _rng,
             )
             step_state, (rewards, dones, infos) = jax.lax.scan(
@@ -910,7 +910,7 @@ def make_train(config, env):
         }
         rng, _rng = jax.random.split(rng)
         test_metrics = get_greedy_metrics(_rng, train_state, time_state) # initial greedy metrics
-        
+
         # train
         rng, _rng = jax.random.split(rng)
         runner_state = (
@@ -928,7 +928,7 @@ def make_train(config, env):
             _update_step, runner_state, None, config["NUM_UPDATES"]
         )
         return {'runner_state':runner_state, 'metrics':metrics}
-    
+
     return train
 
 

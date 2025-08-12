@@ -50,7 +50,7 @@ class EnvState:
 class EnvParams:
 	height: int = 15
 	width: int = 15
-	n_walls: int = 25 
+	n_walls: int = 25
 	agent_view_size: int = 5
 	replace_wall_pos: bool = False
 	see_through_walls: bool = True
@@ -127,8 +127,8 @@ class Maze(Environment):
 		)
 
 	def reset_env(
-		self, 
-		key: chex.PRNGKey, 
+		self,
+		key: chex.PRNGKey,
 	) -> Tuple[chex.Array, EnvState]:
 		"""Reset environment state by resampling contents of maze_map
 		- initial agent position
@@ -143,8 +143,8 @@ class Maze(Environment):
 		# Reset wall map, with shape H x W, and value of 1 at (i,j) iff there is a wall at (i,j)
 		key, subkey = jax.random.split(key)
 		wall_idx = jax.random.choice(
-			subkey, all_pos, 
-			shape=(params.n_walls,), 
+			subkey, all_pos,
+			shape=(params.n_walls,),
 			replace=params.replace_wall_pos)
 
 		occupied_mask = jnp.zeros_like(all_pos)
@@ -168,10 +168,10 @@ class Maze(Environment):
 
 		maze_map = make_maze_map(
 			params,
-			wall_map, 
-			goal_pos, 
-			agent_pos, 
-			agent_dir_idx, 
+			wall_map,
+			goal_pos,
+			agent_pos,
+			agent_dir_idx,
 			pad_obs=True)
 
 		state = EnvState(
@@ -190,7 +190,7 @@ class Maze(Environment):
 	def get_obs(self, state: EnvState) -> chex.Array:
 		"""Return limited grid view ahead of agent."""
 		obs = jnp.zeros(self.obs_shape, dtype=jnp.uint8)
-		
+
 		agent_x, agent_y = state.agent_pos
 
 		obs_fwd_bound1 = state.agent_pos
@@ -241,7 +241,7 @@ class Maze(Environment):
 
 		# Update agent position (forward action)
 		fwd_pos = jnp.minimum(
-			jnp.maximum(state.agent_pos + (action == Actions.forward)*state.agent_dir, 0), 
+			jnp.maximum(state.agent_pos + (action == Actions.forward)*state.agent_dir, 0),
 			jnp.array((params.width-1, params.height-1), dtype=jnp.uint32))
 
 		# Can't go past wall or goal
@@ -277,7 +277,7 @@ class Maze(Environment):
 				agent_pos=agent_pos,
 				agent_dir_idx=agent_dir_idx,
 				agent_dir=agent_dir,
-				maze_map=maze_map,	
+				maze_map=maze_map,
 				terminal=fwd_pos_has_goal),
 			reward
 		)

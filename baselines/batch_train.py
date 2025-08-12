@@ -238,7 +238,7 @@ def check_checkpoints_for_run(algorithm, run_id):
         # Extract step number from path like "checkpoints/fspppo/run_*/main/4882/"
         match = re.search(r'/main/(\d+)/?$', checkpoint_path)
         return int(match.group(1)) if match else 0
-    
+
     return sorted(checkpoints, key=extract_step_number)
 
 
@@ -261,7 +261,7 @@ def main():
 
     # Generate run timestamp
     run_timestamp = get_timestamp()
-    
+
     # Create timestamped run folder
     base_output_dir = Path(args.output_dir)
     output_dir = base_output_dir / f"run_{run_timestamp}"
@@ -381,7 +381,7 @@ def main():
                 import re
                 match = re.search(r'/main/(\d+)/?$', checkpoint_path)
                 return int(match.group(1)) if match else 0
-            
+
             sorted_checkpoints = sorted(all_checkpoints, key=extract_step_number)
             example_checkpoint = sorted_checkpoints[-1]  # Take the most recent
             print(f"   {algorithm}: {example_checkpoint}")

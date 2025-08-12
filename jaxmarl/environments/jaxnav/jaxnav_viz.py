@@ -8,9 +8,9 @@ from .jaxnav_env import JaxNav, State
 import jax.numpy as jnp
 
 class JaxNavVisualizer(object):
-    def __init__(self, 
-                 env: JaxNav, 
-                 obs_seq: List, 
+    def __init__(self,
+                 env: JaxNav,
+                 obs_seq: List,
                  state_seq: List[State],
                  reward_seq: List=None,
                  done_frames=None,
@@ -37,14 +37,14 @@ class JaxNavVisualizer(object):
             self.plot_reward=True
         else:
             self.plot_reward=False
-        
+
         self.fig, self.ax = plt.subplots(1, 1, figsize=(5, 5))
-        
+
         if self.plot_path:
             self.path_seq = jnp.empty((len(self.state_seq), env.num_agents, 2))
             for i in range(len(self.state_seq)):
                 self.path_seq = self.path_seq.at[i].set(self.state_seq[i].pos)
-            
+
 
     def animate(
         self,
@@ -86,7 +86,7 @@ class JaxNavVisualizer(object):
         txt_to_plot = []
         txt_to_plot.append(f"Time: {frame*self.env.dt:.2f} s")
             # self.ax.text(0.05, 0.95, f"Time: {frame*self.env.dt:.2f} s", transform=self.ax.transAxes, fontsize=12, verticalalignment='top', c='w')
-        if self.plot_reward: 
+        if self.plot_reward:
             self.reward += self.reward_seq[frame]
             txt_to_plot.append(f"R: {self.reward:.2f}")
         if self.title_text is not None:
@@ -97,13 +97,13 @@ class JaxNavVisualizer(object):
             # self.ax.text(0.05, 0.9, f"R: {self.reward:.2f}", transform=self.ax.transAxes, fontsize=12, verticalalignment='top', c='w')
         # if len(txt_to_plot) > 0:
         #     self.ax.text(0.05, 0.95, ' '.join(txt_to_plot), transform=self.ax.transAxes, fontsize=12, verticalalignment='top', c='w')
-            
+
         # if self.plot_line_to_goal:
         #     for a in range(self.env.num_agents):
         #         plot_frame = frame
         #         if self.done_frames[a] < frame:
-        #             plot_frame = self.done_frames[a] 
+        #             plot_frame = self.done_frames[a]
         #         x = jnp.concatenate([self.state_seq[plot_frame].pos[a, 0][None], self.state_seq[plot_frame].goal[a, 0][None]])
-        #         y = jnp.concatenate([self.state_seq[plot_frame].pos[a, 1][None], self.state_seq[plot_frame].goal[a, 1][None]])                self.ax.plot(, 
-        #                      jnp.concatenate([self.state_seq[plot_frame].pos[a, 1][None], self.state_seq[plot_frame].goal[a, 1][None]]), 
+        #         y = jnp.concatenate([self.state_seq[plot_frame].pos[a, 1][None], self.state_seq[plot_frame].goal[a, 1][None]])                self.ax.plot(,
+        #                      jnp.concatenate([self.state_seq[plot_frame].pos[a, 1][None], self.state_seq[plot_frame].goal[a, 1][None]]),
         #                      color='gray', alpha=0.4)

@@ -54,7 +54,7 @@ The exact observation varies for each environment, but in general it is a vector
 Check the example `mpe_introduction.py` file in the tutorials folder for an introduction to our implementation of the MPE environments, including an example visualisation. We animate the environment after the state transitions have been collected as follows:
 
 ```python
-import jax 
+import jax
 from jaxmarl import make
 from jaxmarl.environments.mpe import MPEVisualizer
 

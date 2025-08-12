@@ -1,13 +1,13 @@
 # MPE
 
-Multi Particle Environments (MPE) are a set of communication oriented environment where particle agents can (sometimes) move, communicate, see each other, push each other around, and interact with fixed landmarks. 
+Multi Particle Environments (MPE) are a set of communication oriented environment where particle agents can (sometimes) move, communicate, see each other, push each other around, and interact with fixed landmarks.
 
 ![MPE](https://github.com/FLAIROx/JaxMARL/blob/main/docs/imgs/qmix_MPE_simple_tag_v3.gif?raw=true){ width=300px }
 /// caption
 MPE Simple Tag
 ///
 
-## Environments 
+## Environments
 
 We implement all of the [PettingZoo MPE Environments](https://pettingzoo.farama.org/environments/mpe/):
 
@@ -53,7 +53,7 @@ The exact observation varies for each environment, but in general it is a vector
 Check the example `mpe_introduction.py` file in the tutorials folder for an introduction to our implementation of the MPE environments, including an example visualisation. We animate the environment after the state transitions have been collected as follows:
 
 ``` python
-import jax 
+import jax
 from jaxmarl import make
 from jaxmarl.environments.mpe import MPEVisualizer
 

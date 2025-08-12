@@ -108,7 +108,7 @@ class TournamentEvaluator:
         self.base_output_dir = Path(output_dir)
         self.output_dir = self.base_output_dir / f"run_{self.run_timestamp}"
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Store current training seed for checkpoint discovery (used internally)
         self.current_training_seed = None
 
@@ -125,42 +125,42 @@ class TournamentEvaluator:
         print(f"\n🎯 Running Multi-Seed Tournament")
         print(f"Training seeds: {self.training_seeds}")
         print(f"Evaluation seed: {self.evaluation_seed}")
-        
+
         all_results = {}
-        
+
         for seed in self.training_seeds:
             print(f"\n{'='*60}")
             print(f"🌱 TRAINING SEED {seed}")
             print(f"{'='*60}")
-            
+
             # Set current training seed for checkpoint discovery
             self.set_current_training_seed(seed)
-            
+
             # Create seed-specific output directory
             seed_output_dir = self.output_dir / f"seed_{seed}"
             seed_output_dir.mkdir(parents=True, exist_ok=True)
-            
+
             # Temporarily update output directory for this seed
             original_output_dir = self.output_dir
             self.output_dir = seed_output_dir
-            
+
             # Reset tournament state for this seed
             self.players = []
             self.matches = []
             self.results = []
-            
+
             try:
                 # Setup tournament for this specific seed
                 self.setup_tournament(selected_players, latest_only=latest_only)
-                
+
                 if not self.players:
                     print(f"⚠️  No players found for training seed {seed}, skipping...")
                     continue
-                
+
                 # Run tournament for this seed
                 seed_rng_key, rng_key = jax.random.split(rng_key)
                 self.run_tournament(seed_rng_key)
-                
+
                 # Store results for this seed
                 all_results[seed] = {
                     'players': len(self.players),
@@ -168,26 +168,26 @@ class TournamentEvaluator:
                     'episodes': len(self.results),
                     'output_dir': str(seed_output_dir)
                 }
-                
+
                 print(f"✅ Training seed {seed} completed: {len(self.results)} episodes")
-                
+
             except Exception as e:
                 print(f"❌ Error with training seed {seed}: {e}")
                 all_results[seed] = {'error': str(e)}
-            
+
             finally:
                 # Restore original output directory
                 self.output_dir = original_output_dir
-        
+
         # Generate multi-seed summary
         self._generate_multi_seed_summary(all_results)
-        
+
         return all_results
 
     def _generate_multi_seed_summary(self, all_results):
         """Generate a summary of multi-seed tournament results."""
         summary_file = self.output_dir / "multi_seed_tournament_summary.txt"
-        
+
         with open(summary_file, 'w') as f:
             f.write("Multi-Seed Tournament Summary\n")
             f.write("=" * 50 + "\n\n")
@@ -196,10 +196,10 @@ class TournamentEvaluator:
             f.write(f"Environment: {self.env_name}\n")
             f.write(f"Episodes per matchup: {self.episodes_per_matchup}\n")
             f.write(f"Skip random starts: {self.skip_random_starts}\n\n")
-            
+
             total_episodes = 0
             successful_seeds = 0
-            
+
             for seed in self.training_seeds:
                 f.write(f"Training Seed {seed}:\n")
                 if seed in all_results:
@@ -216,12 +216,12 @@ class TournamentEvaluator:
                 else:
                     f.write(f"  ⚠️  No results\n")
                 f.write("\n")
-            
+
             f.write(f"Summary:\n")
             f.write(f"  Total successful seeds: {successful_seeds}/{len(self.training_seeds)}\n")
             f.write(f"  Total episodes: {total_episodes}\n")
             f.write(f"  Results saved in separate directories per seed\n")
-        
+
         print(f"\n📊 Multi-seed summary saved to: {summary_file}")
 
     def _initialize_environment_and_data(self):
@@ -264,33 +264,33 @@ class TournamentEvaluator:
             except Exception:
                 pass
 
-    def _run_batch_episodes(self, green_player: TournamentPlayer, 
-                           red_player: TournamentPlayer, 
-                           rng_key, num_episodes: int, 
-                           side: int, match_id: str, 
+    def _run_batch_episodes(self, green_player: TournamentPlayer,
+                           red_player: TournamentPlayer,
+                           rng_key, num_episodes: int,
+                           side: int, match_id: str,
                            spawn_mode: str = "deterministic",
                            batch_size: int = 10) -> List[Dict[str, Any]]:
         """Run episodes in batches for better performance."""
-        
+
         # Load player parameters if needed
         if green_player.player_type == 'checkpoint' and green_player.params is None:
             self.load_checkpoint_player(green_player)
         if red_player.player_type == 'checkpoint' and red_player.params is None:
             self.load_checkpoint_player(red_player)
-        
+
         all_results = []
         episode_id_start = 0
-        
+
         # Process episodes in batches
         for batch_start in range(0, num_episodes, batch_size):
             batch_end = min(batch_start + batch_size, num_episodes)
             current_batch_size = batch_end - batch_start
-            
+
             # Split RNG keys for this batch
             batch_keys = jax.random.split(rng_key, current_batch_size + 1)
             rng_key = batch_keys[0]  # Update for next batch
             episode_keys = batch_keys[1:]
-            
+
             # Run episodes in this batch sequentially (still faster due to reduced overhead)
             batch_results = []
             for i in range(current_batch_size):
@@ -304,14 +304,14 @@ class TournamentEvaluator:
                     spawn_mode=spawn_mode
                 )
                 batch_results.append(result)
-            
+
             all_results.extend(batch_results)
             episode_id_start += current_batch_size
-            
+
             # Optional: Print progress for long runs
             if num_episodes > 20:
                 print(f"    Completed {batch_end}/{num_episodes} episodes")
-        
+
         return all_results
 
     def _run_optimized_match_chunk(self, green_player: TournamentPlayer,
@@ -320,13 +320,13 @@ class TournamentEvaluator:
                                   match_id: str, spawn_mode: str,
                                   rng_key, start_episode_id: int = 0) -> List[Dict[str, Any]]:
         """Run a chunk of episodes with optimized batching."""
-        
+
         if num_episodes == 0:
             return []
-        
+
         # Use batch processing for better performance
         batch_size = min(10, num_episodes)  # Adjust batch size based on available memory
-        
+
         return self._run_batch_episodes(
             green_player=green_player,
             red_player=red_player,
@@ -413,7 +413,7 @@ class TournamentEvaluator:
         seed = int(seed_match.group(1)) if seed_match else 0
         step = os.path.basename(latest_path)
         name = f"SPPPO_seed{seed}_step{step}"
-        
+
         return [TournamentPlayer(
             name=name,
             player_type='checkpoint',
@@ -559,7 +559,7 @@ class TournamentEvaluator:
         """Load parameters and apply function for a checkpoint player."""
         if player.params is not None:
             return
-        
+
         try:
             # Initialize network based on algorithm
             if player.algorithm == 'IPPO':
@@ -582,7 +582,7 @@ class TournamentEvaluator:
                 # Try PyTreeCheckpointer first (works for FSPPPO)
                 orbax_checkpointer = ocp.PyTreeCheckpointer()
                 restored = orbax_checkpointer.restore(player.checkpoint_path)
-                
+
                 # Handle different checkpoint structures
                 if 'model' in restored:
                     player.params = restored['model']['params']
@@ -595,7 +595,7 @@ class TournamentEvaluator:
                         player.params = restored['params']
                 else:
                     player.params = restored
-                    
+
             except Exception as e1:
                 try:
                     # Try loading from train_state subdirectory (IPPO/SPPPO format)
@@ -608,7 +608,7 @@ class TournamentEvaluator:
                         raise Exception("train_state subdirectory not found")
                 except Exception as e2:
                     raise Exception(f"Failed both direct PyTree ({e1}) and train_state loading ({e2})")
-            
+
             player.apply_fn = network.apply
 
             # Compute simple parameter fingerprint for diagnostics
@@ -636,7 +636,7 @@ class TournamentEvaluator:
                     player.checkpoint_step = int(base)
             except Exception:
                 player.checkpoint_step = None
-            
+
         except Exception as e:
             print(f"ERROR loading player {player.name}: {e}")
             print(f"Path: {player.checkpoint_path}")
@@ -693,7 +693,7 @@ class TournamentEvaluator:
         # Determine winner based on final rewards
         green_total_reward = float(rewards[self.env.agents[0]])
         red_total_reward = float(rewards[self.env.agents[1]])
-        
+
         if green_total_reward > red_total_reward:
             winner = self.env.agents[0]
             outcome = "win"
@@ -820,11 +820,11 @@ class TournamentEvaluator:
         # Determine winner based on final rewards
         green_total_reward = float(rewards[self.env.agents[0]])
         red_total_reward = float(rewards[self.env.agents[1]])
-        
+
         # Debug output for first few episodes to understand what's happening
         if episode_id < 3:
             print(f"  Episode {episode_id}: {episode_length} steps, rewards: green={green_total_reward:.3f}, red={red_total_reward:.3f}, done={dones['__all__']}")
-        
+
         if green_total_reward > red_total_reward:
             winner = self.env.agents[0]  # green
             outcome = "win"
@@ -855,14 +855,14 @@ class TournamentEvaluator:
         print(f"Running match: {match.player1.name} vs {match.player2.name}")
         print(f"Episodes: {match.total_episodes} "
               f"({match.episodes_per_side} per side)")
-        
+
         match_results = []
         episode_id = 0
-        
+
         if self.skip_random_starts:
             # Deterministic spawns only: two chunks (per side)
             self._set_spawn_mode(random_mode=False)
-            
+
             # Side 1 deterministic - batch processing
             print(f"Side 1 (deterministic, {self.episodes_per_side} eps): {match.player1.name} (green) vs {match.player2.name} (red)")
             rng_key, chunk_key = jax.random.split(rng_key)
@@ -874,7 +874,7 @@ class TournamentEvaluator:
             )
             match_results.extend(side1_results)
             episode_id += self.episodes_per_side
-            
+
             # Side 2 deterministic - batch processing
             print(f"Side 2 (deterministic, {self.episodes_per_side} eps): {match.player2.name} (green) vs {match.player1.name} (red)")
             rng_key, chunk_key = jax.random.split(rng_key)
@@ -890,10 +890,10 @@ class TournamentEvaluator:
             # Mixed spawns: four chunks (per side, per spawn mode)
             det_per_side = self.episodes_per_side // 2
             rand_per_side = self.episodes_per_side - det_per_side
-            
+
             # Deterministic chunks - batch processing
             self._set_spawn_mode(random_mode=False)
-            
+
             print(f"Side 1 (deterministic, {det_per_side} eps): {match.player1.name} (green) vs {match.player2.name} (red)")
             rng_key, chunk_key = jax.random.split(rng_key)
             side1_det_results = self._run_optimized_match_chunk(
@@ -904,7 +904,7 @@ class TournamentEvaluator:
             )
             match_results.extend(side1_det_results)
             episode_id += det_per_side
-            
+
             print(f"Side 2 (deterministic, {det_per_side} eps): {match.player2.name} (green) vs {match.player1.name} (red)")
             rng_key, chunk_key = jax.random.split(rng_key)
             side2_det_results = self._run_optimized_match_chunk(
@@ -918,7 +918,7 @@ class TournamentEvaluator:
 
             # Random-spawn chunks - batch processing
             self._set_spawn_mode(random_mode=True)
-            
+
             print(f"Side 1 (random starts, {rand_per_side} eps): {match.player1.name} (green) vs {match.player2.name} (red)")
             rng_key, chunk_key = jax.random.split(rng_key)
             side1_rand_results = self._run_optimized_match_chunk(
@@ -929,7 +929,7 @@ class TournamentEvaluator:
             )
             match_results.extend(side1_rand_results)
             episode_id += rand_per_side
-            
+
             print(f"Side 2 (random starts, {rand_per_side} eps): {match.player2.name} (green) vs {match.player1.name} (red)")
             rng_key, chunk_key = jax.random.split(rng_key)
             side2_rand_results = self._run_optimized_match_chunk(
@@ -940,7 +940,7 @@ class TournamentEvaluator:
             )
             match_results.extend(side2_rand_results)
             episode_id += rand_per_side
-        
+
         # Calculate match statistics
         player1_wins = sum(
             1 for r in match_results if r['winner'] == match.player1.name
@@ -949,12 +949,12 @@ class TournamentEvaluator:
             1 for r in match_results if r['winner'] == match.player2.name
         )
         draws = sum(1 for r in match_results if r['winner'] == 'draw')
-        
+
         print(f"Results: {match.player1.name}: {player1_wins}, "
               f"{match.player2.name}: {player2_wins}, Draws: {draws}")
-        
+
         return match_results
-    
+
     def setup_tournament(self, selected_players: Optional[List[str]] = None,
                          latest_only: bool = False):
         """Set up the tournament with all players and matches."""
@@ -963,7 +963,7 @@ class TournamentEvaluator:
         checkpoint_players = self.discover_checkpoint_players(latest_only=latest_only)
         scripted_players = self.create_scripted_players()
         all_players = checkpoint_players + scripted_players
-        
+
         # Filter players if specific ones were requested
         if selected_players:
             selected_set = set(selected_players)
@@ -988,7 +988,7 @@ class TournamentEvaluator:
             ]
         else:
             self.players = all_players
-        
+
         print(f"Tournament Setup:")
         print(f"Total players: {len(self.players)}")
 
@@ -1025,65 +1025,65 @@ class TournamentEvaluator:
         for player1, player2 in itertools.combinations(self.players, 2):
             match = TournamentMatch(player1, player2, self.episodes_per_side)
             self.matches.append(match)
-        
+
         total_episodes = len(self.matches) * self.episodes_per_matchup
         print(f"\nRunning tournament... (Total matches: {len(self.matches)})")
         print(f"Total episodes: {total_episodes}")
-    
+
     def run_tournament(self, rng_key):
         """Run the complete tournament."""
         print("Starting Tournament!")
         print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        
+
         start_time = time.time()
-        
+
         for i, match in enumerate(self.matches):
             print(f"Match {i+1}/{len(self.matches)}")
             rng_key, match_key = jax.random.split(rng_key)
             match_results = self.run_match(match, match_key)
             self.results.extend(match_results)
-            
+
             # Save intermediate results every 10 matches
             if (i + 1) % 10 == 0:
                 self.save_results(intermediate=True)
-        
+
         end_time = time.time()
         duration = end_time - start_time
-        
+
         print("Tournament Complete!")
         print(f"Duration: {duration/60:.1f} minutes")
         print(f"Total episodes: {len(self.results)}")
-        
+
         # Save final results
         self.save_results(intermediate=False)
         self.generate_summary()
-    
+
     def save_results(self, intermediate: bool = False):
         """Save tournament results to CSV."""
         suffix = "_intermediate" if intermediate else ""
         filename = f"tournament_results{suffix}.csv"
         filepath = self.output_dir / filename
-        
+
         if not self.results:
             print("No results to save")
             return
-        
+
         fieldnames = [
             'match_id', 'episode_id', 'winner', 'outcome', 'steps', 'returns',
             'green_player', 'red_player', 'green_reward', 'red_reward', 'side', 'spawn_mode'
         ]
-        
+
         with open(filepath, 'w', newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(self.results)
-        
+
         print(f"Results saved to: {filepath}")
-    
+
     def generate_summary(self):
         """Generate a summary of tournament results."""
         summary_file = self.output_dir / "tournament_summary.txt"
-        
+
         # Calculate win rates for each player
         player_stats = {}
         for player in self.players:
@@ -1091,19 +1091,19 @@ class TournamentEvaluator:
                 'wins': 0, 'losses': 0, 'draws': 0, 'total_reward': 0.0,
                 'episodes': 0
             }
-        
+
         for result in self.results:
             green_player = result['green_player']
             red_player = result['red_player']
-            
+
             # Update episode counts
             player_stats[green_player]['episodes'] += 1
             player_stats[red_player]['episodes'] += 1
-            
+
             # Update rewards
             player_stats[green_player]['total_reward'] += result['green_reward']
             player_stats[red_player]['total_reward'] += result['red_reward']
-            
+
             # Update win/loss/draw counts
             if result['winner'] == 'green':
                 player_stats[green_player]['wins'] += 1
@@ -1114,7 +1114,7 @@ class TournamentEvaluator:
             else:
                 player_stats[green_player]['draws'] += 1
                 player_stats[red_player]['draws'] += 1
-        
+
         # Generate summary
         with open(summary_file, 'w') as f:
             f.write("TOURNAMENT SUMMARY\n")
@@ -1127,21 +1127,21 @@ class TournamentEvaluator:
             f.write(f"Total players: {len(self.players)}\n")
             f.write(f"Total matches: {len(self.matches)}\n")
             f.write(f"Total episodes: {len(self.results)}\n\n")
-            
+
             f.write("PLAYER STATISTICS\n")
             f.write("-" * 30 + "\n")
-            
+
             # Sort players by win rate
             sorted_players = sorted(
                 player_stats.items(),
                 key=lambda x: x[1]['wins'] / max(x[1]['episodes'], 1),
                 reverse=True
             )
-            
+
             for player_name, stats in sorted_players:
                 win_rate = stats['wins'] / max(stats['episodes'], 1) * 100
                 avg_reward = stats['total_reward'] / max(stats['episodes'], 1)
-                
+
                 f.write(f"\n{player_name}:\n")
                 f.write(
                     f"  Win Rate: {win_rate:.1f}% ({stats['wins']}/"
@@ -1152,7 +1152,7 @@ class TournamentEvaluator:
                     f"{stats['draws']}\n"
                 )
                 f.write(f"  Avg Reward: {avg_reward:.3f}\n")
-        
+
         print(f"Summary saved to: {summary_file}")
 
 
@@ -1187,7 +1187,7 @@ def main():
         # Handle both string and integer inputs
         if isinstance(value, int):
             return [value]
-        
+
         value_str = str(value)
         if ',' in value_str:
             # Multiple seeds: "0,1,2" or 0,1,2
@@ -1195,7 +1195,7 @@ def main():
         else:
             # Single seed: "0" or 0
             return [int(value_str)]
-    
+
     parser.add_argument(
         "--training-seeds", type=str, default="0,1,2",
         help="Training seeds for checkpoint selection (default: 0,1,2). Can be single seed (e.g., 0 or '0') or multiple seeds (e.g., '0,1,2')"
@@ -1237,7 +1237,7 @@ def main():
     # Setup and run multi-seed tournament
     latest_only = not args.all_checkpoints
     rng_key = jax.random.PRNGKey(args.evaluation_seed)
-    
+
     if len(training_seeds) == 1:
         # Single seed mode - use original logic for backward compatibility
         print(f"\n🎯 Running Single-Seed Tournament (seed {training_seeds[0]})")
@@ -1255,7 +1255,7 @@ def main():
         )
         print("\nMulti-seed tournament evaluation complete!")
         print(f"Results saved in separate directories under: {evaluator.output_dir}/")
-        
+
         # Print summary of results
         successful_seeds = sum(1 for r in results.values() if 'error' not in r)
         total_episodes = sum(r.get('episodes', 0) for r in results.values() if 'error' not in r)

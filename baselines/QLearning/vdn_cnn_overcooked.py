@@ -75,7 +75,7 @@ class QNetwork(nn.Module):
             activation = nn.relu
         else:
             activation = nn.tanh
-            
+
         embedding = CNN()(x)
         # no activation here as a nonlinearity has already
         # been applied to the embedding

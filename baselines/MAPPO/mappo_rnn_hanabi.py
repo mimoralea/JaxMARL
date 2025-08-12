@@ -29,16 +29,16 @@ import wandb
 import functools
 import matplotlib.pyplot as plt
 
-    
+
 class HanabiWorldStateWrapper(JaxMARLWrapper):
-    
+
     @partial(jax.jit, static_argnums=0)
     def reset(self,
               key):
         obs, env_state = self._env.reset(key)
         obs["world_state"] = self.world_state(obs, env_state)
         return obs, env_state
-    
+
     @partial(jax.jit, static_argnums=0)
     def step(self,
              key,
@@ -52,17 +52,17 @@ class HanabiWorldStateWrapper(JaxMARLWrapper):
 
     @partial(jax.jit, static_argnums=0)
     def world_state(self, obs, state):
-        """ 
+        """
         For each agent: [agent obs, own hand]
         """
-            
+
         return jnp.array([obs[agent] for agent in self._env.agents])
         # hands = state.player_hands.reshape((self._env.num_agents, -1))
         # return jnp.concatenate((all_obs, hands), axis=1)
-        
+
     @partial(jax.jit, static_argnums=0)
     def world_state_size(self):
-   
+
         return self._env.observation_space(self._env.agents[0]).n * self._env.num_agents # + 125 # NOTE hardcoded hand size
 
 class ScannedRNN(nn.Module):
@@ -125,7 +125,7 @@ class ActorRNN(nn.Module):
 
 class CriticRNN(nn.Module):
     config: Dict
-    
+
     @nn.compact
     def __call__(self, hidden, x):
         world_state, dones = x
@@ -133,10 +133,10 @@ class CriticRNN(nn.Module):
             self.config["FC_DIM_SIZE"], kernel_init=orthogonal(np.sqrt(2)), bias_init=constant(0.0)
         )(world_state)
         embedding = nn.relu(embedding)
-        
+
         rnn_in = (embedding, dones)
         hidden, embedding = ScannedRNN()(hidden, rnn_in)
-        
+
         critic = nn.Dense(128, kernel_init=orthogonal(2), bias_init=constant(0.0))(
             embedding
         )
@@ -144,7 +144,7 @@ class CriticRNN(nn.Module):
         critic = nn.Dense(1, kernel_init=orthogonal(1.0), bias_init=constant(0.0))(
             critic
         )
-        
+
         return hidden, jnp.squeeze(critic, axis=-1)
 
 class Transition(NamedTuple):
@@ -212,7 +212,7 @@ def make_train(config):
         )
         cr_init_hstate = ScannedRNN.initialize_carry(config["NUM_ENVS"], config["GRU_HIDDEN_DIM"])
         critic_network_params = critic_network.init(_rng_critic, cr_init_hstate, cr_init_x)
-        
+
         if config["ANNEAL_LR"]:
             actor_tx = optax.chain(
                 optax.clip_by_global_norm(config["MAX_GRAD_NORM"]),
@@ -253,7 +253,7 @@ def make_train(config):
         def _update_step(update_runner_state, unused):
             # COLLECT TRAJECTORIES
             runner_state, update_steps = update_runner_state
-            
+
             def _env_step(runner_state, unused):
                 train_states, env_state, last_obs, last_done, hstates, rng = runner_state
 
@@ -280,7 +280,7 @@ def make_train(config):
                 # VALUE
                 # output of wrapper is (num_envs, num_agents, world_state_size)
                 # swap axes to (num_agents, num_envs, world_state_size) before reshaping to (num_actors, world_state_size)
-                world_state = last_obs["world_state"].swapaxes(0,1)  
+                world_state = last_obs["world_state"].swapaxes(0,1)
                 world_state = world_state.reshape((config["NUM_ACTORS"],-1))
                 cr_in = (
                     world_state[None, :],
@@ -315,11 +315,11 @@ def make_train(config):
             runner_state, traj_batch = jax.lax.scan(
                 _env_step, runner_state, None, config["NUM_STEPS"]
             )
-            
+
             # CALCULATE ADVANTAGE
             train_states, env_state, last_obs, last_done, hstates, rng = runner_state
-      
-            last_world_state = last_obs["world_state"].swapaxes(0,1)  
+
+            last_world_state = last_obs["world_state"].swapaxes(0,1)
             last_world_state = last_world_state.reshape((config["NUM_ACTORS"],-1))
             cr_in = (
                 last_world_state[None, :],
@@ -385,21 +385,21 @@ def make_train(config):
                         loss_actor = -jnp.minimum(loss_actor1, loss_actor2)
                         loss_actor = loss_actor.mean()
                         entropy = pi.entropy().mean()
-                        
+
                         # debug
                         approx_kl = ((ratio - 1) - logratio).mean()
                         clip_frac = jnp.mean(jnp.abs(ratio - 1) > config["CLIP_EPS"])
-                        
+
                         actor_loss = (
                             loss_actor
                             - config["ENT_COEF"] * entropy
                         )
                         return actor_loss, (loss_actor, entropy, ratio, approx_kl, clip_frac)
-                    
+
                     def _critic_loss_fn(critic_params, init_hstate, traj_batch, targets):
                         # RERUN NETWORK
-                        _, value = critic_network.apply(critic_params, init_hstate.squeeze(), (traj_batch.world_state,  traj_batch.done)) 
-                        
+                        _, value = critic_network.apply(critic_params, init_hstate.squeeze(), (traj_batch.world_state,  traj_batch.done))
+
                         # CALCULATE VALUE LOSS
                         value_pred_clipped = traj_batch.value + (
                             value - traj_batch.value
@@ -420,10 +420,10 @@ def make_train(config):
                     critic_loss, critic_grads = critic_grad_fn(
                         critic_train_state.params, cr_init_hstate, traj_batch, targets
                     )
-                    
+
                     actor_train_state = actor_train_state.apply_gradients(grads=actor_grads)
                     critic_train_state = critic_train_state.apply_gradients(grads=critic_grads)
-                    
+
                     total_loss = actor_loss[0] + critic_loss[0]
                     loss_info = {
                         "total_loss": total_loss,
@@ -434,7 +434,7 @@ def make_train(config):
                         "approx_kl": actor_loss[1][3],
                         "clip_frac": actor_loss[1][4],
                     }
-                    
+
                     return (actor_train_state, critic_train_state), loss_info
 
                 (
@@ -450,7 +450,7 @@ def make_train(config):
                 init_hstates = jax.tree.map(lambda x: jnp.reshape(
                     x, (1, config["NUM_ACTORS"], -1)
                 ), initial_hstates)
-                
+
                 batch = (
                     init_hstates[0],
                     init_hstates[1],
@@ -503,14 +503,14 @@ def make_train(config):
             )
             loss_info["ratio_0"] = loss_info["ratio"].at[0,0].get()
             loss_info = jax.tree.map(lambda x: x.mean(), loss_info)
-            
+
             train_states = update_state[0]
             metric = traj_batch.info
             metric["loss"] = loss_info
             rng = update_state[-1]
 
             def callback(metric):
-                
+
                 wandb.log(
                     {
                         "returns": metric["returned_episode_returns"][-1, :].mean(),
@@ -520,8 +520,8 @@ def make_train(config):
                         **metric["loss"],
                     }
                 )
-                
-            
+
+
             metric["update_steps"] = update_steps
             jax.experimental.io_callback(callback, None, metric)
             update_steps = update_steps + 1
@@ -557,9 +557,9 @@ def main(config):
     )
     rng = jax.random.PRNGKey(config["SEED"])
     with jax.disable_jit(False):
-        train_jit = jax.jit(make_train(config)) 
+        train_jit = jax.jit(make_train(config))
         out = train_jit(rng)
-        
+
     # save params
     if config['SAVE_PATH'] is not None:
 
@@ -573,10 +573,10 @@ def main(config):
         save_params(params, f'{save_dir}/model.safetensors')
         print(f'Parameters of first batch saved in {save_dir}/model.safetensors')
 
-        # upload this to wandb as an artifact   
+        # upload this to wandb as an artifact
         artifact = wandb.Artifact(f'{run.name}-checkpoint', type='checkpoint')
         artifact.add_file(f'{save_dir}/model.safetensors')
         artifact.save()
-    
+
 if __name__=="__main__":
     main()

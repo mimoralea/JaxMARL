@@ -6,18 +6,18 @@ from jaxmarl.environments.multi_agent_env import MultiAgentEnv
 from functools import partial
 
 class TransformersCTRolloutManager(CTRolloutManager):
-    # wraps envs the rollout manager for managing transformers observations and states matrices 
-    
+    # wraps envs the rollout manager for managing transformers observations and states matrices
+
     def __init__(self, env: MultiAgentEnv, batch_size:int):
 
         # SMAX
         if 'smax' in env.name.lower():
-            # For SMAX the simplest approach is to post-process the obs, since they already contain a matrix structure 
+            # For SMAX the simplest approach is to post-process the obs, since they already contain a matrix structure
             super().__init__(env, batch_size, training_agents=None, preprocess_obs=True)
             self._preprocess_obs = self.smax_obs_vec_to_matrix
             self.global_state = self.smax_global_state
 
-        # SPREAD  
+        # SPREAD
         elif 'spread' in env.name.lower():
             # For SPREAD it is simpler to build the obs from scratch as matrices
             super().__init__(env, batch_size, training_agents=None, preprocess_obs=False)
@@ -26,10 +26,10 @@ class TransformersCTRolloutManager(CTRolloutManager):
             else:
                 self._env.get_obs = self.spread_wrapped_get_obs
             self.global_state = lambda obs, state: obs['world_state']
-        
+
         else:
             raise NotImplementedError('This implemention currently supports only MPE_spread and SMAX')
-        
+
 
     @partial(jax.jit, static_argnums=0)
     def smax_obs_vec_to_matrix(self, obs, extra_feats):
@@ -49,19 +49,19 @@ class TransformersCTRolloutManager(CTRolloutManager):
             is_self_feat[:, None],
         ), axis=1)
         return feats
-            
+
     @partial(jax.jit, static_argnums=0)
     def smax_global_state(self, obs, state):
         # extract the main feats that are defined for all the entities
         main_feats = obs['world_state'][:len(self._env.own_features)*(self._env.num_allies+self._env.num_enemies)]
         main_feats = main_feats.reshape(self._env.num_allies+self._env.num_enemies, -1)
-        
+
         # the other feats are is_agent and unit_type, defined for each entity
         other_feats = obs['world_state'][len(self._env.own_features)*(self._env.num_allies+self._env.num_enemies):]
         other_feats = jnp.swapaxes(other_feats.reshape(-1, self._env.num_allies+self._env.num_enemies), 0,1)
-        
+
         return jnp.concatenate((main_feats, other_feats), axis=1)
-    
+
     @partial(jax.jit, static_argnums=0)
     def spread_wrapped_get_obs(self, state):
         """
@@ -85,11 +85,11 @@ class TransformersCTRolloutManager(CTRolloutManager):
             a:feats[i]
             for i, a in enumerate(self._env.agents)
         }
-        
+
         obs['world_state'] = jnp.concatenate((
             state.p_pos,
             state.p_vel,
             is_agent_feat[0][:, None]
         ), axis=1)
-        
+
         return obs

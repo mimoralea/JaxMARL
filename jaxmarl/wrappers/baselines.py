@@ -101,7 +101,7 @@ class LogWrapper(JaxMARLWrapper):
         info["returned_episode_lengths"] = state.returned_episode_lengths
         info["returned_episode"] = jnp.full((self._env.num_agents,), ep_done)
         return obs, state, reward, done, info
-    
+
 @struct.dataclass
 class OvercookedV2LogEnvState:
     env_state: State
@@ -189,7 +189,7 @@ class OvercookedV2LogWrapper(JaxMARLWrapper):
 class MPELogWrapper(LogWrapper):
     """ Times reward signal by number of agents within the environment,
     to match the on-policy codebase. """
-    
+
     @partial(jax.jit, static_argnums=(0,))
     def step(
         self,
@@ -311,16 +311,16 @@ class CTRolloutManager(JaxMARLWrapper):
     """
 
     def __init__(self, env: MultiAgentEnv, batch_size:int, training_agents:List=None, preprocess_obs:bool=True):
-        
+
         super().__init__(env)
-        
+
         self.batch_size = batch_size
 
         # the agents to train could differ from the total trainable agents in the env (f.i. if using pretrained agents)
         # it's important to know it in order to compute properly the default global rewards and state
-        self.training_agents = self.agents if training_agents is None else training_agents  
-        self.preprocess_obs = preprocess_obs  
-        
+        self.training_agents = self.agents if training_agents is None else training_agents
+        self.preprocess_obs = preprocess_obs
+
         # batched action sampling
         self.batch_samplers = {agent: jax.jit(jax.vmap(self.action_space(agent).sample, in_axes=0)) for agent in self.agents}
 
@@ -349,7 +349,7 @@ class CTRolloutManager(JaxMARLWrapper):
             self.global_reward = lambda rewards: rewards[self.training_agents[0]]
             self.get_valid_actions = lambda state: jax.vmap(env.get_legal_moves)(state)
 
-    
+
     @partial(jax.jit, static_argnums=0)
     def batch_reset(self, key):
         keys = jax.random.split(key, self.batch_size)
@@ -385,17 +385,17 @@ class CTRolloutManager(JaxMARLWrapper):
     @partial(jax.jit, static_argnums=0)
     def global_state(self, obs, state):
         return jnp.concatenate([obs[agent] for agent in self.agents], axis=-1)
-    
+
     @partial(jax.jit, static_argnums=0)
     def global_reward(self, reward):
-        return jnp.stack([reward[agent] for agent in self.training_agents]).sum(axis=0) 
-    
+        return jnp.stack([reward[agent] for agent in self.training_agents]).sum(axis=0)
+
     def batch_sample(self, key, agent):
         return self.batch_samplers[agent](jax.random.split(key, self.batch_size)).astype(int)
-    
+
     @partial(jax.jit, static_argnums=0)
     def get_valid_actions(self, state):
-        # default is to return the same valid actions one hot encoded for each env 
+        # default is to return the same valid actions one hot encoded for each env
         return {agent:jnp.tile(actions, self.batch_size).reshape(self.batch_size, -1) for agent, actions in self.valid_actions_oh.items()}
 
     @partial(jax.jit, static_argnums=0)

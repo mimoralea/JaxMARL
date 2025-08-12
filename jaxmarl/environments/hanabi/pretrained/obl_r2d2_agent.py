@@ -121,7 +121,7 @@ def example():
 
     agent = OBLAgentR2D2()
     agent_carry = agent.initialize_carry(jax.random.PRNGKey(0), batch_dims=(2,))
-    
+
     rng = jax.random.PRNGKey(0)
     env = make('hanabi')
     obs, env_state = env.reset(rng)

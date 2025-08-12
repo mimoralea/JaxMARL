@@ -9,7 +9,7 @@ import os, pathlib
 import numpy as np
 from functools import partial
 
-### --- MATHS UTILS --- 
+### --- MATHS UTILS ---
 def pol2cart(rho: float, phi: float) -> chex.Array:
     ''' Convert polar coordinates into cartesian '''
     x = rho * jnp.cos(phi)
@@ -20,7 +20,7 @@ def cart2pol(x, y) -> chex.Array:
     rho = jnp.sqrt(x**2 + y**2)
     phi = jnp.arctan2(y, x)
     return jnp.array([rho, phi])
-    
+
 def unitvec(theta) -> chex.Array:
     return jnp.array([jnp.cos(theta), jnp.sin(theta)])
 
@@ -33,7 +33,7 @@ def wrap(angle):
         large, noChange, angle)
     wrapped_angle = jax.lax.cond(angle < -jnp.pi,
         small, noChange, wrapped_angle)
-    
+
     return wrapped_angle
 
 def euclid_dist(x, y):
@@ -42,4 +42,3 @@ def euclid_dist(x, y):
 def rot_mat(theta):
     """ 2x2 rotation matrix for 2D about the origin """
     return jnp.array([[jnp.cos(theta), -jnp.sin(theta)], [jnp.sin(theta), jnp.cos(theta)]]).squeeze()
-    

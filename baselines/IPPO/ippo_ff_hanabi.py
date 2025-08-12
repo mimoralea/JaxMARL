@@ -315,7 +315,7 @@ def make_train(config):
 
 @hydra.main(version_base=None, config_path="config", config_name="ippo_ff_hanabi")
 def main(config):
-    config = OmegaConf.to_container(config) 
+    config = OmegaConf.to_container(config)
 
     wandb.init(
         entity=config["ENTITY"],

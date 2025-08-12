@@ -5,7 +5,7 @@
 Before installing, ensure you have the correct [JAX installation](https://github.com/google/jax#installation) for your hardware accelerator. We have tested up to JAX version 0.4.36. The JaxMARL environments can be installed directly from PyPi:
 
 ``` sh
-pip install jaxmarl 
+pip install jaxmarl
 ```
 
 ## Algorithms 🦉

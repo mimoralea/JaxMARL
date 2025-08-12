@@ -12,6 +12,6 @@
 "MAX_GRAD_NORM": 0.5
 "ACTIVATION": "tanh"
 "ENV_NAME": "MPE_simple_facmac_v1"
-"ENV_KWARGS": 
+"ENV_KWARGS":
   "score_function": "min"
 "ANNEAL_LR": True

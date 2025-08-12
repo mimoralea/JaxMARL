@@ -84,7 +84,7 @@ def main():
         max_action = jnp.argmax(q_values[q_index]).squeeze()
         random_action = sample_random_action(key)
         return jax.lax.cond(jnp.all(q_values[q_index] == q_values[q_index][0]), lambda: random_action, lambda: max_action)
-    
+
     def sample_action(key, obs_storage, q_values, obs):
 
         key, key_rand_action, key_optimal_action = jax.random.split(key, num=3)

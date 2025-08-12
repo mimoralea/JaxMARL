@@ -56,7 +56,7 @@ def env(request):
 
 def test_inherits_base_env(env: MultiAgentEnv):
     """Test that the environment is a subclass of MultiAgentEnv."""
-    
+
     assert isinstance(env, MultiAgentEnv), "Environment does not inherit from MultiAgentEnv"
 
 def test_observation_space_definition(env: MultiAgentEnv):
@@ -90,7 +90,7 @@ def test_step_returns_correct_format(env):
        with valid types and that the observation adheres to the observation_space."""
     # Ensure the environment defines an action_space attribute.
     assert hasattr(env, "action_space"), "Environment missing action_space attribute"
-    
+
     rng = jax.random.PRNGKey(0)
 
     # Reset the environment first.
@@ -102,13 +102,13 @@ def test_step_returns_correct_format(env):
     actions = {
         a: env.action_space(a).sample(_rng) for a in env.agents
     }
-    
+
     # Take a step in the environment.
     rng, _rng = jax.random.split(rng)
     result = env.step(_rng, initial_state, actions)
     # Check that the result is a 4-tuple.
     assert isinstance(result, tuple) and len(result) == 5, "Step did not return a 5-tuple"
-    
+
     next_obs, next_state, reward, done, info = result
     for agent in env.observation_spaces.keys():
         assert env.observation_spaces[agent].contains(next_obs[agent])

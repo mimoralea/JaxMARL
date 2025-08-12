@@ -1,6 +1,6 @@
 # Contributing to JaxMARL
 
-Please help build JaxMARL into the best possible tool for the MARL community. 
+Please help build JaxMARL into the best possible tool for the MARL community.
 
 ## Contributing code
 
@@ -28,12 +28,12 @@ We use Github's issues to track bugs, just open a new issue! Great Bug Reports t
  - Notes (possibly including why you think this might be happening, or stuff you tried that didn't work)
 
 
-## License 
+## License
 
 All contributions will fall under the project's original license.
 
 ## Roadmap
 
 Some improvements we would like to see implemented:
-- [x] improved RNN implementations. In the current implementation, the hidden size is dependent on "NUM_STEPS", it should be made independent. 
+- [x] improved RNN implementations. In the current implementation, the hidden size is dependent on "NUM_STEPS", it should be made independent.
 - [ ] S5 RNN architecture.

@@ -11,7 +11,7 @@ This analysis compares tournament results from two different periods to understa
 - **Episodes per Matchup**: 100
 - **Decisive Outcomes**: 1,524 wins (54.4%) vs 1,276 draws (45.6%)
 
-### Current Tournament (August 11th, 2025) 
+### Current Tournament (August 11th, 2025)
 - **Total Episodes**: 112 episodes
 - **Players**: 8 (IPPO_seed0_step4882, SPPPO_seed0_step4882, FSPPPO_latest + 5 scripted)
 - **Episodes per Matchup**: 4 (smaller scale test)
@@ -35,7 +35,7 @@ Based on win counts from CSV data:
 Based on fixed analysis with proper winner detection:
 
 1. **FSPPPO_latest**: 53.6% win rate
-2. **scripted_seek**: 42.9% win rate  
+2. **scripted_seek**: 42.9% win rate
 3. **IPPO_seed0_step4882**: 39.3% win rate
 4. **SPPPO_seed0_step4882**: (lower performance, exact % pending full analysis)
 

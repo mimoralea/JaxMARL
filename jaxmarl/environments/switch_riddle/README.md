@@ -1,9 +1,9 @@
-# Switch Riddle 
+# Switch Riddle
 
 This directory contains an implementation of the Switch Riddle game presented in [Learning to communicate with deep multi-agent reinforcement learning.](https://proceedings.neurips.cc/paper_files/paper/2016/hash/c7635bfd99248a2cdef8249ef7bfbef4-Abstract.html) Following is a prosaic description of the game:
 
 > There are n prisoners in prison and a warden. The Warden decides to free the prisoners if they can solve the following problem. So, every day the Warden will select one of the prisoners randomly and send him to an interrogation room which consists of a light bulb with a switch. If the prisoner in the room can tell that all other prisoners including him have been to the room at least once then the Warden will free all of them otherwise kill all of them. Except for the prisoner in the room, other prisoners are unaware of the fact that who got selected on that particular day to go to the interrogation room. Now, the prisoner in the interrogation room can switch on or off the bulb to send some indication to the next prisoner. He can also tell the warden that everyone has been to the room at least once or decide not to say anything. If his claim is correct, then all are set free otherwise they are all killed.
-> 
+>
 
 A more detailed description of the original game can be found [here](https://marl-ieee-nitk.github.io/reinforcement-learning/2019/02/28/Solving-Switch-Riddle-using-RL.html). The original implementation of the game is [here](https://github.com/iassael/learning-to-communicate).
 
@@ -90,5 +90,5 @@ If you use this environment, please cite:
         author={Foerster, Jakob and Assael, Yannis M and de Freitas, Nando and Whiteson, Shimon},
         booktitle={Advances in Neural Information Processing Systems},
         pages={2137--2145},
-        year={2016} 
+        year={2016}
     }

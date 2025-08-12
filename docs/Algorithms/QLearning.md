@@ -9,7 +9,7 @@ Pure JAX implementations of:
 * TransfQMix (Transformers for Leveraging the Graph Structure of MARL Problems)
 * SHAQ (Incorporating Shapley Value Theory into Multi-Agent Q-Learning)
 
-PQN implementation follows [purejaxql](https://github.com/mttga/purejaxql). IQL, VDN and QMix follow the original [Pymarl](https://github.com/oxwhirl/pymarl/blob/master/src/learners/q_learner.py) codebase while SHAQ follows the [paper code](https://github.com/hsvgbkhgbv/shapley-q-learning). 
+PQN implementation follows [purejaxql](https://github.com/mttga/purejaxql). IQL, VDN and QMix follow the original [Pymarl](https://github.com/oxwhirl/pymarl/blob/master/src/learners/q_learner.py) codebase while SHAQ follows the [paper code](https://github.com/hsvgbkhgbv/shapley-q-learning).
 
 
 Standard algorithms (iql, vdn, qmix) support:
@@ -27,7 +27,7 @@ PQN-VDN supports:
 
 **At the moment, PQN-VDN should be the most performant baseline for Q-Learning in terms of returns and training speed.**
 
-❗ TransfQMix and Shaq still use an old implementation of the scripts and need refactoring to match the new format. 
+❗ TransfQMix and Shaq still use an old implementation of the scripts and need refactoring to match the new format.
 
 
 ## ⚙️ Implementation Details
@@ -77,7 +77,7 @@ python baselines/QLearning/pqn_vdn_cnn_overcooked.py +alg=pqn_vdn_cnn_overcooked
 python baselines/QLearning/pqn_vdn_rnn.py +alg=pqn_vdn_rnn_smax alg.MAP_NAME=5m_vs_6m
 ```
 
-Take a look at [`config.yaml`](./config/config.yaml) for the default configuration when running these scripts. There you can choose how many seeds to vmap and you can setup WANDB. 
+Take a look at [`config.yaml`](./config/config.yaml) for the default configuration when running these scripts. There you can choose how many seeds to vmap and you can setup WANDB.
 
 **❗Note on Transformers**: TransfQMix currently supports only MPE_Spread and SMAX. You will need to wrap the observation vectors into matrices to use transformers in other environments. See: ```jaxmarl.wrappers.transformers```
 

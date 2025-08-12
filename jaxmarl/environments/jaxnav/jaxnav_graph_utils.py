@@ -1,4 +1,4 @@
-""" Lifted from MiniMax 
+""" Lifted from MiniMax
 
 Copyright (c) Meta Platforms, Inc. and affiliates.
 All rights reserved.
@@ -17,7 +17,7 @@ import numpy as np
 @partial(jax.jit, static_argnums=(1,))
 def apsp(A, n=None):
 	"""
-	Compute APSP for adjacency matrix A 
+	Compute APSP for adjacency matrix A
 	using Seidel's algorithm.
 	"""
 	if n is None:
@@ -28,14 +28,14 @@ def apsp(A, n=None):
 	A_cache = jnp.zeros((n_steps, n, n), dtype=jnp.uint32)
 	steps_to_reduce = jnp.array(1, dtype=jnp.int32)
 
-	def _scan_fwd_step(carry, step): 
+	def _scan_fwd_step(carry, step):
 		i = step
 		A, A_cache, steps_to_reduce = carry
 		A_cache = A_cache.at[i].set(A)
 
 		Z = A@A
 		B = jnp.logical_or(
-				A == 1, 
+				A == 1,
 				Z > 0
 			).astype(jnp.uint32) \
 			 .at[jnp.diag_indices(n)].set(0)
@@ -89,7 +89,7 @@ def grid_to_graph(grid):
 	print('nodes', nodes)
 	n = len(nodes)
 	A = jnp.zeros((n,n), dtype=jnp.uint32)
-	
+
 	all_idx = jnp.arange(n)
 	# jax.debug.print('dumneigh idx {x}', x=~nodes)
 	dum_neighbor_idx = jnp.argmax(~nodes)
@@ -159,7 +159,7 @@ def grid_to_graph(grid):
 	A = jnp.maximum(A, A.transpose())
 
 	return A
-	
+
 
 NEIGHBOR_OFFSETS = jnp.array([
 	[1,0], # right

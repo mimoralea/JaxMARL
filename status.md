@@ -1,4 +1,4 @@
-We need to think about the next step about comparing the algorithms that we have implemented and their strenghts and weaknesses. In particular, this codebase has the goal to research more robust training curriculums. 
+We need to think about the next step about comparing the algorithms that we have implemented and their strenghts and weaknesses. In particular, this codebase has the goal to research more robust training curriculums.
 
 What we have implemented so far are the "baselines". We have baseline agents, ippo, spppo, and fspppo, and we have scripted behaviors that allow us to benchmark the baselines against fixed opponents.
 
@@ -6,7 +6,7 @@ We want to now evaluate the performance and robustness of all of the baselines a
 
 For instance, when I trained ippo, the algorithm during training seems to perform well, against the opponent that it was trained against. But interestingly, when evaluated against the scripted behavior, it doesn't do consistently well--specifically for ippo, it couldn't even defeat the "static" baseline.
 
-We need to create then a tournament and output data to csv or similar so that we can then run data analysis on matchups and compare the performance of these agents, against the scripted behaviors, but also against each other. 
+We need to create then a tournament and output data to csv or similar so that we can then run data analysis on matchups and compare the performance of these agents, against the scripted behaviors, but also against each other.
 
 Can you help me brainstorm what we should do to reveal the limitation of the baseline algorithms so that we can argue we need more training curriculums that help agents gain robustness and performance consistency, keeping high-performance againt unseen opponents. Help me brainstorm the experiments we should tackle, but also update the plan and rememeber this message as we will continue working on this on our next session.
 
@@ -109,7 +109,7 @@ python
 # Compare algorithms with same training time but different curricula
 compare_curricula = {
     "IPPO": "fixed_opponent",
-    "SPPPO": "self_play_only", 
+    "SPPPO": "self_play_only",
     "FSPPPO": "historical_diversity"
 }
 # Measure generalization performance

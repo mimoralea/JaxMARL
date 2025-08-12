@@ -22,7 +22,7 @@ from jaxmarl.environments.overcooked.layouts import overcooked_layouts as layout
 
 
 BASE_REW_SHAPING_PARAMS = {
-    "PLACEMENT_IN_POT_REW": 3, # reward for putting ingredients 
+    "PLACEMENT_IN_POT_REW": 3, # reward for putting ingredients
     "PLATE_PICKUP_REWARD": 3, # reward for picking up a plate
     "SOUP_PICKUP_REWARD": 5, # reward for picking up a ready soup
     "DISH_DISP_DISTANCE_REW": 0,
@@ -521,7 +521,7 @@ class Overcooked(MultiAgentEnv):
             inventory_all: chex.Array,
             player_idx: int):
         """Assume agent took interact actions. Result depends on what agent is facing and what it is holding."""
-        
+
         fwd_pos = fwd_pos_all[player_idx]
         inventory = inventory_all[player_idx]
 
@@ -606,21 +606,21 @@ class Overcooked(MultiAgentEnv):
 
         # Apply inventory update
         has_picked_up_plate = successful_pickup*(new_object_in_inv == OBJECT_TO_INDEX["plate"])
-        
+
         # number of plates in player hands < number ready/cooking/partially full pot
         num_plates_in_inv = jnp.sum(inventory == OBJECT_TO_INDEX["plate"])
         pot_loc_layer = jnp.array(maze_map[padding:-padding, padding:-padding, 0] == OBJECT_TO_INDEX["pot"], dtype=jnp.uint8)
-        padded_map = maze_map[padding:-padding, padding:-padding, 2] 
+        padded_map = maze_map[padding:-padding, padding:-padding, 2]
         num_notempty_pots = jnp.sum((padded_map!=POT_EMPTY_STATUS)* pot_loc_layer)
         is_dish_picku_useful = num_plates_in_inv < num_notempty_pots
 
         plate_loc_layer = jnp.array(maze_map == OBJECT_TO_INDEX["plate"], dtype=jnp.uint8)
         no_plates_on_counters = jnp.sum(plate_loc_layer) == 0
-        
+
         shaped_reward += no_plates_on_counters*has_picked_up_plate*is_dish_picku_useful*BASE_REW_SHAPING_PARAMS["PLATE_PICKUP_REWARD"]
 
         inventory = new_object_in_inv
-        
+
         # Apply changes to maze
         new_maze_object_on_table = \
             object_is_pot * OBJECT_INDEX_TO_VEC[new_object_on_table].at[-1].set(new_pot_status) \
@@ -657,7 +657,7 @@ class Overcooked(MultiAgentEnv):
     def action_space(self, agent: str) -> spaces.Discrete:
         """Action space of the environment. Agent_id not used since action_space is uniform for all agents"""
         return self.action_spaces[agent]
-    
+
     def observation_space(self, agent: str) -> spaces.Box:
         """Observation space of the environment."""
         return self.observation_spaces[agent]

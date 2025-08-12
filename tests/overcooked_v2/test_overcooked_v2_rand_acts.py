@@ -16,7 +16,7 @@ def test_random_rollout_overcooked_v2():
     rng, rng_reset = jax.random.split(rng)
 
     _, state = env.reset(rng_reset)
-    
+
     for _ in range(10):
         rng, rng_act = jax.random.split(rng)
         rng_act = jax.random.split(rng_act, env.num_agents)

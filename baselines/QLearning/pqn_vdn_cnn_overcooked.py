@@ -95,7 +95,7 @@ class QNetwork(nn.Module):
             x = nn.relu(x)
 
         q_vals = nn.Dense(self.action_dim)(x)
-        
+
         return q_vals
 
 

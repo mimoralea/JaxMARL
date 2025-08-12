@@ -73,7 +73,7 @@ class ActorCriticRNN(nn.Module):
         actor_mean = nn.relu(actor_mean)
         actor_mean = nn.Dense(
             self.action_dim, kernel_init=orthogonal(0.01), bias_init=constant(0.0)
-        )(actor_mean)        
+        )(actor_mean)
 
         pi = distrax.Categorical(logits=actor_mean)
 
@@ -111,7 +111,7 @@ def unbatchify(x: jnp.ndarray, agent_list, num_envs, num_actors):
 
 def make_train(config):
     env = jaxmarl.make(config["ENV_NAME"])
-    
+
     config["NUM_ACTORS"] = env.num_agents * config["NUM_ENVS"]
     config["NUM_UPDATES"] = (
         config["TOTAL_TIMESTEPS"] // config["NUM_STEPS"] // config["NUM_ENVS"]
@@ -448,9 +448,9 @@ def main(config):
     rng = jax.random.PRNGKey(config["SEED"])
     train_jit = jax.jit(make_train(config), device=jax.devices()[0])
     out = train_jit(rng)
-    
+
     '''updates_x = jnp.arange(out["metrics"]["total_loss"][0].shape[0])
-    loss_table = jnp.stack([updates_x, out["metrics"]["total_loss"].mean(axis=0), out["metrics"]["actor_loss"].mean(axis=0), out["metrics"]["critic_loss"].mean(axis=0), out["metrics"]["entropy"].mean(axis=0), out["metrics"]["ratio"].mean(axis=0)], axis=1)    
+    loss_table = jnp.stack([updates_x, out["metrics"]["total_loss"].mean(axis=0), out["metrics"]["actor_loss"].mean(axis=0), out["metrics"]["critic_loss"].mean(axis=0), out["metrics"]["entropy"].mean(axis=0), out["metrics"]["ratio"].mean(axis=0)], axis=1)
     loss_table = wandb.Table(data=loss_table.tolist(), columns=["updates", "total_loss", "actor_loss", "critic_loss", "entropy", "ratio"])'''
     '''print('shape', out["metrics"]["returned_episode_returns"][0].shape)
     updates_x = jnp.arange(out["metrics"]["returned_episode_returns"][0].shape[0])
@@ -459,7 +459,7 @@ def main(config):
     wandb.log({
         "returns_plot": wandb.plot.line(returns_table, "updates", "returns", title="returns_vs_updates"),
         "returns": out["metrics"]["returned_episode_returns"][:,-1].mean(),
-        
+
     })'''
 
 '''

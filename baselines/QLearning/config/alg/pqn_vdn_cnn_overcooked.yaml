@@ -18,7 +18,7 @@
 
 # env
 "ENV_NAME": "overcooked"
-"ENV_KWARGS": 
+"ENV_KWARGS":
   "layout" : "counter_circuit"
 "REW_SHAPING_HORIZON": 2.5e6
 

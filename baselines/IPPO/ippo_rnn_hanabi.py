@@ -21,7 +21,7 @@ import wandb
 import functools
 import hydra
 from omegaconf import OmegaConf
-import os 
+import os
 
 class ScannedRNN(nn.Module):
     @functools.partial(
@@ -284,7 +284,7 @@ def make_train(config):
                         loss_actor = -jnp.minimum(loss_actor1, loss_actor2)
                         loss_actor = loss_actor.mean()
                         entropy = pi.entropy().mean()
-                        
+
                         # debug
                         approx_kl = ((ratio - 1) - logratio).mean()
                         clip_frac = jnp.mean(jnp.abs(ratio - 1) > config["CLIP_EPS"])
@@ -308,7 +308,7 @@ def make_train(config):
 
                 init_hstate = jnp.reshape(
                     init_hstate, (1, config["NUM_ACTORS"], -1)
-                )                
+                )
                 batch = (init_hstate, traj_batch, advantages.squeeze(), targets.squeeze())
                 permutation = jax.random.permutation(_rng, config["NUM_ACTORS"])
 
@@ -355,7 +355,7 @@ def make_train(config):
             }
             rng = update_state[-1]
 
-            def callback(metric):                
+            def callback(metric):
                 wandb.log(
                     {
                         "returns": metric["returned_episode_returns"][-1, :].mean(),
@@ -384,7 +384,7 @@ def make_train(config):
 
 @hydra.main(version_base=None, config_path="config", config_name="ippo_rnn_hanabi")
 def main(config):
-    config = OmegaConf.to_container(config) 
+    config = OmegaConf.to_container(config)
 
     wandb.init(
         entity=config["ENTITY"],

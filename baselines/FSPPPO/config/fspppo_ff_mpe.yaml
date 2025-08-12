@@ -21,7 +21,7 @@
 # "NUM_MINIBATCHES": 2         # bigger minibatch, less shuffling overhead
 # "ENT_COEF":      0.0         # skip entropy bonus for speed; still explores via ε-greedy init
 # "SEED":          0
-# "NUM_SEEDS":     3           # one run is enough for quick iteration, three for plots with std 
+# "NUM_SEEDS":     3           # one run is enough for quick iteration, three for plots with std
 
 # SAME FOR BOTH
 "GAMMA": 0.99

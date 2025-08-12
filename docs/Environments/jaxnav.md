@@ -1,6 +1,6 @@
-# JaxNav 
+# JaxNav
 
-2D geometric navigation for differential drive robots. Using distances readings to nearby obstacles (mimicing LiDAR readings), the direction to their goal and their current velocity, robots must navigate to their goal without colliding with obstacles. 
+2D geometric navigation for differential drive robots. Using distances readings to nearby obstacles (mimicing LiDAR readings), the direction to their goal and their current velocity, robots must navigate to their goal without colliding with obstacles.
 
 ## Environment Details
 
@@ -26,7 +26,7 @@ Visualiser contained within `jaxnav_viz.py`, with an example below:
 ```python
 from jaxmarl.environments.jaxnav.jaxnav_env import JaxNav
 from jaxmarl.environments.jaxnav.jaxnav_viz import JaxNavVisualizer
-import jax 
+import jax
 
 env = JaxNav(num_agents=4)
 
@@ -45,7 +45,7 @@ for _ in range(10):
     obs, env_state, _, _, _ = env.step(step_rng, env_state, actions)
     obs_list.append(obs)
     env_state_list.append(env_state)
-    
+
 viz = JaxNavVisualizer(env, obs_list, env_state_list)
 viz.animate("test.gif")
 ```
@@ -60,12 +60,12 @@ JaxNav was introduced by the following paper, if you use JaxNav in your work ple
 
 ```bibtex
 @misc{rutherford2024noregrets,
-      title={No Regrets: Investigating and Improving Regret Approximations for Curriculum Discovery}, 
+      title={No Regrets: Investigating and Improving Regret Approximations for Curriculum Discovery},
       author={Alexander Rutherford and Michael Beukman and Timon Willi and Bruno Lacerda and Nick Hawes and Jakob Foerster},
       year={2024},
       eprint={2408.15099},
       archivePrefix={arXiv},
       primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2408.15099}, 
+      url={https://arxiv.org/abs/2408.15099},
 }
 ```

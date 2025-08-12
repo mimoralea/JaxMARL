@@ -15,10 +15,10 @@ num_agents=2
 num_inner_steps=152
 
 rng = jax.random.PRNGKey(18)
-env = make('storm', 
-        num_inner_steps=num_inner_steps, 
-        num_outer_steps=num_outer_steps, 
-        num_agents=num_agents, 
+env = make('storm',
+        num_inner_steps=num_inner_steps,
+        num_outer_steps=num_outer_steps,
+        num_agents=num_agents,
         fixed_coin_location=True,
         payoff_matrix=jnp.array([[[3, 0], [5, 1]], [[3, 5], [0, 1]]]),
         freeze_penalty=5,)
@@ -39,7 +39,7 @@ def pos_add(i, val):
         grid = grid.at[(new_pos[i,0], new_pos[i,1])].set(
             jnp.int8(i+1)
         )
-        return (grid, new_pos)  
+        return (grid, new_pos)
 
 
 # grid, _ = jax.lax.fori_loop(0, num_agents, pos_remove, (old_state.grid, old_state.agent_positions))
@@ -120,7 +120,7 @@ for t in range(num_outer_steps * num_inner_steps):
     # if t>76:
     #     raise
 print("Saving GIF")
-pics = [Image.fromarray(img) for img in pics]        
+pics = [Image.fromarray(img) for img in pics]
 pics[0].save(
     "state.gif",
     format="GIF",

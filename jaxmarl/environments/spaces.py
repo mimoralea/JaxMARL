@@ -56,9 +56,9 @@ class MultiDiscrete(Space):
     def sample(self, rng: chex.PRNGKey) -> chex.Array:
         """Sample random action uniformly from set of categorical choices."""
         return jax.random.randint(
-            rng, 
-            shape=self.shape, 
-            minval=0, 
+            rng,
+            shape=self.shape,
+            minval=0,
             maxval=self.num_categories,
             dtype=self.dtype
         )

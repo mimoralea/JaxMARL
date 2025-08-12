@@ -13,7 +13,7 @@
 "ACTIVATION": "relu"
 "ENV_NAME": "overcooked"
 "REW_SHAPING_HORIZON": 2.5e6 # for how many timesteps add a shaping reward
-"ENV_KWARGS": 
+"ENV_KWARGS":
   "layout" : "counter_circuit"
 "ANNEAL_LR": True
 "SEED": 30

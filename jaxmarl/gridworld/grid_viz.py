@@ -57,7 +57,7 @@ class GridVisualizer:
 		grid = np.asarray(state.maze_map[padding:-padding,padding:-padding,:])
 		grid_offset = np.array([1,1])
 		h,w = grid.shape[:2]
-		
+
 		# === Compute highlight mask
 		highlight_mask = np.zeros(shape=(h,w), dtype=np.bool)
 
@@ -196,7 +196,7 @@ class GridVisualizer:
 
 		# Render the grid
 		for y in range(grid.shape[0]):
-			for x in range(grid.shape[1]):		
+			for x in range(grid.shape[1]):
 				obj = grid[y,x,:]
 				if obj[0] in [OBJECT_TO_INDEX['empty'], OBJECT_TO_INDEX['unseen']] \
 					and obj[2] == 0:

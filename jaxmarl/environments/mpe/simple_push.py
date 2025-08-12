@@ -9,7 +9,7 @@ from jaxmarl.environments.spaces import Box
 
 # Obstacle Colours
 COLOUR_1 = jnp.array([0.1, 0.9, 0.1])
-COLOUR_2 = jnp.array([0.1, 0.1, 0.9])  
+COLOUR_2 = jnp.array([0.1, 0.1, 0.9])
 OBS_COLOUR = jnp.concatenate([COLOUR_1, COLOUR_2])
 
 
@@ -135,7 +135,7 @@ class SimplePushMPE(SimpleMPE):
             agent_colour = agent_colour.at[state.goal + 1].set(0.75)
 
             return jnp.concatenate(
-                [  
+                [
                     state.p_vel[aidx].flatten(),  # 2
                     goal_rel_pos.flatten(),  # 2
                     agent_colour,

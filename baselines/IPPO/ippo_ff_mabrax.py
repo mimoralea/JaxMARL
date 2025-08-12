@@ -1,4 +1,4 @@
-""" 
+"""
 Based on PureJaxRL Implementation of PPO
 """
 
@@ -55,7 +55,7 @@ class ActorCritic(nn.Module):
         )
 
         return pi, jnp.squeeze(critic, axis=-1)
-    
+
 class Transition(NamedTuple):
     done: jnp.ndarray
     action: jnp.ndarray
@@ -87,9 +87,9 @@ def make_train(config, rng_init):
     config["MINIBATCH_SIZE"] = (
         config["NUM_ACTORS"] * config["NUM_STEPS"] // config["NUM_MINIBATCHES"]
     )
-    
+
     env = LogWrapper(env, replace_info=True)
-    
+
     def linear_schedule(count):
         frac = 1.0 - (count // (config["NUM_MINIBATCHES"] * config["UPDATE_EPOCHS"])) / config["NUM_UPDATES"]
         return config["LR"] * frac
@@ -113,8 +113,8 @@ def make_train(config, rng_init):
         tx=tx,
     )
 
-    def train(rng):        
-        
+    def train(rng):
+
         # INIT ENV
         rng, _rng = jax.random.split(rng)
         reset_rng = jax.random.split(_rng, config["NUM_ENVS"])
@@ -130,7 +130,7 @@ def make_train(config, rng_init):
                 obs_batch = batchify(last_obs, env.agents, config["NUM_ACTORS"])
                 # SELECT ACTION
                 rng, _rng = jax.random.split(rng)
-                
+
                 pi, value = network.apply(train_state.params, obs_batch)
                 action = pi.sample(seed=_rng)
                 log_prob = pi.log_prob(action)
@@ -190,7 +190,7 @@ def make_train(config, rng_init):
                 return advantages, advantages + traj_batch.value
 
             advantages, targets = _calculate_gae(traj_batch, last_val)
-            
+
             # UPDATE NETWORK
             def _update_epoch(update_state, unused):
                 def _update_minbatch(train_state, batch_info):
@@ -239,7 +239,7 @@ def make_train(config, rng_init):
                         train_state.params, traj_batch, advantages, targets
                     )
                     train_state = train_state.apply_gradients(grads=grads)
-                    
+
                     loss_info = {
                         "total_loss": total_loss[0],
                         "actor_loss": total_loss[1][1],
@@ -247,7 +247,7 @@ def make_train(config, rng_init):
                         "entropy": total_loss[1][2],
                         "ratio": total_loss[1][3],
                     }
-                    
+
                     return train_state, loss_info
 
                 train_state, traj_batch, advantages, targets, rng = update_state
@@ -328,15 +328,15 @@ def main(config):
         rng, _rng = jax.random.split(rng)
         train_jit = jax.jit(make_train(config, _rng),  device=jax.devices()[config["DEVICE"]])
         out = train_jit(rng)
-    
-    
+
+
     # mean_returns = out["metrics"]["returned_episode_returns"].mean(-1).reshape(-1)
     # x = np.arange(len(mean_returns)) * config["NUM_ACTORS"]
     # plt.plot(x, mean_returns)
     # plt.xlabel("Timestep")
     # plt.ylabel("Return")
     # plt.savefig(f'mabrax_ippo_ret.png')
-    
+
     # import pdb; pdb.set_trace()
 
 if __name__ == "__main__":

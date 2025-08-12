@@ -13,9 +13,9 @@ num_inner_steps = 152
 
 rng = jax.random.PRNGKey(0)
 
-env = make('storm_2p', 
-        num_inner_steps=num_inner_steps, 
-        num_outer_steps=num_outer_steps, 
+env = make('storm_2p',
+        num_inner_steps=num_inner_steps,
+        num_outer_steps=num_outer_steps,
         fixed_coin_location=True,
         num_agents=2,
         payoff_matrix=jnp.array([[[3, 0], [5, 1]], [[3, 5], [0, 1]]]),

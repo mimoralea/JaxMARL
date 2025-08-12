@@ -8,7 +8,7 @@ def parse_training_seeds(value):
     # Handle both string and integer inputs
     if isinstance(value, int):
         return [value]
-    
+
     value_str = str(value)
     if ',' in value_str:
         # Multiple seeds: "0,1,2" or 0,1,2
@@ -19,10 +19,10 @@ def parse_training_seeds(value):
 
 def test_training_seeds_parsing():
     """Test various training seeds parsing scenarios."""
-    
+
     print("🧪 Testing --training-seeds parsing logic")
     print("=" * 50)
-    
+
     test_cases = [
         ("0", [0]),
         ("1", [1]),
@@ -36,9 +36,9 @@ def test_training_seeds_parsing():
         (1, [1]),
         (42, [42]),
     ]
-    
+
     all_passed = True
-    
+
     for input_value, expected in test_cases:
         try:
             result = parse_training_seeds(input_value)
@@ -50,18 +50,18 @@ def test_training_seeds_parsing():
         except Exception as e:
             print(f"❌ '{input_value}' -> ERROR: {e}")
             all_passed = False
-    
+
     print("\n" + "=" * 50)
     if all_passed:
         print("🎉 All tests passed! Training seeds parsing works correctly.")
     else:
         print("💥 Some tests failed!")
-    
+
     print("\nExample usage:")
     print("  --training-seeds '0'       # Single seed")
     print("  --training-seeds '0,1,2'   # Multiple seeds (default)")
     print("  --training-seeds '5,7,9'   # Custom seeds")
-    
+
     return all_passed
 
 if __name__ == "__main__":

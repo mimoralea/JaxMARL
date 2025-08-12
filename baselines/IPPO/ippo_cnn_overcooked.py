@@ -1,4 +1,4 @@
-""" 
+"""
 Based on PureJaxRL Implementation of PPO
 """
 
@@ -73,7 +73,7 @@ class ActorCritic(nn.Module):
             activation = nn.relu
         else:
             activation = nn.tanh
-        
+
         embedding = CNN(self.activation)(x)
 
         actor_mean = nn.Dense(

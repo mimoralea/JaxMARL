@@ -101,7 +101,7 @@ def make(env_id: str, **env_kwargs):
         env = InTheGrid_2p(**env_kwargs)
     elif env_id == "storm_np":
         env = InTheMatrix(**env_kwargs)
-    
+
     # 6. Hanabi
     elif env_id == "hanabi":
         env = Hanabi(**env_kwargs)
@@ -115,7 +115,7 @@ def make(env_id: str, **env_kwargs):
     # 8. Coin Game
     elif env_id == "coin_game":
         env = CoinGame(**env_kwargs)
-        
+
     # 9. JaxNav
     elif env_id == "jaxnav":
         env = JaxNav(**env_kwargs)

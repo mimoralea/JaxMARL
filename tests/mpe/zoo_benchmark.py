@@ -19,12 +19,12 @@ env = simple_world_comm_v3.parallel_env(max_cycles=max_steps)
 obs = env.reset()
 
 start_time = time.time()
-actions = {agent: env.action_space(agent).sample() for agent in env.agents} 
+actions = {agent: env.action_space(agent).sample() for agent in env.agents}
 
 print('obs spaces', env.observation_spaces, env.action_spaces)
 #while env.agents:
     #step += 1
-for _ in range(max_steps):    
+for _ in range(max_steps):
     #actions = {agent: env.action_space(agent).sample() for agent in env.agents}  # this is where you would insert your policy
     print('actions', actions)
     observations, rewards, terminations, truncations, infos = env.step(actions)

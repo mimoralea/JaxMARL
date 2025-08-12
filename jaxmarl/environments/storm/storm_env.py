@@ -76,7 +76,7 @@ class Items(IntEnum):
     defection_coin = 10
     wall = 11
     interact = 12
-    #agents if  1 < val < item.WALL 
+    #agents if  1 < val < item.WALL
 
 AGENT_IDX = jnp.array([1,2,3,4,5,6,7,8])
 ROTATIONS = jnp.array(
@@ -259,16 +259,16 @@ class InTheGrid(MultiAgentEnv):
                 # angle1 = -1 * jnp.ones_like(grid1, dtype=jnp.int8)
             #      i look where the blue agent is (with its own orientation)
             #     i correct its orientation relative to mine
-            #     angle is 
+            #     angle is
 
-                def check_angle(grid1, item, other_agent_pos):    
+                def check_angle(grid1, item, other_agent_pos):
                     angle1 = jnp.where(
                         grid1 == item,
                         ((other_agent_pos[2] - agent_pos[2])+1) % 5,
                         0,
                     )
                     return angle1
-                
+
                 vmap_check_angle = jax.vmap(check_angle, (None, 0, 0), 0)
                 angle1 = vmap_check_angle(grid1, other_agents_idx, other_agents_pos)
                 angle1 = jnp.sum(angle1, axis=0) - 1
@@ -366,7 +366,7 @@ class InTheGrid(MultiAgentEnv):
                     agent_pos
                     + STEP[agent_pos[2]]
                     + STEP[(agent_pos[2] + 1) % 4]
-                )  
+                )
                 oob = jnp.logical_or(
                     (target_right > GRID_SIZE - 1).any(),
                     (target_right < 0).any(),
@@ -401,7 +401,7 @@ class InTheGrid(MultiAgentEnv):
                                               grid[target_right[0], target_right[1]],
                                               grid[target_left[0], target_left[1]]])
                 return interact, target, target_ahead, target_right, target_left, interact_targets
-            
+
             vmap_get_target = jax.vmap(get_target, (0, None), (0, 0, 0, 0, 0, 0))
             agent_positions, target, target_ahead, target_right, target_left, interact_targets = vmap_get_target(state.agent_positions, state.grid)
             # print(target, target_ahead, target_right, target_left, interact_targets,'target, target_ahead, target_right, target_left, interact_targets')
@@ -484,7 +484,7 @@ class InTheGrid(MultiAgentEnv):
                 pairwise_mask = pairwise_mask.at[pair_idx].set(interacting)
 
                 return (agent_interaction_mask,  shuffled_indices, interact_targets, agent_inventories, pairwise_mask, zaps)
-            
+
             # for agent0,agent1 in [(0,1),(0,2),(1,2)]:
             #     agent1_in_agent0 = jnp.isin(agent1+1, interact_targets[agent0])
             #     agent0_in_agent1 = jnp.isin(agent0+1, interact_targets[agent1])
@@ -501,7 +501,7 @@ class InTheGrid(MultiAgentEnv):
 
 
 
-            agent_interaction_mask, _, _, _,pairwise_mask, _ = jax.lax.fori_loop(0, num_agents, process_agent_interactions, 
+            agent_interaction_mask, _, _, _,pairwise_mask, _ = jax.lax.fori_loop(0, num_agents, process_agent_interactions,
                                                           (agent_interaction_mask,
                                                            shuffled_indices,
                                                            interact_targets,
@@ -529,8 +529,8 @@ class InTheGrid(MultiAgentEnv):
                 selected_pairs = jnp.where(interaction_masks==1, agent_pairs, -1*jnp.ones((2,), dtype=jnp.int8))
                 selected_rewards = jnp.where(interaction_masks==1, rewards_for_pairs, 0)
                 return  selected_pairs, selected_rewards
-            
-            
+
+
             vmap_get_selected_pairs = jax.vmap(get_selected_pairs, (0,0,0), (0,0))
             selected_pairs, selected_rewards = vmap_get_selected_pairs(interaction_masks, agent_pairs, rewards_for_pairs)
             # print(selected_pairs.shape, 'selected pairs shape')
@@ -543,7 +543,7 @@ class InTheGrid(MultiAgentEnv):
                 rewards = rewards.at[agent0].set(selected_rewards[i][0])
                 rewards = rewards.at[agent1].set(selected_rewards[i][1])
                 return rewards, agent_pairs, selected_rewards
-            
+
             rewards, _, _ = jax.lax.fori_loop(0, selected_rewards.shape[0], assign_reward, (rewards, agent_pairs, selected_rewards))
             # rewards = rewards.at[selected_pairs.ravel()].set(rewards_for_pairs.ravel())
             # print(rewards.shape, 'rewards shape')
@@ -553,7 +553,7 @@ class InTheGrid(MultiAgentEnv):
             #     grid = grid.at[selected_interact_positions[i, 0, 0], selected_interact_positions[i, 0, 1]].set(interact_idx)
             #     grid = grid.at[selected_interact_positions[i, 1, 0], selected_interact_positions[i, 1, 1]].set(interact_idx)
             #     return grid, selected_interact_positions, interact_idx
-            
+
             # grid, _, _ = jax.lax.fori_loop(0, selected_interact_positions.shape[0], update_grid, (state.grid, selected_interact_positions, interact_idx))
 
             # Update state
@@ -602,7 +602,7 @@ class InTheGrid(MultiAgentEnv):
                 )
 
                 # get new positions
-                # moving red 
+                # moving red
                 move = action == Actions.forward
                 new_pos = jnp.where(
                     move, new_pos + STEP[agent_pos[2]], new_pos
@@ -670,7 +670,7 @@ class InTheGrid(MultiAgentEnv):
                 # Compute the result by selecting either the first position or the predefined value.
                 result = jnp.where(same_positions, new_agent_position, old_pos)
                 return result
-            
+
             vmap_process_positions = jax.vmap(process_positions, (0, 0, 0), 0)
             updated_position_coll = vmap_process_positions(updated_position, state.agent_positions, new_agent_positions)
 
@@ -679,13 +679,13 @@ class InTheGrid(MultiAgentEnv):
             upper_triangle_indices = jnp.triu_indices(n, k=1)
             upper_triangle_values = jax.random.choice(subkey, choices, shape=(n * (n - 1) // 2,))
             lower_triangle_values = (upper_triangle_values + 1 )% 2
-            
+
             upper_triangle_matrix = jnp.zeros((n, n))
             upper_triangle_matrix = upper_triangle_matrix.at[upper_triangle_indices].set(upper_triangle_values)
             lower_triangle_matrix = jnp.zeros((n, n))
             lower_triangle_matrix = lower_triangle_matrix.at[upper_triangle_indices].set(lower_triangle_values) #reusing upper indices and then transposing
             # utm_transposed = upper_triangle_matrix.T + 1 % 2
-            
+
             takes_square_matrix = upper_triangle_matrix + lower_triangle_matrix.T
             # print(takes_square_matrix, 'takes square matrix')
             # print(takes_square_matrix, 'takes square matrix 1')
@@ -706,7 +706,7 @@ class InTheGrid(MultiAgentEnv):
             # jax.debug.breakpoint()
 
             # whatever = jnp.delete(takes_square_matrix, jnp.arange(3), axis=0)
-            
+
             # print(takes_square_matrix, 'takes square matrix 2')
             def update_rand_pos(pos_old, pos_new, collision, move1, move2, takes_square):
                 new_pos = jnp.where(
@@ -746,8 +746,8 @@ class InTheGrid(MultiAgentEnv):
             key, subkey = jax.random.split(key)
             red_reward, blue_reward = 0, 0
             (
-                rewards, 
-                state, 
+                rewards,
+                state,
                 interacted_agents
             ) = _interact(state, actions, key)
             # print(interacted_agents, 'interacted agents')
@@ -779,12 +779,12 @@ class InTheGrid(MultiAgentEnv):
             ).T
 
             # print(sft_re_player_pos, 'sft_re_player_pos')
-            def update_positions_freezes(new_player_pos, agent_positions, agent_freezes, 
+            def update_positions_freezes(new_player_pos, agent_positions, agent_freezes,
                                         agent_inventories,):
                 agent_positions = jnp.where(
                                         agent_freezes==0,
                                         new_player_pos,
-                                        agent_positions   
+                                        agent_positions
                                     )
                 agent_inventories = jnp.where(
                                         agent_freezes==0,
@@ -793,12 +793,12 @@ class InTheGrid(MultiAgentEnv):
                 agent_freezes = jnp.where(
                                         agent_freezes==0,
                                         -1,
-                                        agent_freezes   
+                                        agent_freezes
                                     )
                 return agent_positions, agent_freezes, agent_inventories
-            
+
             vmap_update_positions_freezes = jax.vmap(update_positions_freezes, (0, 0, 0, 0), (0,0,0))
-            agent_positions, agent_freezes, agent_inventories = vmap_update_positions_freezes(sft_re_player_pos, 
+            agent_positions, agent_freezes, agent_inventories = vmap_update_positions_freezes(sft_re_player_pos,
                                                                 state.agent_positions, state.agent_freezes, state.agent_inventories)
             # print(agent_freezes, 'agent freezes')
             # print(agent_inventories, 'agent inventories')
@@ -1190,8 +1190,8 @@ class InTheGrid(MultiAgentEnv):
         )
         for a in range(self.num_agents):
             startx, starty = self.get_obs_point(
-                state.agent_positions[a, 0], 
-                state.agent_positions[a, 1], 
+                state.agent_positions[a, 0],
+                state.agent_positions[a, 1],
                 state.agent_positions[a, 2]
             )
             highlight_mask[
@@ -1219,7 +1219,7 @@ class InTheGrid(MultiAgentEnv):
                         if agent_here[a]
                         else agent_dir
                     )
-                
+
                 agent_hat = False
                 for a in range(self.num_agents):
                     agent_hat = (

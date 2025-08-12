@@ -579,8 +579,8 @@ def make_train(config, env):
             """Help function to test greedy policy during training"""
             if not config.get("TEST_DURING_TRAINING", True):
                 return None
-            
-            params = train_state.params['agent']  
+
+            params = train_state.params['agent']
             def _greedy_env_step(step_state, unused):
                 params, env_state, last_obs, last_dones, hstate, rng = step_state
                 rng, key_s = jax.random.split(rng)

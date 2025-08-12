@@ -3,21 +3,21 @@ Check that the environment can be reset and stepped with random actions.
 TODO: replace this with proper unit tests.
 """
 import jax
-# import pytest 
+# import pytest
 
-from jaxmarl.environments.mabrax import MABraxEnv 
+from jaxmarl.environments.mabrax import MABraxEnv
 
 env = MABraxEnv("ant_4x2")
 
 def test_random_rollout():
 
-    
+
 
     rng = jax.random.PRNGKey(0)
     rng, rng_reset = jax.random.split(rng)
 
     _, state = env.reset(rng_reset)
-    
+
     for _ in range(10):
         rng, rng_act = jax.random.split(rng)
         rng_act = jax.random.split(rng_act, env.num_agents)

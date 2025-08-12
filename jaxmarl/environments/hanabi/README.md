@@ -1,6 +1,6 @@
 # Hanabi-JAX Environment
 
-This directory contains a MARL environment for the cooperative card game, Hanabi, implemented in JAX. It is inspired by the popular [Hanabi Learning Environment (HLE)](https://arxiv.org/pdf/1902.00506.pdf), but intended to be simpler to integrate and run with the growing ecosystem of JAX implemented RL research pipelines. 
+This directory contains a MARL environment for the cooperative card game, Hanabi, implemented in JAX. It is inspired by the popular [Hanabi Learning Environment (HLE)](https://arxiv.org/pdf/1902.00506.pdf), but intended to be simpler to integrate and run with the growing ecosystem of JAX implemented RL research pipelines.
 
 
 ## Action Space
@@ -10,7 +10,7 @@ Hanabi is a turn-based game. The current player can choose to discard or play an
 The observations closely follow the featurization in the HLE. Each observation is comprised of 658 features:
 
 * **Hands (127)**: information about the visible hands.
-  * other player hand: 125 
+  * other player hand: 125
     * card 0: 25,
     * card 1: 25
     * card 2: 25
@@ -19,7 +19,7 @@ The observations closely follow the featurization in the HLE. Each observation i
   * Hands missing card: 2 (one-hot)
 
 * **Board (76)**: encoding of the public information visible in the board.
-  * Deck: 40, thermometer 
+  * Deck: 40, thermometer
   * Fireworks: 25, one-hot
   * Info Tokens: 8, thermometer
   * ife Tokens: 3, thermometer
@@ -104,8 +104,8 @@ Score: 0
 Information: 8
 Lives: 3
 Deck: 40
-Discards:                                                  
-Fireworks:     
+Discards:
+Fireworks:
 Actor 0 Hand:<-- current player
 0 W3 || XX|RYGWB12345
 1 G5 || XX|RYGWB12345
@@ -133,8 +133,8 @@ Score: 0
 Information available: 7
 Lives available: 3
 Deck remaining cards: 40
-Discards:                                                  
-Fireworks:     
+Discards:
+Fireworks:
 Other Hand:
 0 Card: W3, Hints: , Possible: RYGWB12345, Belief: [R1: 0.060 Y1: 0.060 G1: 0.060 W1: 0.060 B1: 0.060]
 1 Card: G5, Hints: , Possible: RYGWB12345, Belief: [R1: 0.060 Y1: 0.060 G1: 0.060 W1: 0.060 B1: 0.060]

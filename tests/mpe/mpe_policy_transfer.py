@@ -1,5 +1,5 @@
 """
-Test policy transfer between our MPE implementation and PettingZoo's. 
+Test policy transfer between our MPE implementation and PettingZoo's.
 
 Methodology:
     1. Initilaise JAX internal state from the output of PettingZoo's `reset` method.
@@ -41,7 +41,7 @@ def np_state_to_jax(env_zoo, env_jax):
         #print('zoo landmark name', landmark.name)
         p_pos[l_idx] = landmark.state.p_pos
         #print('zoo landmark pos', landmark.state.p_pos)
-        
+
     state = {
         "p_pos": jnp.array(p_pos),
         "p_vel": p_vel,
@@ -49,7 +49,7 @@ def np_state_to_jax(env_zoo, env_jax):
         "step": env_zoo.aec_env.env.steps,
         "done": np.full((env_jax.num_agents), False),
     }
-    
+
     #print('jax state', state)
     #print('test obs', state["p_pos"][1] - state["p_pos"][0])
     if env_zoo.metadata["name"] == 'simple_crypto_v3':
@@ -113,7 +113,7 @@ print('params keys', params.keys())
 if 'agent' in params.keys():
     params = params['agent'] # qmix also have mixer params
 
-    
+
 
 def obs_to_act(obs, dones, params=params):
 
@@ -131,8 +131,8 @@ def obs_to_act(obs, dones, params=params):
     # get actions from q vals
     valid_q_vals = jax.tree.map(lambda q, valid_idx: q.squeeze(0)[..., valid_idx], q_vals, valid_actions)
     actions = jax.tree.map(lambda q: jnp.argmax(q, axis=-1).squeeze(0), valid_q_vals)
-        
-    return actions 
+
+    return actions
 
 num_ep = 1000
 
@@ -160,7 +160,7 @@ for e in tqdm.tqdm(range(num_ep)):
     for j in range(25):
         #print('-- zoo iteration ', j)
         #print('obs', obs_zoo)
-        
+
         done_zoo = {a: jnp.array([i]) for a, i in done_zoo.items()}
         done_zoo["__all__"] = jnp.all(jnp.array([done_zoo[a] for a in done_zoo.keys()]))[None]
         #print('done', done_zoo)
@@ -190,10 +190,10 @@ for e in tqdm.tqdm(range(num_ep)):
         rew_tallys_jax[j] = rew_batch
 
     mean_diff[e] = np.mean(np.abs(rew_tallys_zoo - rew_tallys_jax))
-    
-    
+
+
     #print('reward tally zoo', rew_tallys_zoo)
-    #print('reward tally jax', rew_tallys_jax)   
+    #print('reward tally jax', rew_tallys_jax)
 
     #rew_tally[e] = np.array([rew_tallys_zoo[ra], rew_tallys_jax[ra]])
 

@@ -43,11 +43,11 @@ class TestTournamentValidation:
         # Create identical players
         player1 = TournamentPlayer(name="scripted_noop", player_type="scripted")
         player2 = TournamentPlayer(name="scripted_noop", player_type="scripted")
-        
+
         # Run multiple episodes with same seed
         rng_key = jax.random.PRNGKey(42)
         results = []
-        
+
         for i in range(5):
             result = self.evaluator._run_episode_with_positions(
                 green_player=player1,
@@ -58,7 +58,7 @@ class TestTournamentValidation:
                 match_id="test"
             )
             results.append(result)
-        
+
         # All results should be identical (deterministic)
         first_result = results[0]
         for result in results[1:]:
@@ -71,9 +71,9 @@ class TestTournamentValidation:
         """Test that side-flipping produces correct symmetrical results."""
         player1 = TournamentPlayer(name="scripted_seek", player_type="scripted")
         player2 = TournamentPlayer(name="scripted_noop", player_type="scripted")
-        
+
         rng_key = jax.random.PRNGKey(42)
-        
+
         # Side 1: player1 (green) vs player2 (red)
         rng_key1, rng_key2 = jax.random.split(rng_key)
         result1 = self.evaluator._run_episode_with_positions(
@@ -84,7 +84,7 @@ class TestTournamentValidation:
             side=1,
             match_id="test"
         )
-        
+
         # Side 2: player2 (green) vs player1 (red)
         result2 = self.evaluator._run_episode_with_positions(
             green_player=player2,
@@ -94,13 +94,13 @@ class TestTournamentValidation:
             side=2,
             match_id="test"
         )
-        
+
         # Verify side assignments are correct
         assert result1['green_player'] == player1.name
         assert result1['red_player'] == player2.name
         assert result2['green_player'] == player2.name
         assert result2['red_player'] == player1.name
-        
+
         # If player1 wins in side 1, they should win in side 2 too
         # (assuming deterministic behavior)
         if result1['winner'] == player1.name:
@@ -112,7 +112,7 @@ class TestTournamentValidation:
         """Test that rewards are consistent with winner determination."""
         player1 = TournamentPlayer(name="scripted_seek", player_type="scripted")
         player2 = TournamentPlayer(name="scripted_noop", player_type="scripted")
-        
+
         rng_key = jax.random.PRNGKey(42)
         result = self.evaluator._run_episode_with_positions(
             green_player=player1,
@@ -122,7 +122,7 @@ class TestTournamentValidation:
             side=1,
             match_id="test"
         )
-        
+
         # Winner should have higher or equal reward
         if result['winner'] == result['green_player']:
             assert result['green_reward'] >= result['red_reward']
@@ -138,22 +138,22 @@ class TestTournamentValidation:
             TournamentPlayer(name="scripted_seek", player_type="scripted"),
             TournamentPlayer(name="scripted_noop", player_type="scripted")
         ]
-        
+
         self.evaluator.players = players
         self.evaluator.setup_matches()
-        
+
         # Run a small tournament
         rng_key = jax.random.PRNGKey(42)
         self.evaluator.run_tournament(rng_key)
-        
+
         # Check CSV file exists and has correct format
         csv_file = self.evaluator.output_dir / "tournament_results.csv"
         assert csv_file.exists()
-        
+
         with open(csv_file, 'r') as f:
             reader = csv.DictReader(f)
             rows = list(reader)
-            
+
             # Check required columns exist
             required_columns = [
                 'match_id', 'episode_id', 'player1', 'player2',
@@ -161,21 +161,21 @@ class TestTournamentValidation:
                 'player1_reward', 'player2_reward',
                 'green_reward', 'red_reward', 'episode_length', 'side'
             ]
-            
+
             for col in required_columns:
                 assert col in reader.fieldnames, f"Missing column: {col}"
-            
+
             # Check data consistency
             for row in rows:
                 # Winner should be one of the players or 'draw'
                 assert row['winner'] in [row['player1'], row['player2'], 'draw']
-                
+
                 # Side should be 1 or 2
                 assert row['side'] in ['1', '2']
-                
+
                 # Episode length should be positive
                 assert int(row['episode_length']) > 0
-                
+
                 # Rewards should be numeric
                 float(row['player1_reward'])
                 float(row['player2_reward'])
@@ -189,26 +189,26 @@ class TestTournamentValidation:
             TournamentPlayer(name="scripted_noop", player_type="scripted"),
             TournamentPlayer(name="scripted_random", player_type="scripted")
         ]
-        
+
         self.evaluator.players = players
         self.evaluator.setup_matches()
-        
+
         # Run tournament
         rng_key = jax.random.PRNGKey(42)
         self.evaluator.run_tournament(rng_key)
-        
+
         # Check that we have the right number of matches
         expected_matches = len(players) * (len(players) - 1)  # Round-robin
         assert len(self.evaluator.matches) == expected_matches
-        
+
         # Check that each match has the right number of episodes
         expected_episodes_per_match = self.evaluator.episodes_per_matchup
-        
+
         match_episode_counts = {}
         for result in self.evaluator.results:
             match_id = result['match_id']
             match_episode_counts[match_id] = match_episode_counts.get(match_id, 0) + 1
-        
+
         for match_id, count in match_episode_counts.items():
             assert count == expected_episodes_per_match, \
                 f"Match {match_id} has {count} episodes, expected {expected_episodes_per_match}"
@@ -216,10 +216,10 @@ class TestTournamentValidation:
     def test_scripted_behavior_discovery(self):
         """Test that scripted behaviors are discovered correctly."""
         scripted_players = self.evaluator.create_scripted_players()
-        
+
         # Should have at least the basic scripted behaviors
         player_names = [p.name for p in scripted_players]
-        
+
         # Check that all players have correct naming format
         for name in player_names:
             assert name.startswith("scripted_")
@@ -232,11 +232,11 @@ class TestTournamentValidation:
             TournamentPlayer(name="scripted_seek", player_type="scripted"),
             TournamentPlayer(name="scripted_noop", player_type="scripted")
         ]
-        
+
         # Run tournament twice with same seed
         results1 = self._run_mini_tournament(players, seed=42)
         results2 = self._run_mini_tournament(players, seed=42)
-        
+
         # Results should be identical
         assert len(results1) == len(results2)
         for r1, r2 in zip(results1, results2):
@@ -251,18 +251,18 @@ class TestTournamentValidation:
             TournamentPlayer(name="scripted_random", player_type="scripted"),
             TournamentPlayer(name="scripted_noop", player_type="scripted")
         ]
-        
+
         # Run tournament with different seeds
         results1 = self._run_mini_tournament(players, seed=42)
         results2 = self._run_mini_tournament(players, seed=123)
-        
+
         # At least some results should be different (due to randomness)
         differences = 0
         for r1, r2 in zip(results1, results2):
             if (r1['winner'] != r2['winner'] or
                 r1['steps'] != r2['steps']):
                 differences += 1
-        
+
         # With random behavior, we expect some variation
         assert differences > 0, "No variation found between different seeds"
 
@@ -274,7 +274,7 @@ class TestTournamentValidation:
             output_dir=tempfile.mkdtemp(),
             max_episode_steps=20
         )
-        
+
         # Use setup_tournament instead of setup_matches
         evaluator.players = players
         evaluator.matches = []
@@ -282,24 +282,24 @@ class TestTournamentValidation:
             for j, player2 in enumerate(players):
                 if i < j:  # Avoid duplicate matches
                     match = TournamentMatch(
-                        player1=player1, 
+                        player1=player1,
                         player2=player2,
                         episodes_per_side=evaluator.episodes_per_side
                     )
                     evaluator.matches.append(match)
-        
+
         rng_key = jax.random.PRNGKey(seed)
         evaluator.run_tournament(rng_key)
-        
-        return evaluator.results 
+
+        return evaluator.results
                         player2=player2,
                         episodes_per_side=evaluator.episodes_per_side
                     )
                     evaluator.matches.append(match)
-        
+
         rng_key = jax.random.PRNGKey(seed)
         evaluator.run_tournament(rng_key)
-        
+
         return evaluator.results
 
 
@@ -315,16 +315,16 @@ class TestResultAnalysis:
             {'player1': 'A', 'player2': 'B', 'winner': 'B'},
             {'player1': 'A', 'player2': 'B', 'winner': 'draw'},
         ]
-        
+
         # Calculate win rates manually
         player_stats = {'A': {'wins': 0, 'losses': 0, 'draws': 0, 'episodes': 0},
                        'B': {'wins': 0, 'losses': 0, 'draws': 0, 'episodes': 0}}
-        
+
         for result in mock_results:
             p1, p2 = result['player1'], result['player2']
             player_stats[p1]['episodes'] += 1
             player_stats[p2]['episodes'] += 1
-            
+
             if result['winner'] == p1:
                 player_stats[p1]['wins'] += 1
                 player_stats[p2]['losses'] += 1
@@ -334,7 +334,7 @@ class TestResultAnalysis:
             else:
                 player_stats[p1]['draws'] += 1
                 player_stats[p2]['draws'] += 1
-        
+
         # Verify calculations
         assert player_stats['A']['wins'] == 2
         assert player_stats['A']['losses'] == 1
@@ -351,7 +351,7 @@ class TestResultAnalysis:
             episodes_per_matchup=4,
             output_dir=temp_dir
         )
-        
+
         # Mock some results using current format
         evaluator.results = [
             {
@@ -383,19 +383,19 @@ class TestResultAnalysis:
                 'spawn_mode': 'deterministic'
             }
         ]
-        
+
         # Add players list for summary generation
         evaluator.players = [
             TournamentPlayer(name="scripted_seek", player_type="scripted"),
             TournamentPlayer(name="scripted_noop", player_type="scripted")
         ]
-        
+
         evaluator.generate_summary()
-        
+
         # Check that summary file exists
         summary_file = Path(temp_dir) / f"run_{evaluator.run_timestamp}" / "tournament_summary.txt"
         assert summary_file.exists()
-        
+
         # Check summary content
         with open(summary_file, 'r') as f:
             content = f.read()

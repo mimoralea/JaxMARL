@@ -13,7 +13,7 @@
 "REW_SHAPING_HORIZON": 2.5e6
 "ACTIVATION": "tanh"
 "ENV_NAME": "overcooked"
-"ENV_KWARGS": 
+"ENV_KWARGS":
   "layout" : "coord_ring"
 "ANNEAL_LR": True
 "SEED": 30

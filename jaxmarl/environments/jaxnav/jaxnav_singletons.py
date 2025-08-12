@@ -28,36 +28,36 @@ class JaxNavSingleton(JaxNav):
         super().__init__(num_agents,
                          map_id=map_id,
                          **env_kwargs)
-        
+
         if fixed_lambda is True:
             self.rew_lambda = rew_lambda
-        else:   
+        else:
             self.rew_lambda = 0.0
-        
+
         if test_case is None:
             raise NotImplementedError
         else:
             if map_id == "Grid-Rand-Poly-Single":
                 map_id = "Grid-Rand-Poly"
             self.map_data = jnp.array(
-                [[int(x) for x in row.split()] for row in test_case.map_data], 
+                [[int(x) for x in row.split()] for row in test_case.map_data],
                 dtype=jnp.int32
             )
             height, width = self.map_data.shape
             self.goal_pose = jnp.array(test_case.goal_pose, dtype=jnp.float32)
             self.start_pose = jnp.array(test_case.start_pose, dtype=jnp.float32)
-            
+
             map_kwargs = {
                 "map_size": (width, height),
                 "fill": 0.5,
             }
             self._map_obj = make_map(map_id, num_agents, self.rad, **map_kwargs)
-                
+
     def reset(
-        self, 
+        self,
         key: chex.PRNGKey=None,
     ):
-        
+
         state = State(
             pos=self.start_pose[:, :2],
             theta=self.start_pose[:, 2],
@@ -75,44 +75,44 @@ class JaxNavSingleton(JaxNav):
         obs_batch = self._get_obs(state)
         obs = {a: obs_batch[i] for i, a in enumerate(self.agents)}
         return obs, state
-    
+
     def get_monitored_metrics(self):
         return ["NumC", "GoalR", "AgentC", "MapC", "TimeO", "Return"]
-        
+
     def viz_testcase(self, save=True, show=False, plot_lidar=True):
-        
+
         obs, state = self.reset()
         fig, ax = plt.subplots(figsize=(5,5))
-        
+
         ax.set_aspect('equal', 'box')
         self._map_obj.plot_map(ax, state.map_data)
         ax.scatter(state.goal[:, 0], state.goal[:, 1], marker='+')
         self._map_obj.plot_agents(ax, state.pos, state.theta, state.goal, state.done)
         if plot_lidar:
             self.plot_lidar(ax, obs, state, 100)
-        
+
         # plot a line from start to goal for each agent
         for i in range(self.num_agents):
-            ax.plot(jnp.concatenate([state.pos[i, 0][None], state.goal[i, 0][None]]), 
-                    jnp.concatenate([state.pos[i, 1][None], state.goal[i, 1][None]]), 
+            ax.plot(jnp.concatenate([state.pos[i, 0][None], state.goal[i, 0][None]]),
+                    jnp.concatenate([state.pos[i, 1][None], state.goal[i, 1][None]]),
                     color='gray', alpha=0.2)
-                                
+
         if save:
             plt.savefig(f'{self.name}.png')
         if show:
             plt.show()
-            
+
     @property
     def name(self) -> str:
         return self.__class__.__name__
-            
+
 
 ## SINGLE AGENT
 # blank map
 class BlankTest(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=1, 
+        self,
+        num_agents=1,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -128,15 +128,15 @@ class BlankTest(JaxNavSingleton):
             start_pose=[(1.5, 1.5, 0.0)],
             goal_pose=[(5.5, 5.5, 0.0)],
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
 
 class MiddleTest(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=1, 
+        self,
+        num_agents=1,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -152,7 +152,7 @@ class MiddleTest(JaxNavSingleton):
             start_pose=[(1.5, 1.5, 0.0)],
             goal_pose=[(5.5, 5.5, 0.0)],
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
@@ -160,8 +160,8 @@ class MiddleTest(JaxNavSingleton):
 ## MULTI-AGENT
 class BlankCross2(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=2, 
+        self,
+        num_agents=2,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -179,15 +179,15 @@ class BlankCross2(JaxNavSingleton):
             goal_pose=[(5.5, 5.5, 0.0),
                        (1.5, 1.5, 0.0)],
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
-        
+
 class BlankCross4(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=4, 
+        self,
+        num_agents=4,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -209,19 +209,19 @@ class BlankCross4(JaxNavSingleton):
                        (5.5, 1.5, 0.0),
                        (1.5, 5.5, 0.0)],
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
-        
+
 class CircleCross(JaxNavSingleton):
     def __init__(
-        self, 
+        self,
         num_agents=10,
         circle_rad=6,
         **env_kwargs
     ):
-        
+
         width, height = circle_rad*3, circle_rad*3
         centre_x = width/2
         centre_y = height/2
@@ -229,7 +229,7 @@ class CircleCross(JaxNavSingleton):
         row = "1 " + "0 " * int(width-2) + "1"
         rows = [row for _ in range(int(height)-2)]
         map_data = [top] + rows + [top]
-        
+
         start_pose = []
         goal_pose = []
         for i in range(num_agents):
@@ -238,21 +238,21 @@ class CircleCross(JaxNavSingleton):
             start_pose.append((circle_rad*jnp.cos(theta)+centre_y, circle_rad*jnp.sin(theta)+centre_x, to_center_theta))
             goal_theta = theta + jnp.pi
             goal_pose.append((circle_rad*jnp.cos(goal_theta)+centre_y, circle_rad*jnp.sin(goal_theta)+centre_x, goal_theta))
-        
+
         test_case = TestCase(
             map_data=map_data,
             start_pose=start_pose,
             goal_pose=goal_pose,
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
 
 class BlankCrossUneven2(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=2, 
+        self,
+        num_agents=2,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -270,15 +270,15 @@ class BlankCrossUneven2(JaxNavSingleton):
             goal_pose=[(5.5, 5.5, 0.0),
                        (1.5, 1.5, 0.0)],
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
 
 class SingleNav1(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=1, 
+        self,
+        num_agents=1,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -294,15 +294,15 @@ class SingleNav1(JaxNavSingleton):
             start_pose=[(9.5, 1.5, 0.78)],
             goal_pose=[(1.5, 5.5, 0.0)],
         )
-                
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
-        
+
 class SingleNav2(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=1, 
+        self,
+        num_agents=1,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -318,15 +318,15 @@ class SingleNav2(JaxNavSingleton):
             start_pose=[(8.5, 1.5, 3.14)],
             goal_pose=[(1.5, 5.5, 0.0)],
         )
-                
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
-        
+
 class SingleNav3(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=1, 
+        self,
+        num_agents=1,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -342,15 +342,15 @@ class SingleNav3(JaxNavSingleton):
             start_pose=[(9.1, 1.5, 3.14)],
             goal_pose=[(1.5, 5.5, 0.0)],
         )
-                
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
-        
+
 class LongCorridor2(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=2, 
+        self,
+        num_agents=2,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -368,15 +368,15 @@ class LongCorridor2(JaxNavSingleton):
             goal_pose=[(6.0, 3.5, 0.0),
                        (1.5, 3.5, 0.0),],
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
-                         **env_kwargs)        
-        
+                         **env_kwargs)
+
 class Corridor4(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=4, 
+        self,
+        num_agents=4,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -398,15 +398,15 @@ class Corridor4(JaxNavSingleton):
                        (2.0, 2.5, 0.0),
                        (2.0, 4.5, 0.0),],
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
-        
+
 class Corridor8(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=8, 
+        self,
+        num_agents=8,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -438,15 +438,15 @@ class Corridor8(JaxNavSingleton):
                        (2.0, 5.5, 0.0),
                        (2.0, 7.0, 0.0),],
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
 
 class Layby4(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=4, 
+        self,
+        num_agents=4,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -468,15 +468,15 @@ class Layby4(JaxNavSingleton):
                        (2.0, 2.5, 0.0),
                        (2.0, 4.5, 0.0),],
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
 
 class Corner2(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=2, 
+        self,
+        num_agents=2,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -494,15 +494,15 @@ class Corner2(JaxNavSingleton):
             goal_pose=[(5.5, 5.5, 3.14),
                        (1.5, 1.5, 3.14),],
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
 
 class Chicane2(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=2, 
+        self,
+        num_agents=2,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -518,15 +518,15 @@ class Chicane2(JaxNavSingleton):
             goal_pose=[(9.5, 3.5, 3.14),
                        (2.5, 2.5, 3.14),],
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
-        
+
 class NarrowChicane2a(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=2, 
+        self,
+        num_agents=2,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -542,15 +542,15 @@ class NarrowChicane2a(JaxNavSingleton):
             goal_pose=[(9.5, 3.5, 3.14),
                        (2.5, 2.5, 3.14),],
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
-        
+
 class NarrowChicane2b(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=2, 
+        self,
+        num_agents=2,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -566,15 +566,15 @@ class NarrowChicane2b(JaxNavSingleton):
             goal_pose=[(7.5, 1.5, 3.14),
                        (2.5, 2.5, 3.14),],
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
 
 class Chicane4(JaxNavSingleton):
     def __init__(
-        self, 
-        num_agents=4, 
+        self,
+        num_agents=4,
         **env_kwargs
     ):
         test_case = TestCase(
@@ -594,20 +594,20 @@ class Chicane4(JaxNavSingleton):
                        (2.5, 3.25, 3.14),
                        (4.5, 1.5, 3.14),],
         )
-        
+
         super().__init__(num_agents,
                          test_case=test_case,
                          **env_kwargs)
 
 # REGISTRATION
-def make_jaxnav_singleton(env_id: str, **env_kwargs) -> JaxNavSingleton:  
+def make_jaxnav_singleton(env_id: str, **env_kwargs) -> JaxNavSingleton:
     if env_id not in registered_singletons:
         raise ValueError(f"Singleton env_id: {env_id} not registered!")
     if env_id == "BlankTest":
         return BlankTest(**env_kwargs)
     if env_id == "MiddleTest":
         return MiddleTest(**env_kwargs)
-    
+
     if env_id == "BlankCross2":
         return BlankCross2(**env_kwargs)
     if env_id == "BlankCross4":
@@ -634,14 +634,14 @@ def make_jaxnav_singleton(env_id: str, **env_kwargs) -> JaxNavSingleton:
         return NarrowChicane2a(**env_kwargs)
     if env_id == "NarrowChicane2b":
         return NarrowChicane2b(**env_kwargs)
-    
+
     if env_id == "SingleNav1":
         return SingleNav1(**env_kwargs)
     if env_id == "SingleNav2":
         return SingleNav2(**env_kwargs)
     if env_id == "SingleNav3":
         return SingleNav3(**env_kwargs)
-    
+
     raise ValueError(f"Map: {env_id} not registered correctly!")
 
 registered_singletons = [
@@ -666,12 +666,12 @@ registered_singletons = [
 ]
 
 def make_jaxnav_singleton_collection(collection_id: str, **env_kwargs) -> Tuple[List[JaxNavSingleton], List[str]]:
-    
+
     env_ids = registered_singleton_collections[collection_id]
     envs = []
     for env_id in env_ids:
         envs.append(make_jaxnav_singleton(env_id, **env_kwargs))
-        
+
     return envs, env_ids
 
 registered_singleton_collections = {
@@ -718,4 +718,3 @@ registered_singleton_collections = {
         "LongCorridor2",
     ],
 }
-    

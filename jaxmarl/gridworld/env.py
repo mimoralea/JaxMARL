@@ -57,8 +57,8 @@ class Environment(object):
 
 	@partial(jax.jit, static_argnums=(0,))
 	def reset(
-		self, 
-		key: chex.PRNGKey, 
+		self,
+		key: chex.PRNGKey,
 	) -> Tuple[chex.ArrayTree, EnvState]:
 		"""Performs resetting of environment."""
 		# Use default env parameters if no others specified

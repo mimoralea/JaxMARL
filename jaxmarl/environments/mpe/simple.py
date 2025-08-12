@@ -235,7 +235,7 @@ class SimpleMPE(MultiAgentEnv):
 
     @partial(jax.jit, static_argnums=[0])
     def step_env(self, key: chex.PRNGKey, state: State, actions: dict):
-        
+
         # Step through the world
         u, c = self.set_actions(actions)
         if (

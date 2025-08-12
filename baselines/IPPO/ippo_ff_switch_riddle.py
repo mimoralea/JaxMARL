@@ -1,4 +1,4 @@
-""" 
+"""
 Based on PureJaxRL Implementation of PPO
 """
 
@@ -55,7 +55,7 @@ class ActorCritic(nn.Module):
         )
 
         return pi, jnp.squeeze(critic, axis=-1)
-    
+
 class Transition(NamedTuple):
     done: jnp.ndarray
     action: jnp.ndarray
@@ -81,14 +81,14 @@ def make_train(config):
     env = jaxmarl.make(config["ENV_NAME"], **config["ENV_KWARGS"])
     config["NUM_ACTORS"] = env.num_agents * config["NUM_ENVS"]
     config["NUM_UPDATES"] = (
-        config["TOTAL_TIMESTEPS"] // config["NUM_STEPS"] // config["NUM_ACTORS"]  
+        config["TOTAL_TIMESTEPS"] // config["NUM_STEPS"] // config["NUM_ACTORS"]
     )
     config["MINIBATCH_SIZE"] = (
         config["NUM_ACTORS"] * config["NUM_STEPS"] // config["NUM_MINIBATCHES"]
     )
-    
+
     env = LogWrapper(env)
-    
+
     def linear_schedule(count):
         frac = 1.0 - (count // (config["NUM_MINIBATCHES"] * config["UPDATE_EPOCHS"])) / config["NUM_UPDATES"]
         return config["LR"] * frac
@@ -113,12 +113,12 @@ def make_train(config):
             params=network_params,
             tx=tx,
         )
-        
+
         # INIT ENV
         rng, _rng = jax.random.split(rng)
         reset_rng = jax.random.split(_rng, config["NUM_ENVS"])
         obsv, env_state = jax.vmap(env.reset)(reset_rng)
-        
+
         # TRAIN LOOP
         def _update_step(runner_state, unused):
             # COLLECT TRAJECTORIES
@@ -128,7 +128,7 @@ def make_train(config):
                 obs_batch = batchify(last_obs, env.agents, config["NUM_ACTORS"])
                 # SELECT ACTION
                 rng, _rng = jax.random.split(rng)
-                
+
                 pi, value = network.apply(train_state.params, obs_batch)
                 action = pi.sample(seed=_rng)
                 log_prob = pi.log_prob(action)
@@ -157,7 +157,7 @@ def make_train(config):
             runner_state, traj_batch = jax.lax.scan(
                 _env_step, runner_state, None, config["NUM_STEPS"]
             )
-            
+
             # CALCULATE ADVANTAGE
             train_state, env_state, last_obs, rng = runner_state
             last_obs_batch = batchify(last_obs, env.agents, config["NUM_ACTORS"])
@@ -188,7 +188,7 @@ def make_train(config):
                 return advantages, advantages + traj_batch.value
 
             advantages, targets = _calculate_gae(traj_batch, last_val)
-            
+
             # UPDATE NETWORK
             def _update_epoch(update_state, unused):
                 def _update_minbatch(train_state, batch_info):
@@ -272,7 +272,7 @@ def make_train(config):
             train_state = update_state[0]
             metric = traj_batch.info
             rng = update_state[-1]
-            
+
             runner_state = (train_state, env_state, last_obs, rng)
             return runner_state, metric
 
@@ -287,9 +287,9 @@ def make_train(config):
 
 
 @hydra.main(version_base=None, config_path="config", config_name="ippo_ff_switch_riddle")
-def main(config): 
+def main(config):
 
-    config = OmegaConf.to_container(config) 
+    config = OmegaConf.to_container(config)
     wandb.init(
         entity=config["ENTITY"],
         project=config["PROJECT"],
@@ -302,7 +302,7 @@ def main(config):
     with jax.disable_jit(config["DISABLE_JIT"]):
         train_jit = jax.jit(make_train(config), device=jax.devices()[config["DEVICE"]])
         out = train_jit(rng)
-        
+
     updates_x = jnp.arange(out["metrics"]["returned_episode_returns"].shape[0])
     returns_table = jnp.stack([updates_x, out["metrics"]["returned_episode_returns"].mean(axis=(-2, -1))], axis=1)
     returns_table = wandb.Table(data=returns_table.tolist(), columns=["updates", "returns"])
@@ -310,7 +310,7 @@ def main(config):
         "returns_plot": wandb.plot.line(returns_table, "updates", "returns", title="returns_vs_updates"),
         "returns": out["metrics"]["returned_episode_returns"].mean()
     })
-    
+
     # mean_returns = out["metrics"]["returned_episode_returns"].mean(-1).reshape(-1)
     # x = np.arange(len(mean_returns)) * config["NUM_ACTORS"]
     # plt.plot(x, mean_returns)
@@ -318,7 +318,7 @@ def main(config):
     # plt.ylabel("Return")
     # plt.savefig(f'switch_riddle_ippo_ret.png')
 
-    
+
     # import pdb; pdb.set_trace()
 
 if __name__=="__main__":
