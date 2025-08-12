@@ -37,17 +37,49 @@ def load_tournament_results(csv_path: str) -> pd.DataFrame:
     df = pd.read_csv(csv_path)
     
     # Add derived columns for easier analysis
-    df['green_algorithm'] = df['player1'].apply(lambda x: 'SCRIPTED' if x.startswith('scripted_') else x.split('_')[0].upper())
-    df['red_algorithm'] = df['player2'].apply(lambda x: 'SCRIPTED' if x.startswith('scripted_') else x.split('_')[0].upper())
-    df['green_spec'] = df['player1']
-    df['red_spec'] = df['player2']
+    df['green_algorithm'] = df['green_player'].apply(lambda x: 'SCRIPTED' if x.startswith('scripted_') else x.split('_')[0].upper())
+    df['red_algorithm'] = df['red_player'].apply(lambda x: 'SCRIPTED' if x.startswith('scripted_') else x.split('_')[0].upper())
+    df['green_spec'] = df['green_player']
+    df['red_spec'] = df['red_player']
     
     # Convert outcome to numeric for easier analysis
-    df['green_wins'] = (df['winner'] == df['player1']).astype(int)
-    df['red_wins'] = (df['winner'] == df['player2']).astype(int)
+    df['green_wins'] = (df['winner'] == df['green_player']).astype(int)
+    df['red_wins'] = (df['winner'] == df['red_player']).astype(int)
     df['draws'] = (df['winner'] == 'draw').astype(int)
     
-    print(f"✅ Loaded {len(df)} episodes from {len(df.groupby(['player1', 'player2']))} unique matchups")
+    # Infer spawn mode from episode ordering if not present
+    if 'spawn_mode' not in df.columns:
+        print("⚠️  spawn_mode column not found, inferring from episode ordering...")
+        df['spawn_mode'] = 'deterministic'  # Default
+        
+        # For each match, infer spawn mode based on episode ordering
+        # Episodes are ordered: deterministic side 1, deterministic side 2, random side 1, random side 2
+        for match_id in df['match_id'].unique():
+            match_episodes = df[df['match_id'] == match_id].copy()
+            total_episodes = len(match_episodes)
+            episodes_per_side = total_episodes // 2
+            det_per_side = episodes_per_side // 2
+            
+            # Mark random episodes (second half of each side)
+            match_episodes = match_episodes.sort_values('episode_id')
+            episode_indices = match_episodes.index
+            
+            # Side 1 random episodes (episodes det_per_side to episodes_per_side-1)
+            side1_random_start = det_per_side
+            side1_random_end = episodes_per_side
+            
+            # Side 2 random episodes (episodes episodes_per_side+det_per_side to total-1)
+            side2_random_start = episodes_per_side + det_per_side
+            side2_random_end = total_episodes
+            
+            for i, idx in enumerate(episode_indices):
+                if (side1_random_start <= i < side1_random_end) or (side2_random_start <= i < side2_random_end):
+                    df.loc[idx, 'spawn_mode'] = 'random'
+    
+    print(f"✅ Loaded {len(df)} episodes from {len(df.groupby(['green_player', 'red_player']))} unique matchups")
+    if 'spawn_mode' in df.columns:
+        spawn_counts = df['spawn_mode'].value_counts()
+        print(f"📊 Spawn modes: {dict(spawn_counts)}")
     
     return df
 
@@ -58,18 +90,18 @@ def calculate_win_rates(df: pd.DataFrame) -> pd.DataFrame:
     print("🧮 Calculating win rates...")
     
     # Get all unique players
-    all_players = list(set(df['player1'].unique()) | set(df['player2'].unique()))
+    all_players = list(set(df['green_player'].unique()) | set(df['red_player'].unique()))
     
     win_rate_data = []
     
     for player in all_players:
-        # Games where player was green (player1)
-        green_games = df[df['player1'] == player]
-        green_wins = len(green_games[green_games['winner'] == player])
+        # Games where player was green
+        green_games = df[df['green_player'] == player]
+        green_wins = len(green_games[green_games['winner'] == 'green'])
         
-        # Games where player was red (player2)
-        red_games = df[df['player2'] == player]
-        red_wins = len(red_games[red_games['winner'] == player])
+        # Games where player was red
+        red_games = df[df['red_player'] == player]
+        red_wins = len(red_games[red_games['winner'] == 'red'])
         
         # Total statistics
         total_games = len(green_games) + len(red_games)
@@ -95,24 +127,24 @@ def calculate_win_rates(df: pd.DataFrame) -> pd.DataFrame:
         
         # As green player
         for _, row in green_games.iterrows():
-            if row['player2'].startswith('scripted_'):
+            if row['red_player'].startswith('scripted_'):
                 vs_scripted_games += 1
-                if row['winner'] == player:
+                if row['winner'] == 'green':
                     vs_scripted_wins += 1
             else:
                 vs_learned_games += 1
-                if row['winner'] == player:
+                if row['winner'] == 'green':
                     vs_learned_wins += 1
         
         # As red player
         for _, row in red_games.iterrows():
-            if row['player1'].startswith('scripted_'):
+            if row['green_player'].startswith('scripted_'):
                 vs_scripted_games += 1
-                if row['winner'] == player:
+                if row['winner'] == 'red':
                     vs_scripted_wins += 1
             else:
                 vs_learned_games += 1
-                if row['winner'] == player:
+                if row['winner'] == 'red':
                     vs_learned_wins += 1
         
         vs_scripted_rate = vs_scripted_wins / vs_scripted_games if vs_scripted_games > 0 else 0
@@ -146,15 +178,22 @@ def calculate_win_rates(df: pd.DataFrame) -> pd.DataFrame:
 def create_visualizations(df: pd.DataFrame, win_rates: pd.DataFrame, output_dir: str) -> List[str]:
     """Create comprehensive visualizations for tournament analysis."""
     
-    print(f"\n📈 Creating Tournament Visualizations")
-    print("=" * 40)
+    print("🎨 Creating visualizations...")
     
-    output_dir = Path(output_dir)
-    output_dir.mkdir(exist_ok=True)
+    # Create output directory
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
     
     artifacts = []
     
-    # 1. Overall Win Rate Comparison
+    # Set up the plotting style
+    plt.style.use('seaborn-v0_8')
+    sns.set_palette("husl")
+    
+    # Check if spawn mode data is available
+    has_spawn_mode = 'spawn_mode' in df.columns and len(df['spawn_mode'].unique()) > 1
+    
+    # Main win rate bar chart
     plt.figure(figsize=(14, 10))
     
     # Main win rate bar chart
@@ -260,7 +299,7 @@ def create_visualizations(df: pd.DataFrame, win_rates: pd.DataFrame, output_dir:
     plt.tight_layout()
     
     # Save main visualization
-    main_viz_path = output_dir / "tournament_analysis_overview.png"
+    main_viz_path = output_path / "tournament_analysis_overview.png"
     plt.savefig(main_viz_path, dpi=300, bbox_inches='tight')
     plt.close()
     artifacts.append(str(main_viz_path))
@@ -279,8 +318,8 @@ def create_visualizations(df: pd.DataFrame, win_rates: pd.DataFrame, output_dir:
             for j, player2 in enumerate(learned_players):
                 if player1 != player2:
                     # Get matches between these players
-                    matches = df[((df['player1'] == player1) & (df['player2'] == player2)) |
-                               ((df['player1'] == player2) & (df['player2'] == player1))]
+                    matches = df[((df['green_player'] == player1) & (df['red_player'] == player2)) |
+                               ((df['green_player'] == player2) & (df['red_player'] == player1))]
                     
                     if len(matches) > 0:
                         # Calculate win rate for player1 (row) vs player2 (column)
@@ -313,13 +352,81 @@ def create_visualizations(df: pd.DataFrame, win_rates: pd.DataFrame, output_dir:
         plt.xlabel('Opponent (Red)')
         plt.ylabel('Player (Green)')
         
-        heatmap_path = output_dir / "learned_vs_learned_heatmap.png"
+        heatmap_path = output_path / "learned_vs_learned_heatmap.png"
         plt.savefig(heatmap_path, dpi=300, bbox_inches='tight')
         plt.close()
         artifacts.append(str(heatmap_path))
         print(f"✅ Learned vs learned heatmap: {heatmap_path}")
     
-    # 8. Scripted Baseline Performance Analysis
+    # 8. Episode length distribution
+    plt.figure(figsize=(10, 6))
+    if has_spawn_mode:
+        # Split by spawn mode
+        for spawn_mode in df['spawn_mode'].unique():
+            subset = df[df['spawn_mode'] == spawn_mode]
+            plt.hist(subset['steps'], bins=30, alpha=0.6, label=f'{spawn_mode.title()} starts', edgecolor='black')
+        plt.legend()
+    else:
+        plt.hist(df['steps'], bins=30, alpha=0.7, edgecolor='black')
+    plt.xlabel('Episode Length (Steps)')
+    plt.ylabel('Frequency')
+    plt.title('Distribution of Episode Lengths' + (' by Spawn Mode' if has_spawn_mode else ''))
+    plt.grid(True, alpha=0.3)
+    
+    length_file = output_path / "episode_length_distribution.png"
+    plt.savefig(length_file, dpi=300, bbox_inches='tight')
+    plt.close()
+    artifacts.append(str(length_file))
+    
+    # 9. Spawn mode comparison (if available)
+    if has_spawn_mode:
+        plt.figure(figsize=(12, 8))
+        
+        # Calculate win rates by spawn mode for each algorithm
+        spawn_comparison = []
+        for algorithm in win_rates['algorithm'].unique():
+            if algorithm == 'SCRIPTED':
+                continue
+            alg_players = win_rates[win_rates['algorithm'] == algorithm]['player'].tolist()
+            
+            for spawn_mode in df['spawn_mode'].unique():
+                subset = df[(df['spawn_mode'] == spawn_mode) & 
+                           ((df['green_player'].isin(alg_players)) | (df['red_player'].isin(alg_players)))]
+                
+                wins = 0
+                total = 0
+                for player in alg_players:
+                    green_wins = len(subset[(subset['green_player'] == player) & (subset['winner'] == player)])
+                    red_wins = len(subset[(subset['red_player'] == player) & (subset['winner'] == player)])
+                    green_total = len(subset[subset['green_player'] == player])
+                    red_total = len(subset[subset['red_player'] == player])
+                    
+                    wins += green_wins + red_wins
+                    total += green_total + red_total
+                
+                win_rate = wins / total if total > 0 else 0
+                spawn_comparison.append({
+                    'algorithm': algorithm,
+                    'spawn_mode': spawn_mode,
+                    'win_rate': win_rate,
+                    'games': total
+                })
+        
+        if spawn_comparison:
+            spawn_df = pd.DataFrame(spawn_comparison)
+            pivot_data = spawn_df.pivot(index='algorithm', columns='spawn_mode', values='win_rate')
+            
+            sns.heatmap(pivot_data, annot=True, fmt='.3f', cmap='RdYlBu_r', center=0.5)
+            plt.title('Algorithm Win Rates by Spawn Mode')
+            plt.ylabel('Algorithm')
+            plt.xlabel('Spawn Mode')
+            
+            spawn_file = output_path / "spawn_mode_comparison.png"
+            plt.savefig(spawn_file, dpi=300, bbox_inches='tight')
+            plt.close()
+            artifacts.append(str(spawn_file))
+    
+    # 10. Scripted Baseline Performance Analysis
     scripted_players = win_rates[win_rates['player_type'] == 'scripted']['player'].tolist()
     
     if len(scripted_players) > 0 and len(learned_players) > 0:
@@ -331,8 +438,8 @@ def create_visualizations(df: pd.DataFrame, win_rates: pd.DataFrame, output_dir:
         for i, learned in enumerate(learned_players):
             for j, scripted in enumerate(scripted_players):
                 # Get matches between learned and scripted
-                matches = df[((df['player1'] == learned) & (df['player2'] == scripted)) |
-                           ((df['player1'] == scripted) & (df['player2'] == learned))]
+                matches = df[((df['green_player'] == learned) & (df['red_player'] == scripted)) |
+                           ((df['green_player'] == scripted) & (df['red_player'] == learned))]
                 
                 if len(matches) > 0:
                     # Calculate win rate for learned agent
@@ -353,7 +460,7 @@ def create_visualizations(df: pd.DataFrame, win_rates: pd.DataFrame, output_dir:
         plt.xlabel('Scripted Baseline')
         plt.ylabel('Learned Agent')
         
-        baseline_path = output_dir / "learned_vs_scripted_heatmap.png"
+        baseline_path = output_path / "learned_vs_scripted_heatmap.png"
         plt.savefig(baseline_path, dpi=300, bbox_inches='tight')
         plt.close()
         artifacts.append(str(baseline_path))
@@ -378,7 +485,7 @@ def generate_analysis_summary(df: pd.DataFrame, win_rates: pd.DataFrame,
         f.write(f"Analysis Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
         f.write(f"Total Episodes: {len(df)}\n")
         f.write(f"Unique Players: {len(win_rates)}\n")
-        f.write(f"Unique Matchups: {len(df.groupby(['player1', 'player2']))}\n\n")
+        f.write(f"Unique Matchups: {len(df.groupby(['green_player', 'red_player']))}\n\n")
         
         # Player Statistics
         f.write("PLAYER PERFORMANCE RANKINGS\n")

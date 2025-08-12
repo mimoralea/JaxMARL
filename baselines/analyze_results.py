@@ -39,59 +39,67 @@ sns.set_palette("husl")
 def discover_checkpoints(run_timestamp: Optional[str] = None) -> Dict[str, List[str]]:
     """Discover available checkpoints from training runs."""
     
-    if run_timestamp is None:
-        # Auto-discover latest run timestamp
-        all_runs = []
-        for pattern in ["checkpoints/*/run_*_seed*", "training_runs/training_summary_*.yaml"]:
-            matches = glob.glob(pattern)
-            for match in matches:
-                if "run_" in match:
-                    # Extract timestamp from path
-                    parts = match.split("run_")[1].split("_seed")[0] if "_seed" in match else match.split("run_")[1].split(".")[0]
-                    if len(parts) == 15:  # YYYYMMDD_HHMMSS format
-                        all_runs.append(parts)
-        
-        if all_runs:
-            run_timestamp = max(all_runs)  # Latest timestamp
-            print(f"🔍 Auto-discovered latest run: {run_timestamp}")
-        else:
-            print("❌ No training runs found. Please run batch_train.py first.")
-            return {}
+    print(f"🔍 Discovering latest checkpoints from all runs")
     
-    print(f"🔍 Discovering checkpoints for run: {run_timestamp}")
-    
-    # Checkpoint discovery patterns
-    patterns = {
-        "IPPO": f"checkpoints/ippo/run_{run_timestamp}_seed*/agent_*/*/",
-        "SPPPO": f"checkpoints/spppo/run_{run_timestamp}_seed*/*/", 
-        "FSPPPO": f"checkpoints/fspppo/run_{run_timestamp}_seed*/main_agent/step_*/",
-    }
-    
+    # Use the same discovery patterns as the working tournament script
     discovered = {}
     
-    for algorithm, pattern in patterns.items():
-        checkpoints = glob.glob(pattern)
-        if checkpoints:
-            # Sort and select representative checkpoints
-            sorted_checkpoints = sorted(checkpoints)
-            
-            # Select checkpoints: early, middle, late training
-            if len(sorted_checkpoints) >= 3:
-                selected = [
-                    sorted_checkpoints[len(sorted_checkpoints)//4],      # Early (25%)
-                    sorted_checkpoints[len(sorted_checkpoints)//2],      # Middle (50%)
-                    sorted_checkpoints[-1],                              # Latest (100%)
-                ]
-            else:
-                selected = sorted_checkpoints
-            
-            discovered[algorithm] = selected
-            print(f"  {algorithm}: {len(checkpoints)} total, {len(selected)} selected")
-            for cp in selected:
-                print(f"    {cp}")
+    # Use the exact same patterns as the working tournament script
+    # IPPO discovery - find most recent checkpoint from any run
+    ippo_checkpoints = glob.glob("checkpoints/ippo/run_*_seed*/main/")
+    if ippo_checkpoints:
+        ippo_checkpoints.sort(key=lambda x: (
+            x.split('run_')[1].split('_seed')[0],  # timestamp
+            int(x.split('_seed')[1].split('/')[0])  # seed number
+        ))
+        latest_ippo = ippo_checkpoints[-1]  # Most recent
+        discovered["IPPO"] = [latest_ippo]
+        print(f"  IPPO: Found {len(ippo_checkpoints)} total, selected latest: {latest_ippo}")
+    else:
+        discovered["IPPO"] = []
+        print(f"  IPPO: No checkpoints found")
+    
+    # SPPPO discovery - find most recent checkpoint from any run
+    spppo_checkpoints = glob.glob("checkpoints/spppo/run_*_seed*/main/")
+    if spppo_checkpoints:
+        spppo_checkpoints.sort(key=lambda x: (
+            x.split('run_')[1].split('_seed')[0],  # timestamp
+            int(x.split('_seed')[1].split('/')[0])  # seed number
+        ))
+        latest_spppo = spppo_checkpoints[-1]  # Most recent
+        discovered["SPPPO"] = [latest_spppo]
+        print(f"  SPPPO: Found {len(spppo_checkpoints)} total, selected latest: {latest_spppo}")
+    else:
+        discovered["SPPPO"] = []
+        print(f"  SPPPO: No checkpoints found")
+    
+    # FSPPPO discovery - find most recent checkpoint from any run
+    fspppo_checkpoints = glob.glob("checkpoints/fspppo/run_*_seed*/main/*/")
+    if fspppo_checkpoints:
+        # Filter out non-numeric directories (like agent_metadata.json)
+        numeric_checkpoints = []
+        for cp in fspppo_checkpoints:
+            try:
+                step_num = int(cp.rstrip('/').split('/')[-1])
+                numeric_checkpoints.append(cp)
+            except ValueError:
+                continue
+        
+        if numeric_checkpoints:
+            numeric_checkpoints.sort(key=lambda x: (
+                x.split('run_')[1].split('_seed')[0],  # timestamp
+                int(x.split('_seed')[1].split('/')[0]),  # seed number
+                int(x.rstrip('/').split('/')[-1])  # step number
+            ))
+            latest_fspppo = numeric_checkpoints[-1]  # Most recent
+            discovered["FSPPPO"] = [latest_fspppo]
+            print(f"  FSPPPO: Found {len(numeric_checkpoints)} total, selected latest: {latest_fspppo}")
         else:
-            print(f"  {algorithm}: No checkpoints found")
-            discovered[algorithm] = []
+            discovered["FSPPPO"] = []
+            print(f"  FSPPPO: No valid checkpoints found")
+    else:
+        discovered["FSPPPO"] = []
+        print(f"  FSPPPO: No checkpoints found")
     
     return discovered
 
@@ -143,9 +151,8 @@ def run_tournament(config_file: str, output_csv: str) -> bool:
     print("=" * 50)
     
     cmd = [
-        "python", "-m", "baselines.tournament_eval",
-        "--config", config_file,
-        "--output-csv", output_csv,
+        "python", "-m", "baselines.run_tournament",
+        "--episodes-per-matchup", "50"
     ]
     
     print(f"Command: {' '.join(cmd)}")
@@ -194,12 +201,12 @@ def load_and_analyze_results(csv_file: str) -> pd.DataFrame:
         if error_matches > 0:
             print(f"   Error rate: {error_matches/total_matches:.1%}")
         
-        # Algorithm breakdown
-        algorithms = set()
-        for col in ['green_algorithm', 'red_algorithm']:
-            algorithms.update(df[col].unique())
+        # Player breakdown
+        players = set()
+        for col in ['green_player', 'red_player']:
+            players.update(df[col].unique())
         
-        print(f"   Algorithms: {sorted(algorithms)}")
+        print(f"   Players: {sorted(players)}")
         
         return df
         
@@ -213,16 +220,17 @@ def calculate_win_rates(df: pd.DataFrame) -> pd.DataFrame:
     
     results = []
     
-    # Get unique algorithms (excluding SCRIPTED)
-    algorithms = set()
-    for col in ['green_algorithm', 'red_algorithm']:
-        algorithms.update(df[col].unique())
-    algorithms = [alg for alg in algorithms if alg != 'SCRIPTED']
+    # Get unique players (excluding scripted behaviors)
+    players = set()
+    for col in ['green_player', 'red_player']:
+        players.update(df[col].unique())
+    # Filter to only learned algorithms (not scripted behaviors)
+    learned_players = [p for p in players if not p.startswith('scripted_')]
     
-    for alg in algorithms:
-        # All matches where this algorithm participated
-        green_matches = df[df['green_algorithm'] == alg]
-        red_matches = df[df['red_algorithm'] == alg]
+    for player in learned_players:
+        # All matches where this player participated
+        green_matches = df[df['green_player'] == player]
+        red_matches = df[df['red_player'] == player]
         
         # Calculate wins
         green_wins = len(green_matches[green_matches['winner'] == 'green'])
@@ -235,28 +243,28 @@ def calculate_win_rates(df: pd.DataFrame) -> pd.DataFrame:
         
         # Win rate vs scripted baselines
         vs_scripted = df[
-            ((df['green_algorithm'] == alg) & (df['red_algorithm'] == 'SCRIPTED')) |
-            ((df['red_algorithm'] == alg) & (df['green_algorithm'] == 'SCRIPTED'))
+            ((df['green_player'] == player) & (df['red_player'].str.startswith('scripted_'))) |
+            ((df['red_player'] == player) & (df['green_player'].str.startswith('scripted_')))
         ]
         vs_scripted_wins = (
-            len(vs_scripted[(vs_scripted['green_algorithm'] == alg) & (vs_scripted['winner'] == 'green')]) +
-            len(vs_scripted[(vs_scripted['red_algorithm'] == alg) & (vs_scripted['winner'] == 'red')])
+            len(vs_scripted[(vs_scripted['green_player'] == player) & (vs_scripted['winner'] == 'green')]) +
+            len(vs_scripted[(vs_scripted['red_player'] == player) & (vs_scripted['winner'] == 'red')])
         )
         vs_scripted_rate = vs_scripted_wins / len(vs_scripted) if len(vs_scripted) > 0 else 0
         
-        # Win rate vs other algorithms
+        # Win rate vs other learned algorithms
         vs_other = df[
-            ((df['green_algorithm'] == alg) & (df['red_algorithm'] != 'SCRIPTED') & (df['green_algorithm'] != df['red_algorithm'])) |
-            ((df['red_algorithm'] == alg) & (df['green_algorithm'] != 'SCRIPTED') & (df['green_algorithm'] != df['red_algorithm']))
+            ((df['green_player'] == player) & (~df['red_player'].str.startswith('scripted_')) & (df['green_player'] != df['red_player'])) |
+            ((df['red_player'] == player) & (~df['green_player'].str.startswith('scripted_')) & (df['green_player'] != df['red_player']))
         ]
         vs_other_wins = (
-            len(vs_other[(vs_other['green_algorithm'] == alg) & (vs_other['winner'] == 'green')]) +
-            len(vs_other[(vs_other['red_algorithm'] == alg) & (vs_other['winner'] == 'red')])
+            len(vs_other[(vs_other['green_player'] == player) & (vs_other['winner'] == 'green')]) +
+            len(vs_other[(vs_other['red_player'] == player) & (vs_other['winner'] == 'red')])
         )
         vs_other_rate = vs_other_wins / len(vs_other) if len(vs_other) > 0 else 0
         
         results.append({
-            'algorithm': alg,
+            'algorithm': player,
             'total_matches': total_matches,
             'total_wins': total_wins,
             'win_rate': win_rate,
@@ -350,7 +358,9 @@ def create_visualizations(df: pd.DataFrame, win_rates: pd.DataFrame, output_dir:
     print(f"✅ Main performance visualization: {main_viz_path}")
     
     # 5. Detailed Heatmap of Algorithm vs Algorithm Performance
-    algorithms = [alg for alg in df['green_algorithm'].unique() if alg != 'SCRIPTED']
+    # Get learned algorithms (exclude scripted behaviors)
+    players = set(df['green_player'].unique()) | set(df['red_player'].unique())
+    algorithms = [p for p in players if not p.startswith('scripted_')]
     
     if len(algorithms) > 1:
         plt.figure(figsize=(10, 8))
@@ -361,7 +371,7 @@ def create_visualizations(df: pd.DataFrame, win_rates: pd.DataFrame, output_dir:
         for i, green_alg in enumerate(algorithms):
             for j, red_alg in enumerate(algorithms):
                 if green_alg != red_alg:
-                    matches = df[(df['green_algorithm'] == green_alg) & (df['red_algorithm'] == red_alg)]
+                    matches = df[(df['green_player'] == green_alg) & (df['red_player'] == red_alg)]
                     if len(matches) > 0:
                         win_rate = len(matches[matches['winner'] == 'green']) / len(matches)
                         matrix[i, j] = win_rate
@@ -386,7 +396,7 @@ def create_visualizations(df: pd.DataFrame, win_rates: pd.DataFrame, output_dir:
         print(f"✅ Algorithm vs algorithm heatmap: {heatmap_path}")
     
     # 6. Scripted Baseline Performance Analysis
-    scripted_baselines = df[df['red_algorithm'] == 'SCRIPTED']['red_spec'].str.split(':').str[-1].unique()
+    scripted_baselines = df[df['red_player'].str.startswith('scripted_')]['red_player'].str.replace('scripted_', '').unique()
     
     if len(scripted_baselines) > 0:
         plt.figure(figsize=(12, 6))
@@ -396,16 +406,14 @@ def create_visualizations(df: pd.DataFrame, win_rates: pd.DataFrame, output_dir:
             for alg in algorithms:
                 # Matches where algorithm was green vs this scripted baseline
                 green_matches = df[
-                    (df['green_algorithm'] == alg) & 
-                    (df['red_algorithm'] == 'SCRIPTED') &
-                    (df['red_spec'].str.contains(baseline, na=False))
+                    (df['green_player'] == alg) & 
+                    (df['red_player'] == f'scripted_{baseline}')
                 ]
                 
                 # Matches where algorithm was red vs this scripted baseline  
                 red_matches = df[
-                    (df['red_algorithm'] == alg) & 
-                    (df['green_algorithm'] == 'SCRIPTED') &
-                    (df['green_spec'].str.contains(baseline, na=False))
+                    (df['red_player'] == alg) & 
+                    (df['green_player'] == f'scripted_{baseline}')
                 ]
                 
                 total_wins = (
@@ -510,8 +518,11 @@ def generate_research_summary(
         f.write("## Statistical Summary\n\n")
         f.write(f"- **Total tournament matches:** {len(df)}\n")
         f.write(f"- **Algorithms evaluated:** {len(win_rates)}\n")
-        f.write(f"- **Scripted baselines:** {len(df[df['red_algorithm'] == 'SCRIPTED']['red_spec'].unique())}\n")
-        f.write(f"- **Seeds per matchup:** {df['seed_idx'].nunique()}\n")
+        scripted_count = len(df[df['red_player'].str.startswith('scripted_')]['red_player'].unique())
+        f.write(f"- **Scripted baselines:** {scripted_count}\n")
+        # Calculate episodes per matchup instead of seeds
+        episodes_per_matchup = len(df) // len(df[['green_player', 'red_player']].drop_duplicates())
+        f.write(f"- **Episodes per matchup:** {episodes_per_matchup}\n")
         
         error_rate = len(df[df['winner'] == 'error']) / len(df)
         f.write(f"- **Error rate:** {error_rate:.1%}\n\n")
@@ -563,54 +574,61 @@ def generate_research_summary(
     return str(summary_file)
 
 
+def find_latest_tournament_results() -> str:
+    """Find the most recent tournament results CSV file."""
+    tournament_dirs = list(Path("tournament_results").glob("run_*"))
+    if not tournament_dirs:
+        return None
+    
+    # Sort by directory name (which includes timestamp) and find the latest one with a CSV
+    for latest_dir in sorted(tournament_dirs, reverse=True):
+        results_csv = latest_dir / "tournament_results.csv"
+        if results_csv.exists():
+            return str(results_csv)
+    
+    return None
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Run comprehensive evaluation and analysis")
-    parser.add_argument("--run-timestamp", help="Specific run timestamp to evaluate")
-    parser.add_argument("--auto-discover", action="store_true", help="Auto-discover latest training run")
-    parser.add_argument("--output-dir", default="evaluation_results", help="Output directory for results")
-    parser.add_argument("--skip-tournament", action="store_true", help="Skip tournament, analyze existing results")
-    parser.add_argument("--results-csv", help="Existing results CSV file to analyze")
+    parser = argparse.ArgumentParser(description="Analyze existing tournament results")
+    parser.add_argument("--results-csv", default=None, help="Tournament results CSV file to analyze (discovers latest if not specified)")
+    parser.add_argument("--output-dir", default="analysis_results", help="Output directory for analysis results")
     
     args = parser.parse_args()
     
-    # Create timestamped run folder
+    # Discover latest results if no CSV specified
+    if args.results_csv is None:
+        print("🔍 No results CSV specified, discovering latest tournament results...")
+        latest_csv = find_latest_tournament_results()
+        if not latest_csv:
+            print("❌ No tournament results found in tournament_results/")
+            print("Please run the tournament first using: python -m baselines.run_tournament")
+            print("Or specify a results file manually with: --results-csv path/to/results.csv")
+            return
+        results_csv = Path(latest_csv)
+        print(f"🔍 Auto-discovered latest tournament results: {results_csv}")
+    else:
+        results_csv = Path(args.results_csv)
+        print(f"📊 Analyzing specified results file: {results_csv}")
+    
+    # Validate input file exists
+    if not results_csv.exists():
+        print(f"❌ Results file not found: {results_csv}")
+        print("Please run the tournament first using: python -m baselines.run_tournament")
+        return
+    
+    # Create timestamped analysis folder
     from datetime import datetime
     run_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     base_output_dir = Path(args.output_dir)
     output_dir = base_output_dir / f"run_{run_timestamp}"
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    print("🎯 Comprehensive Baseline Algorithm Evaluation")
-    print("=" * 60)
-    print(f"Run timestamp: {run_timestamp}")
+    print("📊 Tournament Results Analysis")
+    print("=" * 40)
+    print(f"Input file: {results_csv}")
     print(f"Output directory: {output_dir}")
-    
-    if not args.skip_tournament:
-        # Discover checkpoints
-        run_timestamp = args.run_timestamp if not args.auto_discover else None
-        checkpoints = discover_checkpoints(run_timestamp)
-        
-        if not any(checkpoints.values()):
-            print("❌ No checkpoints found. Please run batch_train.py first.")
-            return
-        
-        # Create tournament configuration
-        tournament_config = output_dir / "tournament_config.yaml"
-        create_tournament_config(checkpoints, str(tournament_config))
-        
-        # Run tournament
-        results_csv = output_dir / "tournament_results.csv"
-        success = run_tournament(str(tournament_config), str(results_csv))
-        
-        if not success:
-            print("❌ Tournament failed. Cannot proceed with analysis.")
-            return
-    else:
-        # Use existing results
-        results_csv = args.results_csv or (output_dir / "tournament_results.csv")
-        if not Path(results_csv).exists():
-            print(f"❌ Results file not found: {results_csv}")
-            return
+    print(f"Analysis timestamp: {run_timestamp}")
     
     # Load and analyze results
     df = load_and_analyze_results(str(results_csv))

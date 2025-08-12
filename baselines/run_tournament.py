@@ -33,6 +33,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 
 import jax
+import jax.numpy as jnp
 import orbax.checkpoint as ocp
 from jaxmarl import make
 
@@ -41,6 +42,7 @@ from jaxmarl.wrappers.baselines import MPELogWrapper as LogWrapper
 from baselines.IPPO.train import ActorCritic
 from baselines.SPPPO.train import ActorCritic as SPPPOActorCritic
 from baselines.FSPPPO.train import ActorCritic as FSPPPOActorCritic
+from baselines.scripted_behaviors import list_scripted_behaviors
 
 
 class TournamentPlayer:
@@ -56,6 +58,10 @@ class TournamentPlayer:
         self.seed = seed
         self.params = None
         self.apply_fn = None
+        # Diagnostics
+        self.param_sum = None  # float fingerprint of parameters
+        self.param_count = None  # total number of scalars in params
+        self.checkpoint_step = None  # parsed step from path if available
 
     def __str__(self):
         if self.player_type == 'scripted':
@@ -85,11 +91,17 @@ class TournamentEvaluator:
     def __init__(self, env_name: str = "MPE_simple_sumo_v3",
                  episodes_per_matchup: int = 100,
                  output_dir: str = "tournament_results",
-                 max_episode_steps: int = 100):
+                 max_episode_steps: int = 100,
+                 training_seed: int = 0,
+                 evaluation_seed: int = 0,
+                 skip_random_starts: bool = False):
         self.env_name = env_name
         self.episodes_per_matchup = episodes_per_matchup
         self.episodes_per_side = episodes_per_matchup // 2
         self.max_episode_steps = max_episode_steps
+        self.training_seed = training_seed
+        self.evaluation_seed = evaluation_seed
+        self.skip_random_starts = skip_random_starts
 
         # Create timestamped run folder
         self.run_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -97,7 +109,7 @@ class TournamentEvaluator:
         self.output_dir = self.base_output_dir / f"run_{self.run_timestamp}"
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Initialize environment with fixed starting positions
+        # Initialize environment; default to deterministic spawns
         if env_name == "MPE_simple_sumo_v3":
             from jaxmarl.environments.mpe.simple_sumo import SimpleSumoMPE
             self.env = SimpleSumoMPE(random_spawn=False)
@@ -116,6 +128,24 @@ class TournamentEvaluator:
               f"({self.episodes_per_side} per side)")
         print(f"Max episode steps: {max_episode_steps}")
         print(f"Output directory: {self.output_dir}")
+        print(f"Skip random starts: {self.skip_random_starts}")
+
+    def _set_spawn_mode(self, random_mode: bool):
+        """Set environment spawn mode for MPE Simple Sumo.
+
+        Re-instantiates the env to ensure spawn behavior takes effect.
+        """
+        if self.env_name == "MPE_simple_sumo_v3":
+            from jaxmarl.environments.mpe.simple_sumo import SimpleSumoMPE
+            # Recreate environment with desired spawn mode and re-wrap
+            self.env = LogWrapper(SimpleSumoMPE(random_spawn=random_mode))
+        else:
+            # Best-effort toggle if supported
+            try:
+                if hasattr(self.env, 'random_spawn'):
+                    setattr(self.env, 'random_spawn', random_mode)
+            except Exception:
+                pass
 
     def discover_checkpoint_players(self, latest_only=False,
                                   include_training_pairs=False):
@@ -152,50 +182,58 @@ class TournamentEvaluator:
         return checkpoint_players
 
     def _get_latest_ippo_checkpoint(self):
-        """Get the most recent IPPO checkpoint."""
+        """Get the most recent IPPO checkpoint for the specified training seed."""
+        ippo_pattern = f"checkpoints/ippo/run_*_seed{self.training_seed}/main/*"
+        ippo_paths = glob.glob(ippo_pattern)
 
-        ippo_runs = glob.glob("training_runs/IPPO_*/")
-        if not ippo_runs:
+        if not ippo_paths:
             return []
 
-        latest_run = max(ippo_runs, key=os.path.getmtime)
-
-        # Extract seed from path
-        match = re.search(r'seed_(\d+)', latest_run)
-        seed = int(match.group(1)) if match else 0
+        # Find the most recent checkpoint
+        latest_path = max(ippo_paths, key=os.path.getmtime)
+        parts = latest_path.split('/')
+        run_seed = parts[-3]
+        seed_match = re.search(r'seed(\d+)', run_seed)
+        seed = int(seed_match.group(1)) if seed_match else 0
+        step = os.path.basename(latest_path)
+        name = f"IPPO_seed{seed}_step{step}"
 
         return [TournamentPlayer(
-            name=f"IPPO_latest_seed{seed}",
+            name=name,
             player_type='checkpoint',
-            checkpoint_path=latest_run,
             algorithm='IPPO',
+            checkpoint_path=os.path.abspath(latest_path),
             seed=seed
         )]
 
     def _get_latest_spppo_checkpoint(self):
-        """Get the most recent SPPPO checkpoint."""
+        """Get the latest SPPPO checkpoint for the specified training seed."""
+        spppo_pattern = f"checkpoints/spppo/run_*_seed{self.training_seed}/main/*"
+        spppo_paths = glob.glob(spppo_pattern)
 
-        spppo_runs = glob.glob("training_runs/SPPPO_*/")
-        if not spppo_runs:
+        if not spppo_paths:
             return []
 
-        latest_run = max(spppo_runs, key=os.path.getmtime)
-
-        # Extract seed from path
-        match = re.search(r'seed_(\d+)', latest_run)
-        seed = int(match.group(1)) if match else 0
-
+        # Find the most recent checkpoint
+        latest_path = max(spppo_paths, key=os.path.getmtime)
+        parts = latest_path.split('/')
+        run_seed = parts[-3]
+        seed_match = re.search(r'seed(\d+)', run_seed)
+        seed = int(seed_match.group(1)) if seed_match else 0
+        step = os.path.basename(latest_path)
+        name = f"SPPPO_seed{seed}_step{step}"
+        
         return [TournamentPlayer(
-            name=f"SPPPO_latest_seed{seed}",
+            name=name,
             player_type='checkpoint',
-            checkpoint_path=latest_run,
             algorithm='SPPPO',
+            checkpoint_path=os.path.abspath(latest_path),
             seed=seed
         )]
 
     def _get_latest_fspppo_checkpoint(self):
-        """Get the most recent FSPPPO checkpoint."""
-        fspppo_pattern = "checkpoints/fspppo/run_*_seed*/main_agent/step_*/"
+        """Get the most recent FSPPPO checkpoint for the specified training seed."""
+        fspppo_pattern = f"checkpoints/fspppo/run_*_seed{self.training_seed}/main/*"
         fspppo_paths = glob.glob(fspppo_pattern)
 
         if not fspppo_paths:
@@ -223,167 +261,39 @@ class TournamentEvaluator:
                 name=name,
                 player_type='checkpoint',
                 algorithm='FSPPPO',
-                checkpoint_path=latest_path,
+                checkpoint_path=os.path.abspath(latest_path),
                 seed=seed
             )]
 
         return []
 
     def _get_all_ippo_checkpoints(self):
-        """Get all IPPO checkpoints (original behavior)."""
+        """Get all IPPO checkpoints for the specified training seed."""
         players = []
-        # Check both main and opponent directories for IPPO
-        for agent_type in ['main', 'opponent']:
-            ippo_pattern = f"checkpoints/ippo/run_*_seed*/{agent_type}/"
-            ippo_paths = glob.glob(ippo_pattern)
-
-            for path in ippo_paths:
-                if os.path.isdir(path):
-                    # Extract run info
-                    parts = path.split('/')
-                    run_seed = parts[-2]  # e.g., "run_20250728_105631_seed0"
-                    agent_id = agent_type  # "main" or "opponent"
-
-                    # Extract seed number
-                    seed_match = re.search(r'seed(\d+)', run_seed)
-                    seed = int(seed_match.group(1)) if seed_match else 0
-
-                    # Find latest checkpoint in this agent directory
-                    # IPPO uses Orbax with numeric directories (e.g., '4882.0')
-                    checkpoint_dirs = [
-                        d for d in glob.glob(os.path.join(path, "*"))
-                        if (os.path.isdir(d) and
-                            os.path.basename(d).replace('.', '').isdigit())]
-                    if checkpoint_dirs:
-                        latest_checkpoint = max(
-                            checkpoint_dirs,
-                            key=lambda x: float(os.path.basename(x))
-                        )
-                        step = os.path.basename(latest_checkpoint).split('.')[0]
-                        name = (f"IPPO_{run_seed.split('_')[-1]}_"
-                                f"{agent_id}_step{step}")
-                        players.append(TournamentPlayer(
-                            name=name,
-                            player_type='checkpoint',
-                            algorithm='IPPO',
-                            checkpoint_path=latest_checkpoint,
-                            seed=seed
-                        ))
-
-        return players
-
-    def _get_training_setting_pairs(self, latest_only=False):
-        """Get training setting pairs for each algorithm type.
-
-        Returns players configured for training setting evaluation:
-        - IPPO: agent_0 vs agent_1 from same training run.
-        - SPPPO: shared_agent vs shared_agent (self-play).
-        - FSPPPO: main_agent vs main_agent (self-play).
-        """
-        training_players = []
-
-        # IPPO Training Setting: main vs opponent from same run
-        ippo_pattern = "checkpoints/ippo/run_*_seed*/*/"
+        ippo_pattern = f"checkpoints/ippo/run_*_seed{self.training_seed}/main/*"
         ippo_paths = glob.glob(ippo_pattern)
 
-        # Group by run_seed to find agent pairs
-        run_groups = {}
         for path in ippo_paths:
             if os.path.isdir(path):
                 parts = path.split('/')
-                run_seed = parts[-2]
-                agent_id = parts[-1]
-
-                if run_seed not in run_groups:
-                    run_groups[run_seed] = {}
-
-                # Find latest checkpoint in this agent directory
-                checkpoint_dirs = [
-                    d for d in glob.glob(os.path.join(path, "*"))
-                    if (os.path.isdir(d) and
-                        os.path.basename(d).replace('.', '').isdigit())
-                ]
-                if checkpoint_dirs:
-                    latest_checkpoint = max(
-                        checkpoint_dirs,
-                        key=lambda x: float(os.path.basename(x))
-                    )
-                    run_groups[run_seed][agent_id] = latest_checkpoint
-
-        # Find the most recent run with both agents
-        latest_run = None
-        latest_time = 0
-        for run_seed, agents in run_groups.items():
-            if 'agent_0' in agents and 'agent_1' in agents:
-                # Use the modification time of agent_0's checkpoint
-                mtime = os.path.getmtime(agents['agent_0'])
-                if mtime > latest_time:
-                    latest_time = mtime
-                    latest_run = run_seed
-
-        if latest_run:
-            seed_match = re.search(r'seed(\d+)', latest_run)
-            seed = int(seed_match.group(1)) if seed_match else 0
-
-            # Add both agents from the training pair
-            for agent_id in ['agent_0', 'agent_1']:
-                name = f"IPPO_training_{agent_id}"
-                training_players.append(TournamentPlayer(
+                run_seed = parts[-3]
+                seed_match = re.search(r'seed(\d+)', run_seed)
+                seed = int(seed_match.group(1)) if seed_match else 0
+                step = os.path.basename(path)
+                name = f"IPPO_seed{seed}_step{step}"
+                players.append(TournamentPlayer(
                     name=name,
                     player_type='checkpoint',
                     algorithm='IPPO',
-                    checkpoint_path=run_groups[latest_run][agent_id],
+                    checkpoint_path=os.path.abspath(path),
                     seed=seed
                 ))
-
-        # SPPPO Training Setting: shared_agent vs shared_agent (self-play)
-        spppo_latest = self._get_latest_spppo_checkpoint()
-        if spppo_latest:
-            # Create a duplicate for self-play evaluation
-            original = spppo_latest[0]
-            training_players.append(TournamentPlayer(
-                name="SPPPO_training_main",
-                player_type='checkpoint',
-                algorithm='SPPPO',
-                checkpoint_path=original.checkpoint_path,
-                seed=original.seed
-            ))
-            opponent_spppo = TournamentPlayer(
-                name="SPPPO_training_opponent",
-                player_type='checkpoint',
-                algorithm='SPPPO',
-                checkpoint_path=original.checkpoint_path,
-                seed=original.seed
-            )
-            training_players.append(opponent_spppo)
-
-        # FSPPPO Training Setting: main_agent vs main_agent (self-play)
-        fspppo_latest = self._get_latest_fspppo_checkpoint()
-        if fspppo_latest:
-            # Create a duplicate for self-play evaluation
-            original = fspppo_latest[0]
-            training_players.append(TournamentPlayer(
-                name="FSPPPO_training_main",
-                player_type='checkpoint',
-                algorithm='FSPPPO',
-                checkpoint_path=original.checkpoint_path,
-                seed=original.seed
-            ))
-            opponent_fspppo = TournamentPlayer(
-                name="FSPPPO_training_opponent",
-                player_type='checkpoint',
-                algorithm='FSPPPO',
-                checkpoint_path=original.checkpoint_path,
-                seed=original.seed
-            )
-            training_players.append(opponent_fspppo)
-
-        return training_players
+        return players
 
     def _get_all_spppo_checkpoints(self):
-        """Get all SPPPO checkpoints (original behavior)."""
+        """Get all SPPPO checkpoints for the specified training seed."""
         players = []
-        spppo_pattern = "checkpoints/spppo/run_*_seed*/shared_agent/*/"
+        spppo_pattern = f"checkpoints/spppo/run_*_seed{self.training_seed}/main/*"
         spppo_paths = glob.glob(spppo_pattern)
 
         for path in spppo_paths:
@@ -392,66 +302,75 @@ class TournamentEvaluator:
                 run_seed = parts[-3]
                 seed_match = re.search(r'seed(\d+)', run_seed)
                 seed = int(seed_match.group(1)) if seed_match else 0
-
-                checkpoint_dirs = [
-                    d for d in glob.glob(os.path.join(path, "*"))
-                    if (os.path.isdir(d) and
-                        os.path.basename(d).replace('.', '').isdigit())]
-                if checkpoint_dirs:
-                    latest_checkpoint = max(
-                        checkpoint_dirs,
-                        key=lambda x: float(os.path.basename(x))
-                    )
-                    step = os.path.basename(latest_checkpoint).split('.')[0]
-                    name = f"SPPPO_{run_seed.split('_')[-1]}_step{step}"
-                    players.append(TournamentPlayer(
-                        name=name,
-                        player_type='checkpoint',
-                        algorithm='SPPPO',
-                        checkpoint_path=latest_checkpoint,
-                        seed=seed
-                    ))
+                step = os.path.basename(path)
+                name = f"SPPPO_seed{seed}_step{step}"
+                players.append(TournamentPlayer(
+                    name=name,
+                    player_type='checkpoint',
+                    algorithm='SPPPO',
+                    checkpoint_path=os.path.abspath(path),
+                    seed=seed
+                ))
         return players
 
     def _get_all_fspppo_checkpoints(self):
-        """Get all FSPPPO checkpoints (original behavior)."""
+        """Get all FSPPPO checkpoints for the specified training seed."""
         players = []
-        fspppo_pattern = "checkpoints/fspppo/run_*_seed*/main_agent/step_*"
-        fspppo_checkpoints = glob.glob(fspppo_pattern)
-        for checkpoint_dir in fspppo_checkpoints:
-            path_parts = checkpoint_dir.strip('/').split('/')
-            run_seed_dir = path_parts[-3]
-            seed_match = re.search(r'seed(\d+)', run_seed_dir)
-            seed = int(seed_match.group(1)) if seed_match else 0
-            step = int(path_parts[-1].split('_')[-1])
-            name = f"FSPPPO_seed{seed}_step{step}"
-            players.append(TournamentPlayer(
-                name=name,
-                player_type='checkpoint',
-                checkpoint_path=checkpoint_dir,
-                algorithm='FSPPPO',
-                seed=seed
-            ))
+        fspppo_pattern = f"checkpoints/fspppo/run_*_seed{self.training_seed}/main/*"
+        fspppo_paths = glob.glob(fspppo_pattern)
 
+        for path in fspppo_paths:
+            if os.path.isdir(path):
+                parts = path.split('/')
+                run_seed = parts[-3]
+                seed_match = re.search(r'seed(\d+)', run_seed)
+                seed = int(seed_match.group(1)) if seed_match else 0
+                step = os.path.basename(path)
+                name = f"FSPPPO_seed{seed}_step{step}"
+                players.append(TournamentPlayer(
+                    name=name,
+                    player_type='checkpoint',
+                    algorithm='FSPPPO',
+                    checkpoint_path=os.path.abspath(path),
+                    seed=seed
+                ))
         return players
 
-    def create_scripted_players(self) -> List[TournamentPlayer]:
-        """Create scripted opponent players using standardized behaviors."""
+    def create_scripted_players(self):
+        """Create TournamentPlayer entries for all scripted behaviors.
+
+        Uses `baselines.scripted_behaviors.list_scripted_behaviors()` and
+        generates names as `scripted_<behavior>` which downstream logic expects.
+        """
         scripted_players = []
-        behavior_names = ["noop", "turn-left", "turn-right", "gas", "brake"]
+        try:
+            behavior_names = list_scripted_behaviors()
+        except Exception:
+            # Fallback to a safe minimal set if discovery fails
+            behavior_names = []
+
         for name in behavior_names:
             scripted_players.append(TournamentPlayer(
                 name=f"scripted_{name}",
                 player_type='scripted',
-                algorithm='scripted'
+                algorithm=name,
             ))
         return scripted_players
+
+    def get_scripted_action(self, obs, player_name, rng_key):
+        """Get action from scripted behavior."""
+        from baselines.scripted_behaviors import get_scripted_action
+        # Extract behavior name from player name (remove "scripted_" prefix)
+        behavior_name = player_name.replace("scripted_", "")
+        return get_scripted_action(obs, behavior_name, rng_key)
 
     def load_checkpoint_player(self, player: TournamentPlayer):
         """Load parameters and apply function for a checkpoint player."""
         if player.params is not None:
             return
+        
         try:
+            # Initialize network based on algorithm
             if player.algorithm == 'IPPO':
                 network = ActorCritic(
                     self.env.action_space(self.env.agents[0]).n, activation="tanh"
@@ -467,22 +386,69 @@ class TournamentEvaluator:
             else:
                 raise ValueError(f"Unknown algorithm: {player.algorithm}")
 
-            # Use Orbax to load the checkpoint
+            # Use Orbax to load the checkpoint - try different approaches
             try:
+                # Try PyTreeCheckpointer first (works for FSPPPO)
                 orbax_checkpointer = ocp.PyTreeCheckpointer()
                 restored = orbax_checkpointer.restore(player.checkpoint_path)
+                
+                # Handle different checkpoint structures
                 if 'model' in restored:
                     player.params = restored['model']['params']
+                elif 'params' in restored:
+                    # FSPPPO stores params directly in the 'params' key
+                    # but we need to wrap them for Flax network.apply()
+                    if player.algorithm == 'FSPPPO':
+                        player.params = {'params': restored['params']}
+                    else:
+                        player.params = restored['params']
                 else:
-                    player.params = restored # Older checkpoints
-                player.apply_fn = network.apply
-            except Exception as e:
-                print(f"Error loading checkpoint for {player.name}: {e}")
-                print(f"Path: {player.checkpoint_path}")
-                player.params = None
-                player.apply_fn = None
+                    player.params = restored
+                    
+            except Exception as e1:
+                try:
+                    # Try loading from train_state subdirectory (IPPO/SPPPO format)
+                    train_state_path = os.path.join(player.checkpoint_path, 'train_state')
+                    if os.path.exists(train_state_path):
+                        orbax_checkpointer = ocp.PyTreeCheckpointer()
+                        restored = orbax_checkpointer.restore(train_state_path)
+                        player.params = restored['params']
+                    else:
+                        raise Exception("train_state subdirectory not found")
+                except Exception as e2:
+                    raise Exception(f"Failed both direct PyTree ({e1}) and train_state loading ({e2})")
+            
+            player.apply_fn = network.apply
+
+            # Compute simple parameter fingerprint for diagnostics
+            try:
+                leaves = jax.tree_util.tree_leaves(player.params)
+                total_sum = 0.0
+                total_count = 0
+                for leaf in leaves:
+                    arr = jnp.asarray(leaf)
+                    total_sum += float(jnp.sum(arr))
+                    total_count += int(arr.size)
+                player.param_sum = float(total_sum)
+                player.param_count = int(total_count)
+            except Exception as _:
+                player.param_sum = None
+                player.param_count = None
+
+            # Parse checkpoint step from the path if possible
+            try:
+                base = os.path.basename(os.path.normpath(player.checkpoint_path))
+                # supports either numeric steps or prefixed like step_000012
+                if base.startswith('step_'):
+                    player.checkpoint_step = int(base.split('_')[-1])
+                else:
+                    player.checkpoint_step = int(base)
+            except Exception:
+                player.checkpoint_step = None
+            
         except Exception as e:
             print(f"ERROR loading player {player.name}: {e}")
+            print(f"Path: {player.checkpoint_path}")
             player.params = None
             player.apply_fn = None
 
@@ -533,7 +499,19 @@ class TournamentEvaluator:
             if dones["__all__"] or episode_length >= self.max_episode_steps:
                 break
 
-        winner, outcome = self.env.get_info(state)
+        # Determine winner based on final rewards
+        green_total_reward = float(rewards[self.env.agents[0]])
+        red_total_reward = float(rewards[self.env.agents[1]])
+        
+        if green_total_reward > red_total_reward:
+            winner = self.env.agents[0]
+            outcome = "win"
+        elif red_total_reward > green_total_reward:
+            winner = self.env.agents[1]
+            outcome = "win"
+        else:
+            winner = None
+            outcome = "draw"
 
         return {
             "match_id": f"{player1.name}_vs_{player2.name}",
@@ -549,7 +527,7 @@ class TournamentEvaluator:
     def _run_episode_with_positions(self, green_player: TournamentPlayer,
                                   red_player: TournamentPlayer,
                                   rng_key, episode_id: int, side: int,
-                                  match_id: str) -> Dict[str, Any]:
+                                  match_id: str, spawn_mode: str = "deterministic") -> Dict[str, Any]:
         """Run a single episode with explicit player position assignments.
 
         Args:
@@ -590,9 +568,21 @@ class TournamentEvaluator:
                 )
                 if isinstance(network_output, tuple):
                     pi, _ = network_output
-                    actions[self.env.agents[0]] = jax.random.categorical(action_key, pi)
+                    # Handle different output types
+                    if hasattr(pi, 'sample'):
+                        actions[self.env.agents[0]] = pi.sample(seed=action_key)
+                    elif hasattr(pi, 'logits'):
+                        actions[self.env.agents[0]] = jax.random.categorical(action_key, pi.logits)
+                    else:
+                        actions[self.env.agents[0]] = jax.random.categorical(action_key, pi)
                 else:
-                    actions[self.env.agents[0]] = jax.random.categorical(action_key, network_output)
+                    # Handle different output types
+                    if hasattr(network_output, 'sample'):
+                        actions[self.env.agents[0]] = network_output.sample(seed=action_key)
+                    elif hasattr(network_output, 'logits'):
+                        actions[self.env.agents[0]] = jax.random.categorical(action_key, network_output.logits)
+                    else:
+                        actions[self.env.agents[0]] = jax.random.categorical(action_key, network_output)
 
             # Red player (agent_1) action
             if red_player.player_type == 'scripted':
@@ -611,9 +601,21 @@ class TournamentEvaluator:
                 )
                 if isinstance(network_output, tuple):
                     pi, _ = network_output
-                    actions[self.env.agents[1]] = jax.random.categorical(action_key, pi)
+                    # Handle different output types
+                    if hasattr(pi, 'sample'):
+                        actions[self.env.agents[1]] = pi.sample(seed=action_key)
+                    elif hasattr(pi, 'logits'):
+                        actions[self.env.agents[1]] = jax.random.categorical(action_key, pi.logits)
+                    else:
+                        actions[self.env.agents[1]] = jax.random.categorical(action_key, pi)
                 else:
-                    actions[self.env.agents[1]] = jax.random.categorical(action_key, network_output)
+                    # Handle different output types
+                    if hasattr(network_output, 'sample'):
+                        actions[self.env.agents[1]] = network_output.sample(seed=action_key)
+                    elif hasattr(network_output, 'logits'):
+                        actions[self.env.agents[1]] = jax.random.categorical(action_key, network_output.logits)
+                    else:
+                        actions[self.env.agents[1]] = jax.random.categorical(action_key, network_output)
 
             # Step environment
             rng_key, step_key = jax.random.split(rng_key)
@@ -624,23 +626,37 @@ class TournamentEvaluator:
             if dones["__all__"] or episode_length >= self.max_episode_steps:
                 break
 
-        winner, outcome = self.env.get_info(state)
-
-        green_total_reward = state.rewards[self.env.agents[0]]
-        red_total_reward = state.rewards[self.env.agents[1]]
+        # Determine winner based on final rewards
+        green_total_reward = float(rewards[self.env.agents[0]])
+        red_total_reward = float(rewards[self.env.agents[1]])
+        
+        # Debug output for first few episodes to understand what's happening
+        if episode_id < 3:
+            print(f"  Episode {episode_id}: {episode_length} steps, rewards: green={green_total_reward:.3f}, red={red_total_reward:.3f}, done={dones['__all__']}")
+        
+        if green_total_reward > red_total_reward:
+            winner = self.env.agents[0]  # green
+            outcome = "win"
+        elif red_total_reward > green_total_reward:
+            winner = self.env.agents[1]  # red
+            outcome = "win"
+        else:
+            winner = "draw"
+            outcome = "draw"
 
         return {
             "match_id": match_id,
             "episode_id": episode_id,
             "winner": winner,
             "outcome": outcome,
-            "steps": state.step,
-            "returns": state.rewards,
+            "steps": episode_length,
+            "returns": rewards,
             "green_player": green_player.name,
             "red_player": red_player.name,
             "green_reward": float(green_total_reward),
             "red_reward": float(red_total_reward),
             "side": side,
+            "spawn_mode": spawn_mode,
         }
 
     def run_match(self, match: TournamentMatch, rng_key) -> List[Dict[str, Any]]:
@@ -652,39 +668,87 @@ class TournamentEvaluator:
         match_results = []
         episode_id = 0
         
-        # Side 1: Player1 as green (agent_0), Player2 as red (agent_1)
-        print(f"Side 1: {match.player1.name} (green) vs "
-              f"{match.player2.name} (red)")
-        for _ in range(self.episodes_per_side):
-            rng_key, episode_key = jax.random.split(rng_key)
-            result = self._run_episode_with_positions(
-                green_player=match.player1, red_player=match.player2, 
-                rng_key=episode_key, episode_id=episode_id, side=1,
-                match_id=match.get_match_id()
-            )
-            match_results.append(result)
-            episode_id += 1
-            
-            if (episode_id - 1) % 10 == 0:
-                print(f"Completed {(episode_id - 1) + 1}/{match.episodes_per_side} episodes")
-        
-        # Side 2: Player2 as green (agent_0), Player1 as red (agent_1)
-        print(f"Side 2: {match.player2.name} (green) vs "
-              f"{match.player1.name} (red)")
-        for _ in range(self.episodes_per_side):
-            rng_key, episode_key = jax.random.split(rng_key)
-            result = self._run_episode_with_positions(
-                green_player=match.player2, red_player=match.player1,
-                rng_key=episode_key,
-                episode_id=episode_id,
-                side=2,
-                match_id=match.get_match_id(),
-            )
-            match_results.append(result)
-            episode_id += 1
-            
-            if (episode_id - 1) % 10 == 0:
-                print(f"Completed {(episode_id - 1) + 1}/{match.episodes_per_side} episodes")
+        if self.skip_random_starts:
+            # Deterministic spawns only: two chunks (per side)
+            self._set_spawn_mode(random_mode=False)
+            # Side 1 deterministic
+            print(f"Side 1 (deterministic): {match.player1.name} (green) vs {match.player2.name} (red)")
+            for side1_ep in range(self.episodes_per_side):
+                rng_key, episode_key = jax.random.split(rng_key)
+                result = self._run_episode_with_positions(
+                    green_player=match.player1, red_player=match.player2,
+                    rng_key=episode_key, episode_id=episode_id, side=1,
+                    match_id=match.get_match_id()
+                )
+                match_results.append(result)
+                episode_id += 1
+                if (side1_ep + 1) % 10 == 0:
+                    print(f"Completed {side1_ep + 1}/{self.episodes_per_side} episodes (side 1)")
+
+            # Side 2 deterministic
+            print(f"Side 2 (deterministic): {match.player2.name} (green) vs {match.player1.name} (red)")
+            for side2_ep in range(self.episodes_per_side):
+                rng_key, episode_key = jax.random.split(rng_key)
+                result = self._run_episode_with_positions(
+                    green_player=match.player2, red_player=match.player1,
+                    rng_key=episode_key, episode_id=episode_id, side=2,
+                    match_id=match.get_match_id(), spawn_mode="deterministic"
+                )
+                match_results.append(result)
+                episode_id += 1
+                if (side2_ep + 1) % 10 == 0:
+                    print(f"Completed {side2_ep + 1}/{self.episodes_per_side} episodes (side 2)")
+        else:
+            # Four chunks: per side, split into deterministic and random spawns
+            # Compute per-side allocation
+            det_per_side = self.episodes_per_side // 2
+            rand_per_side = self.episodes_per_side - det_per_side
+
+            # Deterministic chunks
+            self._set_spawn_mode(random_mode=False)
+            print(f"Side 1 (deterministic, {det_per_side} eps): {match.player1.name} (green) vs {match.player2.name} (red)")
+            for i in range(det_per_side):
+                rng_key, episode_key = jax.random.split(rng_key)
+                result = self._run_episode_with_positions(
+                    green_player=match.player1, red_player=match.player2,
+                    rng_key=episode_key, episode_id=episode_id, side=1,
+                    match_id=match.get_match_id()
+                )
+                match_results.append(result)
+                episode_id += 1
+            print(f"Side 2 (deterministic, {det_per_side} eps): {match.player2.name} (green) vs {match.player1.name} (red)")
+            for i in range(det_per_side):
+                rng_key, episode_key = jax.random.split(rng_key)
+                result = self._run_episode_with_positions(
+                    green_player=match.player2, red_player=match.player1,
+                    rng_key=episode_key, episode_id=episode_id, side=2,
+                    match_id=match.get_match_id()
+                )
+                match_results.append(result)
+                episode_id += 1
+
+            # Random-spawn chunks
+            self._set_spawn_mode(random_mode=True)
+            print(f"Side 1 (random starts, {rand_per_side} eps): {match.player1.name} (green) vs {match.player2.name} (red)")
+            for i in range(rand_per_side):
+                rng_key, episode_key = jax.random.split(rng_key)
+                result = self._run_episode_with_positions(
+                    green_player=match.player1, red_player=match.player2,
+                    rng_key=episode_key, episode_id=episode_id, side=1,
+                    match_id=match.get_match_id()
+                )
+                match_results.append(result)
+                episode_id += 1
+            print(f"Side 2 (random starts, {rand_per_side} eps): {match.player2.name} (green) vs {match.player1.name} (red)")
+            for i in range(rand_per_side):
+                rng_key, episode_key = jax.random.split(rng_key)
+                result = self._run_episode_with_positions(
+                    green_player=match.player2, red_player=match.player1,
+                    rng_key=episode_key, episode_id=episode_id, side=2,
+                    match_id=match.get_match_id()
+                )
+                match_results.append(result)
+                episode_id += 1
         
         # Calculate match statistics
         player1_wins = sum(
@@ -714,26 +778,57 @@ class TournamentEvaluator:
             selected_set = set(selected_players)
             if 'ippo' in selected_set:
                 selected_set.update(
-                    [p.name for p in checkpoint_players if 'IPPO' in p.name]
+                    [p.name for p in checkpoint_players if p.algorithm == 'IPPO']
                 )
             if 'spppo' in selected_set:
                 selected_set.update(
-                    [p.name for p in checkpoint_players if 'SPPPO' in p.name]
+                    [p.name for p in checkpoint_players if p.algorithm == 'SPPPO']
                 )
             if 'fspppo' in selected_set:
                 selected_set.update(
-                    [p.name for p in checkpoint_players if 'FSPPPO' in p.name]
+                    [p.name for p in checkpoint_players if p.algorithm == 'FSPPPO']
                 )
             if 'scripted' in selected_set:
                 selected_set.update([p.name for p in scripted_players])
-            
-            self.players = [p for p in all_players if p.name in selected_set]
+
+            # Finalize selected players
+            self.players = [
+                p for p in all_players if p.name in selected_set
+            ]
         else:
             self.players = all_players
         
         print(f"Tournament Setup:")
         print(f"Total players: {len(self.players)}")
-        
+
+        # Eagerly load checkpoint players once to record diagnostics and manifest
+        for p in self.players:
+            if p.player_type == 'checkpoint':
+                self.load_checkpoint_player(p)
+
+        # Save a manifest for reproducibility/debugging
+        try:
+            manifest = []
+            for p in self.players:
+                entry = {
+                    'name': p.name,
+                    'type': p.player_type,
+                    'algorithm': p.algorithm,
+                    'seed': p.seed,
+                    'checkpoint_path': p.checkpoint_path,
+                    'checkpoint_step': p.checkpoint_step,
+                    'param_sum': p.param_sum,
+                    'param_count': p.param_count,
+                }
+                manifest.append(entry)
+            manifest_path = self.output_dir / 'players_manifest.json'
+            with open(manifest_path, 'w') as f:
+                import json
+                json.dump(manifest, f, indent=2)
+            print(f"Saved players manifest: {manifest_path}")
+        except Exception as e:
+            print(f"Warning: failed to save players manifest: {e}")
+
         # Create all possible matches (round-robin)
         self.matches = []
         for player1, player2 in itertools.combinations(self.players, 2):
@@ -747,7 +842,7 @@ class TournamentEvaluator:
     def run_tournament(self, rng_key):
         """Run the complete tournament."""
         print("Starting Tournament!")
-        print(f"Timestamp: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         
         start_time = time.time()
         
@@ -783,11 +878,8 @@ class TournamentEvaluator:
             return
         
         fieldnames = [
-            'episode_id', 'player1', 'player2', 'player1_reward',
-            'player2_reward',
-            'player1_color', 'player2_color', 'winner', 'outcome',
-            'episode_length', 'completed', 'side',
-            'green_player', 'red_player', 'green_reward', 'red_reward'
+            'match_id', 'episode_id', 'winner', 'outcome', 'steps', 'returns',
+            'green_player', 'red_player', 'green_reward', 'red_reward', 'side', 'spawn_mode'
         ]
         
         with open(filepath, 'w', newline='') as csvfile:
@@ -810,26 +902,27 @@ class TournamentEvaluator:
             }
         
         for result in self.results:
-            p1, p2 = result['player1'], result['player2']
+            green_player = result['green_player']
+            red_player = result['red_player']
             
             # Update episode counts
-            player_stats[p1]['episodes'] += 1
-            player_stats[p2]['episodes'] += 1
+            player_stats[green_player]['episodes'] += 1
+            player_stats[red_player]['episodes'] += 1
             
             # Update rewards
-            player_stats[p1]['total_reward'] += result['player1_reward']
-            player_stats[p2]['total_reward'] += result['player2_reward']
+            player_stats[green_player]['total_reward'] += result['green_reward']
+            player_stats[red_player]['total_reward'] += result['red_reward']
             
             # Update win/loss/draw counts
-            if result['winner'] == p1:
-                player_stats[p1]['wins'] += 1
-                player_stats[p2]['losses'] += 1
-            elif result['winner'] == p2:
-                player_stats[p2]['wins'] += 1
-                player_stats[p1]['losses'] += 1
+            if result['winner'] == 'green':
+                player_stats[green_player]['wins'] += 1
+                player_stats[red_player]['losses'] += 1
+            elif result['winner'] == 'red':
+                player_stats[red_player]['wins'] += 1
+                player_stats[green_player]['losses'] += 1
             else:
-                player_stats[p1]['draws'] += 1
-                player_stats[p2]['draws'] += 1
+                player_stats[green_player]['draws'] += 1
+                player_stats[red_player]['draws'] += 1
         
         # Generate summary
         with open(summary_file, 'w') as f:
@@ -878,6 +971,10 @@ def main():
         description="Run comprehensive tournament evaluation"
     )
     parser.add_argument(
+        "--env", type=str, default="MPE_simple_sumo_v3",
+        help="Environment name (default: MPE_simple_sumo_v3)"
+    )
+    parser.add_argument(
         "--players", type=str, default=None,
         help="Comma-separated list of players (e.g., 'ippo,spppo,scripted')"
     )
@@ -885,16 +982,26 @@ def main():
         "--episodes-per-matchup", type=int, default=100,
         help="Number of episodes per matchup (default: 100)"
     )
-    parser.add_argument(
-        "--max-episode-steps", type=int, default=100,
-        help="Maximum steps per episode (default: 100)"
-    )
+    parser.add_argument("--max-episode-steps", type=int, default=100,
+                        help="Maximum steps per episode")
     parser.add_argument(
         "--output-dir", type=str, default="tournament_results",
         help="Output directory for results (default: tournament_results)"
     )
     parser.add_argument(
         "--seed", type=int, default=42, help="Random seed (default: 42)"
+    )
+    parser.add_argument(
+        "--training-seed", type=int, default=0,
+        help="Training seed for checkpoint selection (default: 0)"
+    )
+    parser.add_argument(
+        "--evaluation-seed", type=int, default=0,
+        help="Evaluation seed for tournament RNG (default: 0)"
+    )
+    parser.add_argument(
+        "--skip-random-starts", action="store_true", default=False,
+        help="If set, do not use random-start episodes. When False (default), split each side's episodes into deterministic and random-start chunks."
     )
     parser.add_argument(
         "--all-checkpoints", action="store_true", default=False,
@@ -910,17 +1017,21 @@ def main():
 
     # Initialize tournament
     evaluator = TournamentEvaluator(
+        env_name=args.env,
         episodes_per_matchup=args.episodes_per_matchup,
         output_dir=args.output_dir,
-        max_episode_steps=args.max_episode_steps
+        max_episode_steps=args.max_episode_steps,
+        training_seed=args.training_seed,
+        evaluation_seed=args.evaluation_seed,
+        skip_random_starts=args.skip_random_starts
     )
 
     # Setup and run tournament
     latest_only = not args.all_checkpoints
     evaluator.setup_tournament(selected_players, latest_only=latest_only)
 
-    # Run tournament
-    rng_key = jax.random.PRNGKey(args.seed)
+    # Run tournament using evaluation seed
+    rng_key = jax.random.PRNGKey(args.evaluation_seed)
     evaluator.run_tournament(rng_key)
 
     print("\nTournament evaluation complete!")
