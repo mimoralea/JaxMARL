@@ -691,7 +691,7 @@ class TournamentEvaluator:
                 break
 
         # Determine winner based on final rewards
-        green_total_reward = float(rewards[self.env.agents[0]])
+        green_total_reward = cumulative_rewards[self.env.agents[0]]
         red_total_reward = float(rewards[self.env.agents[1]])
 
         if green_total_reward > red_total_reward:
@@ -738,6 +738,9 @@ class TournamentEvaluator:
 
         done = {"__all__": False}
         episode_length = 0
+
+        # Initialize cumulative rewards
+        cumulative_rewards = {agent: 0.0 for agent in self.env.agents}
 
         while not done["__all__"]:
             actions = {}
@@ -812,14 +815,18 @@ class TournamentEvaluator:
             rng_key, step_key = jax.random.split(rng_key)
             obs, state, rewards, dones, infos = self.env.step(step_key, state, actions)
 
+            # Accumulate rewards after getting them from the environment
+            for agent in self.env.agents:
+                cumulative_rewards[agent] += float(rewards[agent])
+
             episode_length += 1
 
             if dones["__all__"] or episode_length >= self.max_episode_steps:
                 break
 
-        # Determine winner based on final rewards
-        green_total_reward = float(rewards[self.env.agents[0]])
-        red_total_reward = float(rewards[self.env.agents[1]])
+        # Determine winner based on cumulative rewards for both players
+        green_total_reward = cumulative_rewards[self.env.agents[0]]
+        red_total_reward = cumulative_rewards[self.env.agents[1]]
 
         # Debug output for first few episodes to understand what's happening
         if episode_id < 3:
@@ -841,7 +848,7 @@ class TournamentEvaluator:
             "winner": winner,
             "outcome": outcome,
             "steps": episode_length,
-            "returns": rewards,
+            "returns": cumulative_rewards,  # Use cumulative rewards instead of final step rewards
             "green_player": green_player.name,
             "red_player": red_player.name,
             "green_reward": float(green_total_reward),
