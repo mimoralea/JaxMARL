@@ -92,14 +92,14 @@ class TournamentEvaluator:
                  episodes_per_matchup: int = 100,
                  output_dir: str = "tournament_results",
                  max_episode_steps: int = 100,
-                 training_seed: int = 0,
+                 training_seeds: list = None,
                  evaluation_seed: int = 0,
                  skip_random_starts: bool = False):
         self.env_name = env_name
         self.episodes_per_matchup = episodes_per_matchup
         self.episodes_per_side = episodes_per_matchup // 2
         self.max_episode_steps = max_episode_steps
-        self.training_seed = training_seed
+        self.training_seeds = training_seeds if training_seeds is not None else [0, 1, 2]
         self.evaluation_seed = evaluation_seed
         self.skip_random_starts = skip_random_starts
 
@@ -108,13 +108,130 @@ class TournamentEvaluator:
         self.base_output_dir = Path(output_dir)
         self.output_dir = self.base_output_dir / f"run_{self.run_timestamp}"
         self.output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Store current training seed for checkpoint discovery (used internally)
+        self.current_training_seed = None
 
+        # Initialize environment and tournament data structures
+        self._initialize_environment_and_data()
+
+    def set_current_training_seed(self, seed: int):
+        """Set the current training seed for checkpoint discovery."""
+        self.current_training_seed = seed
+        print(f"Set current training seed to: {seed}")
+
+    def run_multi_seed_tournament(self, selected_players=None, latest_only=False, rng_key=None):
+        """Run tournaments for each training seed with separate output files."""
+        print(f"\n🎯 Running Multi-Seed Tournament")
+        print(f"Training seeds: {self.training_seeds}")
+        print(f"Evaluation seed: {self.evaluation_seed}")
+        
+        all_results = {}
+        
+        for seed in self.training_seeds:
+            print(f"\n{'='*60}")
+            print(f"🌱 TRAINING SEED {seed}")
+            print(f"{'='*60}")
+            
+            # Set current training seed for checkpoint discovery
+            self.set_current_training_seed(seed)
+            
+            # Create seed-specific output directory
+            seed_output_dir = self.output_dir / f"seed_{seed}"
+            seed_output_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Temporarily update output directory for this seed
+            original_output_dir = self.output_dir
+            self.output_dir = seed_output_dir
+            
+            # Reset tournament state for this seed
+            self.players = []
+            self.matches = []
+            self.results = []
+            
+            try:
+                # Setup tournament for this specific seed
+                self.setup_tournament(selected_players, latest_only=latest_only)
+                
+                if not self.players:
+                    print(f"⚠️  No players found for training seed {seed}, skipping...")
+                    continue
+                
+                # Run tournament for this seed
+                seed_rng_key, rng_key = jax.random.split(rng_key)
+                self.run_tournament(seed_rng_key)
+                
+                # Store results for this seed
+                all_results[seed] = {
+                    'players': len(self.players),
+                    'matches': len(self.matches),
+                    'episodes': len(self.results),
+                    'output_dir': str(seed_output_dir)
+                }
+                
+                print(f"✅ Training seed {seed} completed: {len(self.results)} episodes")
+                
+            except Exception as e:
+                print(f"❌ Error with training seed {seed}: {e}")
+                all_results[seed] = {'error': str(e)}
+            
+            finally:
+                # Restore original output directory
+                self.output_dir = original_output_dir
+        
+        # Generate multi-seed summary
+        self._generate_multi_seed_summary(all_results)
+        
+        return all_results
+
+    def _generate_multi_seed_summary(self, all_results):
+        """Generate a summary of multi-seed tournament results."""
+        summary_file = self.output_dir / "multi_seed_tournament_summary.txt"
+        
+        with open(summary_file, 'w') as f:
+            f.write("Multi-Seed Tournament Summary\n")
+            f.write("=" * 50 + "\n\n")
+            f.write(f"Training seeds: {self.training_seeds}\n")
+            f.write(f"Evaluation seed: {self.evaluation_seed}\n")
+            f.write(f"Environment: {self.env_name}\n")
+            f.write(f"Episodes per matchup: {self.episodes_per_matchup}\n")
+            f.write(f"Skip random starts: {self.skip_random_starts}\n\n")
+            
+            total_episodes = 0
+            successful_seeds = 0
+            
+            for seed in self.training_seeds:
+                f.write(f"Training Seed {seed}:\n")
+                if seed in all_results:
+                    result = all_results[seed]
+                    if 'error' in result:
+                        f.write(f"  ❌ Error: {result['error']}\n")
+                    else:
+                        f.write(f"  ✅ Players: {result['players']}\n")
+                        f.write(f"  ✅ Matches: {result['matches']}\n")
+                        f.write(f"  ✅ Episodes: {result['episodes']}\n")
+                        f.write(f"  ✅ Output: {result['output_dir']}\n")
+                        total_episodes += result['episodes']
+                        successful_seeds += 1
+                else:
+                    f.write(f"  ⚠️  No results\n")
+                f.write("\n")
+            
+            f.write(f"Summary:\n")
+            f.write(f"  Total successful seeds: {successful_seeds}/{len(self.training_seeds)}\n")
+            f.write(f"  Total episodes: {total_episodes}\n")
+            f.write(f"  Results saved in separate directories per seed\n")
+        
+        print(f"\n📊 Multi-seed summary saved to: {summary_file}")
+
+    def _initialize_environment_and_data(self):
+        """Initialize environment and tournament data structures."""
         # Initialize environment; default to deterministic spawns
-        if env_name == "MPE_simple_sumo_v3":
+        if self.env_name == "MPE_simple_sumo_v3":
             from jaxmarl.environments.mpe.simple_sumo import SimpleSumoMPE
             self.env = SimpleSumoMPE(random_spawn=False)
         else:
-            self.env = make(env_name)
+            self.env = make(self.env_name)
         self.env = LogWrapper(self.env)
 
         # Tournament data
@@ -123,10 +240,10 @@ class TournamentEvaluator:
         self.results = []
 
         print("Tournament Evaluator initialized")
-        print(f"Environment: {env_name}")
-        print(f"Episodes per matchup: {episodes_per_matchup} "
+        print(f"Environment: {self.env_name}")
+        print(f"Episodes per matchup: {self.episodes_per_matchup} "
               f"({self.episodes_per_side} per side)")
-        print(f"Max episode steps: {max_episode_steps}")
+        print(f"Max episode steps: {self.max_episode_steps}")
         print(f"Output directory: {self.output_dir}")
         print(f"Skip random starts: {self.skip_random_starts}")
 
@@ -182,8 +299,8 @@ class TournamentEvaluator:
         return checkpoint_players
 
     def _get_latest_ippo_checkpoint(self):
-        """Get the most recent IPPO checkpoint for the specified training seed."""
-        ippo_pattern = f"checkpoints/ippo/run_*_seed{self.training_seed}/main/*"
+        """Get the latest IPPO checkpoint for the current training seed."""
+        ippo_pattern = f"checkpoints/ippo/run_*_seed{self.current_training_seed}/main/*"
         ippo_paths = glob.glob(ippo_pattern)
 
         if not ippo_paths:
@@ -207,8 +324,8 @@ class TournamentEvaluator:
         )]
 
     def _get_latest_spppo_checkpoint(self):
-        """Get the latest SPPPO checkpoint for the specified training seed."""
-        spppo_pattern = f"checkpoints/spppo/run_*_seed{self.training_seed}/main/*"
+        """Get the latest SPPPO checkpoint for the current training seed."""
+        spppo_pattern = f"checkpoints/spppo/run_*_seed{self.current_training_seed}/main/*"
         spppo_paths = glob.glob(spppo_pattern)
 
         if not spppo_paths:
@@ -232,8 +349,8 @@ class TournamentEvaluator:
         )]
 
     def _get_latest_fspppo_checkpoint(self):
-        """Get the most recent FSPPPO checkpoint for the specified training seed."""
-        fspppo_pattern = f"checkpoints/fspppo/run_*_seed{self.training_seed}/main/*"
+        """Get the most recent FSPPPO checkpoint for the current training seed."""
+        fspppo_pattern = f"checkpoints/fspppo/run_*_seed{self.current_training_seed}/main/*"
         fspppo_paths = glob.glob(fspppo_pattern)
 
         if not fspppo_paths:
@@ -991,9 +1108,23 @@ def main():
     parser.add_argument(
         "--seed", type=int, default=42, help="Random seed (default: 42)"
     )
+    def parse_training_seeds(value):
+        """Parse training seeds from CLI argument."""
+        # Handle both string and integer inputs
+        if isinstance(value, int):
+            return [value]
+        
+        value_str = str(value)
+        if ',' in value_str:
+            # Multiple seeds: "0,1,2" or 0,1,2
+            return [int(s.strip()) for s in value_str.split(',')]
+        else:
+            # Single seed: "0" or 0
+            return [int(value_str)]
+    
     parser.add_argument(
-        "--training-seed", type=int, default=0,
-        help="Training seed for checkpoint selection (default: 0)"
+        "--training-seeds", type=str, default="0,1,2",
+        help="Training seeds for checkpoint selection (default: 0,1,2). Can be single seed (e.g., 0 or '0') or multiple seeds (e.g., '0,1,2')"
     )
     parser.add_argument(
         "--evaluation-seed", type=int, default=0,
@@ -1015,27 +1146,47 @@ def main():
     if args.players:
         selected_players = [p.strip() for p in args.players.split(',')]
 
+    # Parse training seeds
+    training_seeds = parse_training_seeds(args.training_seeds)
+
     # Initialize tournament
     evaluator = TournamentEvaluator(
         env_name=args.env,
         episodes_per_matchup=args.episodes_per_matchup,
         output_dir=args.output_dir,
         max_episode_steps=args.max_episode_steps,
-        training_seed=args.training_seed,
+        training_seeds=training_seeds,
         evaluation_seed=args.evaluation_seed,
         skip_random_starts=args.skip_random_starts
     )
 
-    # Setup and run tournament
+    # Setup and run multi-seed tournament
     latest_only = not args.all_checkpoints
-    evaluator.setup_tournament(selected_players, latest_only=latest_only)
-
-    # Run tournament using evaluation seed
     rng_key = jax.random.PRNGKey(args.evaluation_seed)
-    evaluator.run_tournament(rng_key)
-
-    print("\nTournament evaluation complete!")
-    print(f"Results saved in: {evaluator.output_dir}/")
+    
+    if len(training_seeds) == 1:
+        # Single seed mode - use original logic for backward compatibility
+        print(f"\n🎯 Running Single-Seed Tournament (seed {training_seeds[0]})")
+        evaluator.set_current_training_seed(training_seeds[0])
+        evaluator.setup_tournament(selected_players, latest_only=latest_only)
+        evaluator.run_tournament(rng_key)
+        print("\nTournament evaluation complete!")
+        print(f"Results saved in: {evaluator.output_dir}/")
+    else:
+        # Multi-seed mode - run tournaments for each seed separately
+        results = evaluator.run_multi_seed_tournament(
+            selected_players=selected_players,
+            latest_only=latest_only,
+            rng_key=rng_key
+        )
+        print("\nMulti-seed tournament evaluation complete!")
+        print(f"Results saved in separate directories under: {evaluator.output_dir}/")
+        
+        # Print summary of results
+        successful_seeds = sum(1 for r in results.values() if 'error' not in r)
+        total_episodes = sum(r.get('episodes', 0) for r in results.values() if 'error' not in r)
+        print(f"Successfully completed: {successful_seeds}/{len(training_seeds)} seeds")
+        print(f"Total episodes: {total_episodes}")
 
 
 if __name__ == "__main__":
