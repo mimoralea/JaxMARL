@@ -112,8 +112,28 @@ class TournamentEvaluator:
         # Store current training seed for checkpoint discovery (used internally)
         self.current_training_seed = None
 
+        # Progress tracking variables
+        self.total_seeds = len(self.training_seeds)
+        self.current_seed_index = 0
+        self.total_matches_per_seed = 0
+        self.current_match_index = 0
+        self.total_chunks_in_match = 0
+        self.current_chunk_index = 0
+        
         # Initialize environment and tournament data structures
         self._initialize_environment_and_data()
+
+    def _print_progress(self):
+        """Print three-level progress after each chunk."""
+        # Calculate progress percentages
+        matchup_progress = (self.current_chunk_index / self.total_chunks_in_match) * 100
+        seed_progress = ((self.current_match_index - 1) * self.total_chunks_in_match + self.current_chunk_index) / (self.total_matches_per_seed * self.total_chunks_in_match) * 100
+        tournament_progress = ((self.current_seed_index - 1) * self.total_matches_per_seed * self.total_chunks_in_match + 
+                              (self.current_match_index - 1) * self.total_chunks_in_match + self.current_chunk_index) / (self.total_seeds * self.total_matches_per_seed * self.total_chunks_in_match) * 100
+        
+        print(f"Progress - Matchup: {self.current_chunk_index}/{self.total_chunks_in_match} ({matchup_progress:.1f}%)")
+        print(f"Progress - Seed {self.current_training_seed}: {((self.current_match_index - 1) * self.total_chunks_in_match + self.current_chunk_index)}/{self.total_matches_per_seed * self.total_chunks_in_match} ({seed_progress:.1f}%)")
+        print(f"Progress - Tournament: {((self.current_seed_index - 1) * self.total_matches_per_seed * self.total_chunks_in_match + (self.current_match_index - 1) * self.total_chunks_in_match + self.current_chunk_index)}/{self.total_seeds * self.total_matches_per_seed * self.total_chunks_in_match} ({tournament_progress:.1f}%)")
 
     def set_current_training_seed(self, seed: int):
         """Set the current training seed for checkpoint discovery."""
@@ -128,7 +148,8 @@ class TournamentEvaluator:
 
         all_results = {}
 
-        for seed in self.training_seeds:
+        for seed_index, seed in enumerate(self.training_seeds):
+            self.current_seed_index = seed_index + 1
             print(f"\n{'='*60}")
             print(f"🌱 TRAINING SEED {seed}")
             print(f"{'='*60}")
@@ -335,6 +356,12 @@ class TournamentEvaluator:
         print(f"    {green_player.name} (green): {green_wins}/{num_episodes} wins ({green_wins/num_episodes:.2f}), avg reward: {total_green_reward/num_episodes:.3f}")
         print(f"    {red_player.name} (red): {red_wins}/{num_episodes} wins ({red_wins/num_episodes:.2f}), avg reward: {total_red_reward/num_episodes:.3f}")
         print(f"    Draws: {draws}/{num_episodes} ({draws/num_episodes:.2f})\n")
+        
+        # Update chunk progress and display progress
+        self.current_chunk_index += 1
+        self._print_progress()
+        print()  # Extra line for spacing
+        
         return all_results
 
     def _run_optimized_match_chunk(self, green_player: TournamentPlayer,
@@ -884,6 +911,13 @@ class TournamentEvaluator:
         print(f"Episodes: {match.total_episodes} "
               f"({match.episodes_per_side} per side)")
 
+        # Initialize progress tracking for this match
+        if self.skip_random_starts:
+            self.total_chunks_in_match = 2  # 2 sides only
+        else:
+            self.total_chunks_in_match = 4  # 2 sides x 2 spawn modes
+        self.current_chunk_index = 0
+
         match_results = []
         episode_id = 0
 
@@ -1073,10 +1107,15 @@ class TournamentEvaluator:
         print("Starting Tournament!")
         print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
+        # Initialize progress tracking for this tournament
+        self.total_matches_per_seed = len(self.matches)
+        self.current_match_index = 0
+
         start_time = time.time()
 
         for i, match in enumerate(self.matches):
             print(f"Match {i+1}/{len(self.matches)}")
+            self.current_match_index = i + 1
             rng_key, match_key = jax.random.split(rng_key)
             match_results = self.run_match(match, match_key)
             self.results.extend(match_results)
@@ -1279,6 +1318,7 @@ def main():
     if len(training_seeds) == 1:
         # Single seed mode - use original logic for backward compatibility
         print(f"\n🎯 Running Single-Seed Tournament (seed {training_seeds[0]})")
+        evaluator.current_seed_index = 1  # First and only seed
         evaluator.set_current_training_seed(training_seeds[0])
         evaluator.setup_tournament(selected_players, latest_only=latest_only)
         evaluator.run_tournament(rng_key)
