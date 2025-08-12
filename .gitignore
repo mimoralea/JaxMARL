@@ -17,7 +17,6 @@ outputs/
 models/
 checkpoints/
 analysis_results/
-*.backup
 *.png
 *.gif
 
