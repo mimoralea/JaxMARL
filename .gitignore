@@ -16,6 +16,7 @@ wandb/
 outputs/
 models/
 checkpoints/
+analysis_results/
 *.png
 *.gif
 
