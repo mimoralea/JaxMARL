@@ -308,10 +308,33 @@ class TournamentEvaluator:
             all_results.extend(batch_results)
             episode_id_start += current_batch_size
 
-            # Optional: Print progress for long runs
+            # Print progress for long runs
             if num_episodes > 20:
                 print(f"    Completed {batch_end}/{num_episodes} episodes")
 
+        # Calculate summary statistics for this batch
+        green_wins = 0
+        red_wins = 0
+        draws = 0
+        total_green_reward = 0.0
+        total_red_reward = 0.0
+        
+        for result in all_results:
+            if result["winner"] == self.env.agents[0]:  # green
+                green_wins += 1
+            elif result["winner"] == self.env.agents[1]:  # red
+                red_wins += 1
+            else:  # draw
+                draws += 1
+            
+            total_green_reward += result["green_reward"]
+            total_red_reward += result["red_reward"]
+        
+        # Print summary
+        print(f"\n    BLOCK SUMMARY ({spawn_mode} spawn mode):")
+        print(f"    {green_player.name} (green): {green_wins}/{num_episodes} wins ({green_wins/num_episodes:.2f}), avg reward: {total_green_reward/num_episodes:.3f}")
+        print(f"    {red_player.name} (red): {red_wins}/{num_episodes} wins ({red_wins/num_episodes:.2f}), avg reward: {total_red_reward/num_episodes:.3f}")
+        print(f"    Draws: {draws}/{num_episodes} ({draws/num_episodes:.2f})\n")
         return all_results
 
     def _run_optimized_match_chunk(self, green_player: TournamentPlayer,
@@ -828,9 +851,7 @@ class TournamentEvaluator:
         green_total_reward = cumulative_rewards[self.env.agents[0]]
         red_total_reward = cumulative_rewards[self.env.agents[1]]
 
-        # Debug output for first few episodes to understand what's happening
-        if episode_id < 3:
-            print(f"  Episode {episode_id}: {episode_length} steps, rewards: green={green_total_reward:.3f}, red={red_total_reward:.3f}, done={dones['__all__']}")
+        # No per-episode debug output
 
         if green_total_reward > red_total_reward:
             winner = self.env.agents[0]  # green
