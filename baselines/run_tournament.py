@@ -970,13 +970,23 @@ class TournamentEvaluator:
             episode_id += rand_per_side
 
         # Calculate match statistics
-        player1_wins = sum(
-            1 for r in match_results if r['winner'] == match.player1.name
-        )
-        player2_wins = sum(
-            1 for r in match_results if r['winner'] == match.player2.name
-        )
-        draws = sum(1 for r in match_results if r['winner'] == 'draw')
+        player1_wins = 0
+        player2_wins = 0
+        draws = 0
+        
+        for r in match_results:
+            if r['winner'] == 'draw':
+                draws += 1
+            elif r['side'] == 1:  # Side 1: player1=green, player2=red
+                if r['winner'] == self.env.agents[0]:  # green wins
+                    player1_wins += 1
+                elif r['winner'] == self.env.agents[1]:  # red wins
+                    player2_wins += 1
+            else:  # Side 2: player2=green, player1=red
+                if r['winner'] == self.env.agents[0]:  # green wins
+                    player2_wins += 1
+                elif r['winner'] == self.env.agents[1]:  # red wins
+                    player1_wins += 1
 
         print(f"Results: {match.player1.name}: {player1_wins}, "
               f"{match.player2.name}: {player2_wins}, Draws: {draws}")
