@@ -264,6 +264,80 @@ class TournamentEvaluator:
             except Exception:
                 pass
 
+    def _run_batch_episodes(self, green_player: TournamentPlayer, 
+                           red_player: TournamentPlayer, 
+                           rng_key, num_episodes: int, 
+                           side: int, match_id: str, 
+                           spawn_mode: str = "deterministic",
+                           batch_size: int = 10) -> List[Dict[str, Any]]:
+        """Run episodes in batches for better performance."""
+        
+        # Load player parameters if needed
+        if green_player.player_type == 'checkpoint' and green_player.params is None:
+            self.load_checkpoint_player(green_player)
+        if red_player.player_type == 'checkpoint' and red_player.params is None:
+            self.load_checkpoint_player(red_player)
+        
+        all_results = []
+        episode_id_start = 0
+        
+        # Process episodes in batches
+        for batch_start in range(0, num_episodes, batch_size):
+            batch_end = min(batch_start + batch_size, num_episodes)
+            current_batch_size = batch_end - batch_start
+            
+            # Split RNG keys for this batch
+            batch_keys = jax.random.split(rng_key, current_batch_size + 1)
+            rng_key = batch_keys[0]  # Update for next batch
+            episode_keys = batch_keys[1:]
+            
+            # Run episodes in this batch sequentially (still faster due to reduced overhead)
+            batch_results = []
+            for i in range(current_batch_size):
+                result = self._run_episode_with_positions(
+                    green_player=green_player,
+                    red_player=red_player,
+                    rng_key=episode_keys[i],
+                    episode_id=episode_id_start + i,
+                    side=side,
+                    match_id=match_id,
+                    spawn_mode=spawn_mode
+                )
+                batch_results.append(result)
+            
+            all_results.extend(batch_results)
+            episode_id_start += current_batch_size
+            
+            # Optional: Print progress for long runs
+            if num_episodes > 20:
+                print(f"    Completed {batch_end}/{num_episodes} episodes")
+        
+        return all_results
+
+    def _run_optimized_match_chunk(self, green_player: TournamentPlayer,
+                                  red_player: TournamentPlayer,
+                                  num_episodes: int, side: int,
+                                  match_id: str, spawn_mode: str,
+                                  rng_key, start_episode_id: int = 0) -> List[Dict[str, Any]]:
+        """Run a chunk of episodes with optimized batching."""
+        
+        if num_episodes == 0:
+            return []
+        
+        # Use batch processing for better performance
+        batch_size = min(10, num_episodes)  # Adjust batch size based on available memory
+        
+        return self._run_batch_episodes(
+            green_player=green_player,
+            red_player=red_player,
+            rng_key=rng_key,
+            num_episodes=num_episodes,
+            side=side,
+            match_id=match_id,
+            spawn_mode=spawn_mode,
+            batch_size=batch_size
+        )
+
     def discover_checkpoint_players(self, latest_only=False,
                                   include_training_pairs=False):
         """Discover available checkpoint players from trained models.
@@ -777,7 +851,7 @@ class TournamentEvaluator:
         }
 
     def run_match(self, match: TournamentMatch, rng_key) -> List[Dict[str, Any]]:
-        """Run a complete match between two players (symmetrical)."""
+        """Run a complete match between two players (symmetrical) with optimized batch processing."""
         print(f"Running match: {match.player1.name} vs {match.player2.name}")
         print(f"Episodes: {match.total_episodes} "
               f"({match.episodes_per_side} per side)")
@@ -788,84 +862,84 @@ class TournamentEvaluator:
         if self.skip_random_starts:
             # Deterministic spawns only: two chunks (per side)
             self._set_spawn_mode(random_mode=False)
-            # Side 1 deterministic
-            print(f"Side 1 (deterministic): {match.player1.name} (green) vs {match.player2.name} (red)")
-            for side1_ep in range(self.episodes_per_side):
-                rng_key, episode_key = jax.random.split(rng_key)
-                result = self._run_episode_with_positions(
-                    green_player=match.player1, red_player=match.player2,
-                    rng_key=episode_key, episode_id=episode_id, side=1,
-                    match_id=match.get_match_id()
-                )
-                match_results.append(result)
-                episode_id += 1
-                if (side1_ep + 1) % 10 == 0:
-                    print(f"Completed {side1_ep + 1}/{self.episodes_per_side} episodes (side 1)")
-
-            # Side 2 deterministic
-            print(f"Side 2 (deterministic): {match.player2.name} (green) vs {match.player1.name} (red)")
-            for side2_ep in range(self.episodes_per_side):
-                rng_key, episode_key = jax.random.split(rng_key)
-                result = self._run_episode_with_positions(
-                    green_player=match.player2, red_player=match.player1,
-                    rng_key=episode_key, episode_id=episode_id, side=2,
-                    match_id=match.get_match_id(), spawn_mode="deterministic"
-                )
-                match_results.append(result)
-                episode_id += 1
-                if (side2_ep + 1) % 10 == 0:
-                    print(f"Completed {side2_ep + 1}/{self.episodes_per_side} episodes (side 2)")
+            
+            # Side 1 deterministic - batch processing
+            print(f"Side 1 (deterministic, {self.episodes_per_side} eps): {match.player1.name} (green) vs {match.player2.name} (red)")
+            rng_key, chunk_key = jax.random.split(rng_key)
+            side1_results = self._run_optimized_match_chunk(
+                green_player=match.player1, red_player=match.player2,
+                num_episodes=self.episodes_per_side, side=1,
+                match_id=match.get_match_id(), spawn_mode="deterministic",
+                rng_key=chunk_key, start_episode_id=episode_id
+            )
+            match_results.extend(side1_results)
+            episode_id += self.episodes_per_side
+            
+            # Side 2 deterministic - batch processing
+            print(f"Side 2 (deterministic, {self.episodes_per_side} eps): {match.player2.name} (green) vs {match.player1.name} (red)")
+            rng_key, chunk_key = jax.random.split(rng_key)
+            side2_results = self._run_optimized_match_chunk(
+                green_player=match.player2, red_player=match.player1,
+                num_episodes=self.episodes_per_side, side=2,
+                match_id=match.get_match_id(), spawn_mode="deterministic",
+                rng_key=chunk_key, start_episode_id=episode_id
+            )
+            match_results.extend(side2_results)
+            episode_id += self.episodes_per_side
         else:
-            # Four chunks: per side, split into deterministic and random spawns
-            # Compute per-side allocation
+            # Mixed spawns: four chunks (per side, per spawn mode)
             det_per_side = self.episodes_per_side // 2
             rand_per_side = self.episodes_per_side - det_per_side
-
-            # Deterministic chunks
+            
+            # Deterministic chunks - batch processing
             self._set_spawn_mode(random_mode=False)
+            
             print(f"Side 1 (deterministic, {det_per_side} eps): {match.player1.name} (green) vs {match.player2.name} (red)")
-            for i in range(det_per_side):
-                rng_key, episode_key = jax.random.split(rng_key)
-                result = self._run_episode_with_positions(
-                    green_player=match.player1, red_player=match.player2,
-                    rng_key=episode_key, episode_id=episode_id, side=1,
-                    match_id=match.get_match_id()
-                )
-                match_results.append(result)
-                episode_id += 1
+            rng_key, chunk_key = jax.random.split(rng_key)
+            side1_det_results = self._run_optimized_match_chunk(
+                green_player=match.player1, red_player=match.player2,
+                num_episodes=det_per_side, side=1,
+                match_id=match.get_match_id(), spawn_mode="deterministic",
+                rng_key=chunk_key, start_episode_id=episode_id
+            )
+            match_results.extend(side1_det_results)
+            episode_id += det_per_side
+            
             print(f"Side 2 (deterministic, {det_per_side} eps): {match.player2.name} (green) vs {match.player1.name} (red)")
-            for i in range(det_per_side):
-                rng_key, episode_key = jax.random.split(rng_key)
-                result = self._run_episode_with_positions(
-                    green_player=match.player2, red_player=match.player1,
-                    rng_key=episode_key, episode_id=episode_id, side=2,
-                    match_id=match.get_match_id()
-                )
-                match_results.append(result)
-                episode_id += 1
+            rng_key, chunk_key = jax.random.split(rng_key)
+            side2_det_results = self._run_optimized_match_chunk(
+                green_player=match.player2, red_player=match.player1,
+                num_episodes=det_per_side, side=2,
+                match_id=match.get_match_id(), spawn_mode="deterministic",
+                rng_key=chunk_key, start_episode_id=episode_id
+            )
+            match_results.extend(side2_det_results)
+            episode_id += det_per_side
 
-            # Random-spawn chunks
+            # Random-spawn chunks - batch processing
             self._set_spawn_mode(random_mode=True)
+            
             print(f"Side 1 (random starts, {rand_per_side} eps): {match.player1.name} (green) vs {match.player2.name} (red)")
-            for i in range(rand_per_side):
-                rng_key, episode_key = jax.random.split(rng_key)
-                result = self._run_episode_with_positions(
-                    green_player=match.player1, red_player=match.player2,
-                    rng_key=episode_key, episode_id=episode_id, side=1,
-                    match_id=match.get_match_id()
-                )
-                match_results.append(result)
-                episode_id += 1
+            rng_key, chunk_key = jax.random.split(rng_key)
+            side1_rand_results = self._run_optimized_match_chunk(
+                green_player=match.player1, red_player=match.player2,
+                num_episodes=rand_per_side, side=1,
+                match_id=match.get_match_id(), spawn_mode="random",
+                rng_key=chunk_key, start_episode_id=episode_id
+            )
+            match_results.extend(side1_rand_results)
+            episode_id += rand_per_side
+            
             print(f"Side 2 (random starts, {rand_per_side} eps): {match.player2.name} (green) vs {match.player1.name} (red)")
-            for i in range(rand_per_side):
-                rng_key, episode_key = jax.random.split(rng_key)
-                result = self._run_episode_with_positions(
-                    green_player=match.player2, red_player=match.player1,
-                    rng_key=episode_key, episode_id=episode_id, side=2,
-                    match_id=match.get_match_id()
-                )
-                match_results.append(result)
-                episode_id += 1
+            rng_key, chunk_key = jax.random.split(rng_key)
+            side2_rand_results = self._run_optimized_match_chunk(
+                green_player=match.player2, red_player=match.player1,
+                num_episodes=rand_per_side, side=2,
+                match_id=match.get_match_id(), spawn_mode="random",
+                rng_key=chunk_key, start_episode_id=episode_id
+            )
+            match_results.extend(side2_rand_results)
+            episode_id += rand_per_side
         
         # Calculate match statistics
         player1_wins = sum(

@@ -259,8 +259,8 @@ class TestTournamentValidation:
         # At least some results should be different (due to randomness)
         differences = 0
         for r1, r2 in zip(results1, results2):
-            if (r1['winner'] != r2['winner'] or 
-                r1['episode_length'] != r2['episode_length']):
+            if (r1['winner'] != r2['winner'] or
+                r1['steps'] != r2['steps']):
                 differences += 1
         
         # With random behavior, we expect some variation
@@ -275,8 +275,27 @@ class TestTournamentValidation:
             max_episode_steps=20
         )
         
+        # Use setup_tournament instead of setup_matches
         evaluator.players = players
-        evaluator.setup_matches()
+        evaluator.matches = []
+        for i, player1 in enumerate(players):
+            for j, player2 in enumerate(players):
+                if i < j:  # Avoid duplicate matches
+                    match = TournamentMatch(
+                        player1=player1, 
+                        player2=player2,
+                        episodes_per_side=evaluator.episodes_per_side
+                    )
+                    evaluator.matches.append(match)
+        
+        rng_key = jax.random.PRNGKey(seed)
+        evaluator.run_tournament(rng_key)
+        
+        return evaluator.results 
+                        player2=player2,
+                        episodes_per_side=evaluator.episodes_per_side
+                    )
+                    evaluator.matches.append(match)
         
         rng_key = jax.random.PRNGKey(seed)
         evaluator.run_tournament(rng_key)
@@ -333,16 +352,42 @@ class TestResultAnalysis:
             output_dir=temp_dir
         )
         
-        # Mock some results
+        # Mock some results using current format
         evaluator.results = [
             {
-                'player1': 'scripted_seek', 'player2': 'scripted_noop',
-                'winner': 'scripted_seek', 'player1_reward': 1.0, 'player2_reward': 0.0
+                'match_id': 'scripted_seek_vs_scripted_noop',
+                'episode_id': 0,
+                'winner': 'scripted_seek',
+                'outcome': 'win',
+                'steps': 20,
+                'returns': {'green': 1.0, 'red': 0.0},
+                'green_player': 'scripted_seek',
+                'red_player': 'scripted_noop',
+                'green_reward': 1.0,
+                'red_reward': 0.0,
+                'side': 1,
+                'spawn_mode': 'deterministic'
             },
             {
-                'player1': 'scripted_seek', 'player2': 'scripted_noop',
-                'winner': 'scripted_seek', 'player1_reward': 1.0, 'player2_reward': 0.0
+                'match_id': 'scripted_seek_vs_scripted_noop',
+                'episode_id': 1,
+                'winner': 'scripted_seek',
+                'outcome': 'win',
+                'steps': 20,
+                'returns': {'green': 1.0, 'red': 0.0},
+                'green_player': 'scripted_seek',
+                'red_player': 'scripted_noop',
+                'green_reward': 1.0,
+                'red_reward': 0.0,
+                'side': 1,
+                'spawn_mode': 'deterministic'
             }
+        ]
+        
+        # Add players list for summary generation
+        evaluator.players = [
+            TournamentPlayer(name="scripted_seek", player_type="scripted"),
+            TournamentPlayer(name="scripted_noop", player_type="scripted")
         ]
         
         evaluator.generate_summary()
