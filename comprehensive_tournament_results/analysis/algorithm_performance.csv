@@ -1,4 +1,0 @@
-player,overall_win_rate,overall_loss_rate,overall_draw_rate,overall_mean_reward,vs_scripted_win_rate,vs_scripted_loss_rate,vs_scripted_draw_rate,vs_scripted_mean_reward,vs_learned_win_rate,generalization_gap,algorithm
-IPPO_latest_,0.3,0.7,0.0,0.5428571428571428,0.4,0.6,0.0,0.78,0.05,0.35000000000000003,IPPO
-SPPPO_latest,0.2571428571428571,0.7428571428571429,0.0,0.4714285714285714,0.36,0.64,0.0,0.7,0.0,0.36,SPPPO
-FSPPPO_latest,0.4,0.6,0.0,0.6285714285714286,0.52,0.48,0.0,0.82,0.1,0.42000000000000004,FSPPPO
