@@ -90,7 +90,7 @@ class TournamentEvaluator:
 
     def __init__(self, env_name: str = "MPE_simple_sumo_v3",
                  episodes_per_matchup: int = 100,
-                 output_dir: str = "tournament_results",
+                 output_dir: str = "experiments/results",
                  max_episode_steps: int = 100,
                  training_seeds: list = None,
                  evaluation_seed: int = 0,
@@ -424,7 +424,7 @@ class TournamentEvaluator:
 
     def _get_latest_ippo_checkpoint(self):
         """Get the latest IPPO checkpoint for the current training seed."""
-        ippo_pattern = f"checkpoints/ippo/run_*_seed{self.current_training_seed}/main/*"
+        ippo_pattern = f"experiments/checkpoints/ippo/run_*_seed{self.current_training_seed}/main/*"
         ippo_paths = glob.glob(ippo_pattern)
 
         if not ippo_paths:
@@ -449,7 +449,7 @@ class TournamentEvaluator:
 
     def _get_latest_spppo_checkpoint(self):
         """Get the latest SPPPO checkpoint for the current training seed."""
-        spppo_pattern = f"checkpoints/spppo/run_*_seed{self.current_training_seed}/main/*"
+        spppo_pattern = f"experiments/checkpoints/spppo/run_*_seed{self.current_training_seed}/main/*"
         spppo_paths = glob.glob(spppo_pattern)
 
         if not spppo_paths:
@@ -474,7 +474,7 @@ class TournamentEvaluator:
 
     def _get_latest_fspppo_checkpoint(self):
         """Get the most recent FSPPPO checkpoint for the current training seed."""
-        fspppo_pattern = f"checkpoints/fspppo/run_*_seed{self.current_training_seed}/main/*"
+        fspppo_pattern = f"experiments/checkpoints/fspppo/run_*_seed{self.current_training_seed}/main/*"
         fspppo_paths = glob.glob(fspppo_pattern)
 
         if not fspppo_paths:
@@ -511,7 +511,7 @@ class TournamentEvaluator:
     def _get_all_ippo_checkpoints(self):
         """Get all IPPO checkpoints for the specified training seed."""
         players = []
-        ippo_pattern = f"checkpoints/ippo/run_*_seed{self.training_seed}/main/*"
+        ippo_pattern = f"experiments/checkpoints/ippo/run_*_seed{self.training_seed}/main/*"
         ippo_paths = glob.glob(ippo_pattern)
 
         for path in ippo_paths:
@@ -534,7 +534,7 @@ class TournamentEvaluator:
     def _get_all_spppo_checkpoints(self):
         """Get all SPPPO checkpoints for the specified training seed."""
         players = []
-        spppo_pattern = f"checkpoints/spppo/run_*_seed{self.training_seed}/main/*"
+        spppo_pattern = f"experiments/checkpoints/spppo/run_*_seed{self.training_seed}/main/*"
         spppo_paths = glob.glob(spppo_pattern)
 
         for path in spppo_paths:
@@ -557,7 +557,7 @@ class TournamentEvaluator:
     def _get_all_fspppo_checkpoints(self):
         """Get all FSPPPO checkpoints for the specified training seed."""
         players = []
-        fspppo_pattern = f"checkpoints/fspppo/run_*_seed{self.training_seed}/main/*"
+        fspppo_pattern = f"experiments/checkpoints/fspppo/run_*_seed{self.training_seed}/main/*"
         fspppo_paths = glob.glob(fspppo_pattern)
 
         for path in fspppo_paths:
@@ -1253,8 +1253,8 @@ def main():
     parser.add_argument("--max-episode-steps", type=int, default=100,
                         help="Maximum steps per episode")
     parser.add_argument(
-        "--output-dir", type=str, default="tournament_results",
-        help="Output directory for results (default: tournament_results)"
+        "--output-dir", type=str, default="experiments/results",
+        help="Output directory for results (default: experiments/results)"
     )
     parser.add_argument(
         "--seed", type=int, default=42, help="Random seed (default: 42)"

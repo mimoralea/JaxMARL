@@ -17,8 +17,12 @@ outputs/
 models/
 checkpoints/
 analysis_results/
+*.backup
 *.png
 *.gif
+
+# Experiments directory - contains all experimental data
+experiments/
 
 # Batch training and evaluation logs
 batch_training_logs/

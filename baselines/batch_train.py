@@ -195,7 +195,7 @@ def find_recent_run_ids(algorithm: str, since_time: str) -> List[str]:
     import os
 
     # Find all run directories for this algorithm
-    pattern = f"checkpoints/{algorithm.lower()}/run_*_seed*"
+    pattern = f"experiments/checkpoints/{algorithm.lower()}/run_*_seed*"
     all_runs = glob.glob(pattern)
 
     # Filter by creation time (since batch training started)
@@ -225,9 +225,9 @@ def check_checkpoints_for_run(algorithm, run_id):
 
     # Use the specific run_id to find checkpoints
     checkpoint_patterns = {
-        "IPPO": f"checkpoints/ippo/{run_id}_seed*/main/*/",
-        "SPPPO": f"checkpoints/spppo/{run_id}_seed*/main/*/",
-        "FSPPPO": f"checkpoints/fspppo/{run_id}_seed*/main/*/",
+        "IPPO": f"experiments/checkpoints/ippo/{run_id}_seed*/main/*/",
+        "SPPPO": f"experiments/checkpoints/spppo/{run_id}_seed*/main/*/",
+        "FSPPPO": f"experiments/checkpoints/fspppo/{run_id}_seed*/main/*/",
     }
 
     pattern = checkpoint_patterns.get(algorithm, "")
@@ -248,7 +248,7 @@ def main():
     parser.add_argument("--quick-test", action="store_true", help="Run quick test with reduced parameters")
     parser.add_argument("--algorithms", nargs="+", default=["IPPO", "SPPPO", "FSPPPO"],
                        help="Algorithms to train")
-    parser.add_argument("--output-dir", default="training_runs", help="Output directory for configs and logs")
+    parser.add_argument("--output-dir", default="experiments/training_runs", help="Output directory for configs and logs")
     parser.add_argument("--skip-training", action="store_true", help="Skip training, just check existing checkpoints")
 
     args = parser.parse_args()
