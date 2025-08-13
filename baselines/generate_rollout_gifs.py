@@ -588,7 +588,7 @@ def main():
     parser.add_argument('--agent2', type=str, default='noop',
                        help='Second agent type (scripted: noop, random, seek, dodge, guardian; learned: FSPPPO, IPPO, SPPPO)')
     parser.add_argument('--num-rollouts', type=int, default=10,
-                       help='Number of rollouts to generate')
+                       help='Number of rollouts to generate (default: 10)')
     parser.add_argument('--output-dir', type=str, default='experiments/rollouts',
                        help='Output directory for GIF files')
     parser.add_argument('--learned-algorithms', nargs='*', default=[],

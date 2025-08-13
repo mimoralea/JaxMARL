@@ -736,7 +736,171 @@ def create_visualizations(df: pd.DataFrame, win_rates: pd.DataFrame, output_dir:
         plt.close()
         artifacts.append(str(diversity_draws_plot))
 
-    # Removed duplicate conservatism analysis - keeping only the professional version above
+    # 8. NEW: Performance vs Episode Length Analysis for Each Learned Algorithm
+    if not learned_only.empty:
+        # Calculate detailed matchup statistics for each learned algorithm
+        learned_algorithms = ['FSPPPO', 'IPPO', 'SPPPO']
+        
+        for algorithm in learned_algorithms:
+            # Check if algorithm exists in the aggregated algorithm columns
+            if (algorithm not in df['green_algorithm'].values and 
+                algorithm not in df['red_algorithm'].values):
+                continue  # Skip if algorithm not present in data
+                
+            fig, ax = plt.subplots(figsize=(12, 8))
+            sns.despine()
+            
+            # Get all matchups for this algorithm
+            algo_matchups = df[
+                (df['green_algorithm'] == algorithm) | (df['red_algorithm'] == algorithm)
+            ].copy()
+            
+            if algo_matchups.empty:
+                plt.close()
+                continue
+            
+            # Calculate win rate and average episode length per opponent
+            opponent_stats = []
+            
+            # Get unique opponents (avoid duplicates from green and red columns)
+            all_opponents = set(df['green_algorithm'].unique().tolist() + df['red_algorithm'].unique().tolist())
+            all_opponents.discard(algorithm)  # Remove the current algorithm
+            
+            for opponent in sorted(all_opponents):
+                if opponent == algorithm:
+                    continue
+                    
+                # Get matchups against this opponent
+                vs_opponent = algo_matchups[
+                    ((algo_matchups['green_algorithm'] == algorithm) & (algo_matchups['red_algorithm'] == opponent)) |
+                    ((algo_matchups['red_algorithm'] == algorithm) & (algo_matchups['green_algorithm'] == opponent))
+                ]
+                
+                if vs_opponent.empty:
+                    continue
+                
+                # Calculate statistics
+                total_games = len(vs_opponent)
+                
+                # Count wins for our algorithm
+                wins = len(vs_opponent[
+                    ((vs_opponent['green_algorithm'] == algorithm) & (vs_opponent['winner'] == 'green')) |
+                    ((vs_opponent['red_algorithm'] == algorithm) & (vs_opponent['winner'] == 'red'))
+                ])
+                
+                win_rate = wins / total_games if total_games > 0 else 0
+                avg_episode_length = vs_opponent['steps'].mean()
+                
+                # Categorize opponent type
+                opponent_type = 'Scripted' if opponent.startswith('scripted_') else 'Learned'
+                
+                opponent_stats.append({
+                    'opponent': opponent.replace('scripted_', ''),
+                    'opponent_type': opponent_type,
+                    'win_rate': win_rate,
+                    'avg_episode_length': avg_episode_length,
+                    'total_games': total_games
+                })
+            
+            if not opponent_stats:
+                plt.close()
+                continue
+                
+            stats_df = pd.DataFrame(opponent_stats)
+            
+            # Use seaborn color palettes for maximum distinction
+            import seaborn as sns
+            
+            # Get distinct colors using seaborn palettes
+            scripted_opponents = stats_df[stats_df['opponent_type'] == 'Scripted']['opponent'].unique()
+            learned_opponents = stats_df[stats_df['opponent_type'] == 'Learned']['opponent'].unique()
+            
+            # Use Set1 and Set2 palettes for maximum distinction
+            scripted_colors = sns.color_palette("Set1", n_colors=max(8, len(scripted_opponents)))
+            learned_colors = sns.color_palette("Set2", n_colors=max(8, len(learned_opponents)))
+            
+            # Create color mapping for each opponent
+            color_map = {}
+            for i, opp in enumerate(scripted_opponents):
+                color_map[opp] = scripted_colors[i % len(scripted_colors)]
+            for i, opp in enumerate(learned_opponents):
+                color_map[opp] = learned_colors[i % len(learned_colors)]
+            
+            # Create scatter plot with distinct colors per opponent
+            # Add small jitter to separate overlapping points
+            np.random.seed(42)  # For reproducible jitter
+            
+            for _, row in stats_df.iterrows():
+                color = color_map[row['opponent']]
+                marker = 'o' if row['opponent_type'] == 'Scripted' else 's'  # circles for scripted, squares for learned
+                
+                # Add small random jitter to avoid perfect overlaps
+                x_jitter = row['avg_episode_length'] + np.random.uniform(-0.5, 0.5)
+                y_jitter = row['win_rate'] + np.random.uniform(-0.005, 0.005)
+                
+                scatter = ax.scatter(x_jitter, y_jitter, 
+                                   c=[color], s=120, alpha=0.8, marker=marker,
+                                   edgecolors='black', linewidth=1.5)
+            
+            # Create custom legend with unique entries (no duplicates)
+            legend_elements = []
+            
+            # Add scripted opponents (unique only)
+            for opponent in scripted_opponents:
+                color = color_map[opponent]
+                legend_elements.append(plt.Line2D([0], [0], marker='o', color='w', 
+                                                markerfacecolor=color, markersize=10,
+                                                markeredgecolor='black', markeredgewidth=1.5,
+                                                label=f"{opponent} (Scripted)", linestyle='None'))
+            
+            # Add learned opponents (unique only)
+            for opponent in learned_opponents:
+                color = color_map[opponent]
+                legend_elements.append(plt.Line2D([0], [0], marker='s', color='w',
+                                                markerfacecolor=color, markersize=10, 
+                                                markeredgecolor='black', markeredgewidth=1.5,
+                                                label=f"{opponent} (Learned)", linestyle='None'))
+            
+            # Add quadrant lines to identify easy wins vs challenging matchups
+            ax.axhline(y=0.5, color='gray', linestyle='--', alpha=0.5, linewidth=1)
+            ax.axvline(x=50, color='gray', linestyle='--', alpha=0.5, linewidth=1)
+            
+            # Add quadrant labels
+            ax.text(25, 0.9, 'Quick Wins\n(Easy)', ha='center', va='center', 
+                   fontsize=10, fontweight='bold', color='green', alpha=0.7,
+                   bbox=dict(boxstyle="round,pad=0.3", facecolor='lightgreen', alpha=0.3))
+            
+            ax.text(75, 0.9, 'Slow Wins\n(Grinding)', ha='center', va='center', 
+                   fontsize=10, fontweight='bold', color='orange', alpha=0.7,
+                   bbox=dict(boxstyle="round,pad=0.3", facecolor='lightyellow', alpha=0.3))
+            
+            ax.text(25, 0.1, 'Quick Losses\n(Dominated)', ha='center', va='center', 
+                   fontsize=10, fontweight='bold', color='red', alpha=0.7,
+                   bbox=dict(boxstyle="round,pad=0.3", facecolor='lightcoral', alpha=0.3))
+            
+            ax.text(75, 0.1, 'Long Struggles\n(Challenging)', ha='center', va='center', 
+                   fontsize=10, fontweight='bold', color='purple', alpha=0.7,
+                   bbox=dict(boxstyle="round,pad=0.3", facecolor='plum', alpha=0.3))
+            
+            # Customize the plot
+            ax.set_xlabel('Average Episode Steps', fontsize=12, fontweight='bold')
+            ax.set_ylabel('Win Rate', fontsize=12, fontweight='bold')
+            ax.set_title(f'{algorithm} Performance: Win Rate vs Episode Steps', 
+                        fontsize=14, fontweight='bold')
+            
+            # Set fixed axis ranges with padding for edge visibility
+            ax.set_xlim(0, 102)
+            ax.set_ylim(0, 1.02)
+            
+            # Set custom legend
+            ax.legend(handles=legend_elements, bbox_to_anchor=(1.05, 1), loc='upper left')
+            ax.grid(True, alpha=0.3)
+            
+            plt.tight_layout()
+            performance_plot = output_path / f"{algorithm.lower()}_performance_vs_episode_steps.png"
+            plt.savefig(performance_plot, dpi=300, bbox_inches='tight', facecolor='white')
+            plt.close()
+            artifacts.append(str(performance_plot))
 
     print(f"✅ Created {len(artifacts)} visualizations")
     return artifacts
@@ -933,7 +1097,7 @@ def discover_tournament_data(input_path: str = None):
                 }
     
     # Auto-discover latest tournament results
-    tournament_dirs = list(Path("tournament_results").glob("run_*"))
+    tournament_dirs = list(Path("experiments/results/tournament_results").glob("run_*"))
     if not tournament_dirs:
         return None
 
@@ -1028,7 +1192,7 @@ def main():
     tournament_data = discover_tournament_data(args.results_csv)
     
     if not tournament_data:
-        print("❌ No tournament results found in tournament_results/")
+        print("❌ No tournament results found in experiments/results/tournament_results/")
         print("Please run the tournament first using: python -m baselines.run_tournament")
         print("Or specify a results file/directory manually with: --results-csv path/to/results")
         return
