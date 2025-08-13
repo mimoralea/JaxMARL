@@ -180,7 +180,7 @@ def get_scripted_agent(agent_name, seed=0):
         raise ValueError(f"Unknown agent: {agent_name}")
 
 
-def load_learned_agent(algorithm, checkpoint_dir="checkpoints"):
+def load_learned_agent(algorithm, checkpoint_dir="experiments/checkpoints"):
     """Load a learned agent from checkpoint using simple direct approach."""
     if algorithm.upper() == "FSPPPO":
         import glob
@@ -589,7 +589,7 @@ def main():
                        help='Second agent type (scripted: noop, random, seek, dodge, guardian; learned: FSPPPO, IPPO, SPPPO)')
     parser.add_argument('--num-rollouts', type=int, default=10,
                        help='Number of rollouts to generate')
-    parser.add_argument('--output-dir', type=str, default='rollout_gifs',
+    parser.add_argument('--output-dir', type=str, default='experiments/rollouts',
                        help='Output directory for GIF files')
     parser.add_argument('--learned-algorithms', nargs='*', default=[],
                        choices=['FSPPPO', 'IPPO', 'SPPPO'],
