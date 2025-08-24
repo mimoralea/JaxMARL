@@ -1,17 +1,17 @@
 """
 Orbax-based checkpoint management utilities for FSPPPO and other algorithms using Orbax.
-Provides hierarchical storage: checkpoints/{algorithm}/{run_id}/{agent_id}/step_{step}/
+Provides hierarchical storage: checkpoints/{algorithm}/{run_id}/{agent_id}/{step}/
 Uses Orbax for proper JAX/Flax checkpointing without JIT compilation issues.
 
 CHECKPOINT DIRECTORY STRUCTURE DESIGN:
 =====================================
 
 Current Structure (CORRECT):
-    checkpoints/fspppo/run_xyz_seed[0-9]/agent_id/step_xxxxxx/
+    checkpoints/fspppo/run_xyz_seed[0-9]/agent_id/{step}/
 
 Example:
-    checkpoints/fspppo/run_20250717_231055_seed0/main/step_000012/
-    checkpoints/fspppo/run_20250717_231055_seed1/main/step_000012/
+    checkpoints/fspppo/run_20250717_231055_seed0/main/12/
+    checkpoints/fspppo/run_20250717_231055_seed1/main/12/
 
 Why This Structure is Optimal:
 
@@ -33,7 +33,7 @@ Why This Structure is Optimal:
 4. **Standard ML Practice**: Follows common ML conventions where seeds are experiment-level
 
 Alternative Structure (REJECTED):
-    checkpoints/fspppo/run_xyz/agent_id/seed[0-9]/step_xxxxxx/
+    checkpoints/fspppo/run_xyz/agent_id/seed[0-9]/{step}/
 
 Problems with rejected approach:
     - Implies seeds are agent-specific (conceptually wrong)

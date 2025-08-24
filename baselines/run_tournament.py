@@ -426,6 +426,10 @@ class TournamentEvaluator:
         """Get the latest IPPO checkpoint for the current training seed."""
         ippo_pattern = f"experiments/checkpoints/ippo/run_*_seed{self.current_training_seed}/main/*"
         ippo_paths = glob.glob(ippo_pattern)
+        if not ippo_paths:
+            # Fallback to consolidated checkpoints root
+            ippo_pattern_alt = f"checkpoints/ippo/run_*_seed{self.current_training_seed}/main/*"
+            ippo_paths = glob.glob(ippo_pattern_alt)
 
         if not ippo_paths:
             return []
@@ -451,6 +455,10 @@ class TournamentEvaluator:
         """Get the latest SPPPO checkpoint for the current training seed."""
         spppo_pattern = f"experiments/checkpoints/spppo/run_*_seed{self.current_training_seed}/main/*"
         spppo_paths = glob.glob(spppo_pattern)
+        if not spppo_paths:
+            # Fallback to consolidated checkpoints root
+            spppo_pattern_alt = f"checkpoints/spppo/run_*_seed{self.current_training_seed}/main/*"
+            spppo_paths = glob.glob(spppo_pattern_alt)
 
         if not spppo_paths:
             return []
@@ -476,6 +484,10 @@ class TournamentEvaluator:
         """Get the most recent FSPPPO checkpoint for the current training seed."""
         fspppo_pattern = f"experiments/checkpoints/fspppo/run_*_seed{self.current_training_seed}/main/*"
         fspppo_paths = glob.glob(fspppo_pattern)
+        if not fspppo_paths:
+            # Fallback to consolidated checkpoints root
+            fspppo_pattern_alt = f"checkpoints/fspppo/run_*_seed{self.current_training_seed}/main/*"
+            fspppo_paths = glob.glob(fspppo_pattern_alt)
 
         if not fspppo_paths:
             return []
@@ -511,8 +523,12 @@ class TournamentEvaluator:
     def _get_all_ippo_checkpoints(self):
         """Get all IPPO checkpoints for the specified training seed."""
         players = []
-        ippo_pattern = f"experiments/checkpoints/ippo/run_*_seed{self.training_seed}/main/*"
+        ippo_pattern = f"experiments/checkpoints/ippo/run_*_seed{self.current_training_seed}/main/*"
         ippo_paths = glob.glob(ippo_pattern)
+        if not ippo_paths:
+            # Fallback to consolidated checkpoints root
+            ippo_pattern_alt = f"checkpoints/ippo/run_*_seed{self.current_training_seed}/main/*"
+            ippo_paths = glob.glob(ippo_pattern_alt)
 
         for path in ippo_paths:
             if os.path.isdir(path):
@@ -534,8 +550,12 @@ class TournamentEvaluator:
     def _get_all_spppo_checkpoints(self):
         """Get all SPPPO checkpoints for the specified training seed."""
         players = []
-        spppo_pattern = f"experiments/checkpoints/spppo/run_*_seed{self.training_seed}/main/*"
+        spppo_pattern = f"experiments/checkpoints/spppo/run_*_seed{self.current_training_seed}/main/*"
         spppo_paths = glob.glob(spppo_pattern)
+        if not spppo_paths:
+            # Fallback to consolidated checkpoints root
+            spppo_pattern_alt = f"checkpoints/spppo/run_*_seed{self.current_training_seed}/main/*"
+            spppo_paths = glob.glob(spppo_pattern_alt)
 
         for path in spppo_paths:
             if os.path.isdir(path):
@@ -557,8 +577,12 @@ class TournamentEvaluator:
     def _get_all_fspppo_checkpoints(self):
         """Get all FSPPPO checkpoints for the specified training seed."""
         players = []
-        fspppo_pattern = f"experiments/checkpoints/fspppo/run_*_seed{self.training_seed}/main/*"
+        fspppo_pattern = f"experiments/checkpoints/fspppo/run_*_seed{self.current_training_seed}/main/*"
         fspppo_paths = glob.glob(fspppo_pattern)
+        if not fspppo_paths:
+            # Fallback to consolidated checkpoints root
+            fspppo_pattern_alt = f"checkpoints/fspppo/run_*_seed{self.current_training_seed}/main/*"
+            fspppo_paths = glob.glob(fspppo_pattern_alt)
 
         for path in fspppo_paths:
             if os.path.isdir(path):
@@ -786,13 +810,13 @@ class TournamentEvaluator:
         rng_key, reset_key = jax.random.split(rng_key)
         obs, state = self.env.reset(reset_key)
 
-        done = {"__all__": False}
+        dones = {"__all__": False}
         episode_length = 0
 
         # Initialize cumulative rewards
         cumulative_rewards = {agent: 0.0 for agent in self.env.agents}
 
-        while not done["__all__"]:
+        while not dones["__all__"]:
             actions = {}
 
             # Green player (agent_0) action
@@ -1181,11 +1205,11 @@ class TournamentEvaluator:
             player_stats[green_player]['total_reward'] += result['green_reward']
             player_stats[red_player]['total_reward'] += result['red_reward']
 
-            # Update win/loss/draw counts
-            if result['winner'] == 'green':
+            # Update win/loss/draw counts (winner is env agent id or 'draw')
+            if result['winner'] in (self.env.agents[0], 'green'):
                 player_stats[green_player]['wins'] += 1
                 player_stats[red_player]['losses'] += 1
-            elif result['winner'] == 'red':
+            elif result['winner'] in (self.env.agents[1], 'red'):
                 player_stats[red_player]['wins'] += 1
                 player_stats[green_player]['losses'] += 1
             else:

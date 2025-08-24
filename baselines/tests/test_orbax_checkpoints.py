@@ -71,8 +71,8 @@ def test_basic_checkpoint_save_load():
 
         print(f"✅ Checkpoint saved to: {checkpoint_dir}")
 
-        # Verify directory structure
-        expected_dir = os.path.join(temp_dir, "test_algo", run_id, agent_id, f"step_{update_step:06d}")
+        # Verify directory structure (numeric step directory, no 'step_' prefix)
+        expected_dir = os.path.join(temp_dir, "test_algo", run_id, agent_id, f"{update_step}")
         assert os.path.exists(expected_dir), f"Checkpoint directory not found: {expected_dir}"
         assert os.path.exists(os.path.join(expected_dir, "metadata.json")), "Metadata file not found"
 
@@ -160,7 +160,7 @@ def test_training_integration():
         "ALGORITHM": "fspppo",
         "NUM_SEEDS": 2,
         "NUM_UPDATES": 150,
-        "AGENT_ID": "main_agent"
+        "AGENT_ID": "main"
     }
 
     try:
@@ -232,7 +232,7 @@ def test_checkpoint_loading_for_opponent():
 
         # Save a checkpoint
         run_id = "test_run"
-        agent_id = "main_agent"
+        agent_id = "main"
         update_step = 100
 
         checkpoint_dir = manager.save_checkpoint(

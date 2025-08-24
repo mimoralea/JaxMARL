@@ -14,7 +14,7 @@ Seed Concept:
 Checkpoint Structure per Seed:
     - Base run_id: "run_20250717_231055"
     - Seed-specific run_id: "run_20250717_231055_seed0"
-    - Full path: checkpoints/fspppo/run_20250717_231055_seed0/main_agent/step_000012/
+    - Full path: checkpoints/fspppo/run_20250717_231055_seed0/main/12/
 
 Multi-Seed Training:
     - Each seed gets its own complete checkpoint directory tree
@@ -22,8 +22,8 @@ Multi-Seed Training:
     - Supports future population training with consistent agent pairs per seed
 
 Future Population Training Structure:
-    checkpoints/fspppo/run_xyz_seed0/main_agent/step_000012/
-    checkpoints/fspppo/run_xyz_seed0/opponent_agent/step_000012/
+    checkpoints/fspppo/run_xyz_seed0/main/12/
+    checkpoints/fspppo/run_xyz_seed0/opponent/12/
 
     This ensures same seed controls both agents (shared randomness).
 """
@@ -61,7 +61,7 @@ class TrainingCheckpointCallback:
     """
 
     def __init__(self, checkpoint_manager: FSPPPOCheckpointManager,
-                 run_id: str, agent_id: str = "main_agent",
+                 run_id: str, agent_id: str = "main",
                  checkpoint_freq: int = 100, max_checkpoints: int = 10):
         self.checkpoint_manager = checkpoint_manager
         self.run_id = run_id
@@ -83,12 +83,12 @@ class TrainingCheckpointCallback:
         """
         try:
             checkpoint_dir = self.checkpoint_manager.save_checkpoint(
-                params, self.run_id, self.agent_id, update_step
+                params, int(update_step), self.run_id, self.agent_id
             )
             self.saved_checkpoints.append(checkpoint_dir)
 
             # Optional cleanup of old checkpoints
-            cleanup_enabled = self.config.get("CLEANUP_OLD_CHECKPOINTS", False)
+            cleanup_enabled = getattr(self, "config", {}).get("CLEANUP_OLD_CHECKPOINTS", False)
             if cleanup_enabled:
                 removed_count = self.checkpoint_manager.cleanup_old_checkpoints(
                     self.run_id, self.agent_id, self.max_checkpoints
@@ -169,7 +169,7 @@ def save_final_checkpoints(train_states: Any, config: dict, checkpoint_manager: 
     # Get configuration and convert to integers to handle JAX array values
     checkpoint_freq = int(config.get("CHECKPOINT_FREQ", 100))
     max_checkpoints = int(config.get("MAX_CHECKPOINTS", 10))
-    agent_id = config.get("AGENT_ID", "main_agent")
+    agent_id = config.get("AGENT_ID", "main")
 
     # Process each seed's results
     # IMPORTANT: Each seed represents an independent training experiment

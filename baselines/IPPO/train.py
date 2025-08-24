@@ -5,41 +5,35 @@ Based on the PureJaxRL Implementation of PPO
 import os
 import time
 import logging
+import warnings
 import numpy as np
 import hydra
 import jaxmarl
 import jax
 import jax.numpy as jnp
-import flax
-import flax.linen as nn
 import optax
-import distrax
 import matplotlib.pyplot as plt
 import wandb
-from tqdm import tqdm
 from jaxmarl.environments.mpe.default_params import MAX_STEPS
-from typing import Sequence, NamedTuple, Dict, Any, List
-from functools import partial
-from flax.linen.initializers import constant, orthogonal
 from flax.training.train_state import TrainState
 from jaxmarl.environments.mpe.mpe_visualizer import MPEVisualizer
-import distrax
-import jaxmarl
 from jaxmarl.wrappers.baselines import MPELogWrapper as LogWrapper
-import matplotlib.pyplot as plt
-import hydra
 from omegaconf import OmegaConf
-import wandb
 
 # Configure logging levels to reduce verbose output
 logging.getLogger("absl").setLevel(logging.CRITICAL)
 logging.getLogger("orbax").setLevel(logging.CRITICAL)
 # Suppress specific Orbax checkpoint manager warnings
-import warnings
 warnings.filterwarnings("ignore", message=".*CheckpointManager.*asynchronous.*")
 logging.getLogger("jax").setLevel(logging.WARNING)
 logging.getLogger("jax._src").setLevel(logging.ERROR)
 logging.getLogger("tensorstore").setLevel(logging.ERROR)
+
+# Import shared PPO implementation
+try:
+    from ..algorithms.ppo import ActorCritic, Transition, batchify, unbatchify
+except ImportError:
+    from baselines.algorithms.ppo import ActorCritic, Transition, batchify, unbatchify
 
 # Import checkpoint manager
 try:
@@ -57,73 +51,7 @@ except ImportError:
 # jax.config.update('jax_disable_jit', True)
 
 
-class ActorCritic(nn.Module):
-    action_dim: Sequence[int]
-    activation: str = "tanh"
-
-    @nn.compact
-    def __call__(self, x):
-        if self.activation == "relu":
-            activation = nn.relu
-        else:
-            activation = nn.tanh
-        actor_mean = nn.Dense(
-            64, kernel_init=orthogonal(np.sqrt(2)), bias_init=constant(0.0)
-        )(x)
-        actor_mean = activation(actor_mean)
-        actor_mean = nn.Dense(
-            64, kernel_init=orthogonal(np.sqrt(2)), bias_init=constant(0.0)
-        )(actor_mean)
-        actor_mean = activation(actor_mean)
-        actor_mean = nn.Dense(
-            self.action_dim,
-            kernel_init=orthogonal(0.01),
-            bias_init=constant(0.0),
-        )(actor_mean)
-        pi = distrax.Categorical(logits=actor_mean)
-
-        critic = nn.Dense(
-            64, kernel_init=orthogonal(np.sqrt(2)), bias_init=constant(0.0)
-        )(x)
-        critic = activation(critic)
-        critic = nn.Dense(
-            64, kernel_init=orthogonal(np.sqrt(2)), bias_init=constant(0.0)
-        )(critic)
-        critic = activation(critic)
-        critic = nn.Dense(
-            1, kernel_init=orthogonal(1.0), bias_init=constant(0.0)
-        )(critic)
-
-        return pi, jnp.squeeze(critic, axis=-1)
-
-
-class Transition(NamedTuple):
-    done: jnp.ndarray
-    action: jnp.ndarray
-    value: jnp.ndarray
-    reward: jnp.ndarray
-    log_prob: jnp.ndarray
-    obs: jnp.ndarray
-    info: jnp.ndarray
-
-
-def batchify(x: dict, agent_list, num_actors):
-    max_dim = max([x[a].shape[-1] for a in agent_list])
-
-    def pad(z, length):
-        return jnp.concatenate(
-            [z, jnp.zeros(z.shape[:-1] + [length - z.shape[-1]])], -1
-        )
-
-    x = jnp.stack(
-        [x[a] if x[a].shape[-1] == max_dim else pad(x[a]) for a in agent_list]
-    )
-    return x.reshape((num_actors, -1))
-
-
-def unbatchify(x: jnp.ndarray, agent_list, num_envs, num_actors):
-    x = x.reshape((num_actors, num_envs, -1))
-    return {a: x[i] for i, a in enumerate(agent_list)}
+# ActorCritic, Transition, batchify, and unbatchify are now imported from shared PPO module
 
 
 def make_train(config, checkpoint_callback=None):

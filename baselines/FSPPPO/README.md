@@ -51,21 +51,28 @@ CHECKPOINT_FREQ: 50
 
 ## Directory Structure
 
-Each seed maintains its own independent checkpoint history:
+Each seed maintains its own independent checkpoint history (standardized):
 ```
 checkpoints/fspppo/
 ├── run_20250727_223608_seed0/
-│   └── main_agent/
-│       ├── step_000050/
-│       ├── step_000100/
-│       └── step_000150/
+│   └── main/
+│       ├── 50/
+│       ├── 100/
+│       └── 150/
 ├── run_20250727_223608_seed1/
-│   └── main_agent/
-│       ├── step_000050/
-│       ├── step_000100/
-│       └── step_000150/
+│   └── main/
+│       ├── 50/
+│       ├── 100/
+│       └── 150/
 └── ...
 ```
+
+Notes:
+- Step directories are numeric (e.g., `50`, `100`, `150`) and correspond to training update steps.
+- Agent directory is `main/` for the primary agent.
+
+Backward compatibility:
+- Older runs may appear as `main_agent/step_000050/` (with `step_` prefix and zero-padding). Current code and tooling use the standardized `main/<step>/` layout.
 
 **Key Point**: seed0 can ONLY sample from `run_20250727_223608_seed0/` directory. It cannot access seed1's checkpoints or any other run's checkpoints.
 

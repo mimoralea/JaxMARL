@@ -12,10 +12,10 @@ from jaxmarl.environments.mpe.default_params import (CONTINUOUS_ACT, DISCRETE_AC
 
 
 class SimpleSumoMPE(SimpleMPE):
-    """Two-player sumo wrestle in a circular arena.
+    """Two-player sumo in a circular arena of radius R (default 0.4).
 
-    The first agent to move outside the unit circle loses. Continuous
-    2-D thrust controls, zero-sum terminal reward.
+    The first agent to move outside the arena loses. Discrete 5-action thrust by
+    default; optional continuous 2-D thrust. Zero-sum terminal rewards (+1/-1; 0 otherwise).
     """
 
     def __init__(self, R: float = 0.4, action_type=DISCRETE_ACT, *, random_spawn: bool = True, **kwargs):
@@ -88,7 +88,7 @@ class SimpleSumoMPE(SimpleMPE):
         return u, jnp.zeros((0,))
 
     # ---------------------------------------------------------------------
-    # Deterministic reset – agents start opposite on a 0.95R circle (very close to the edge).
+    # Deterministic reset – agents start opposite on a 0.5R circle (symmetric left/right).
     # ---------------------------------------------------------------------
     def reset(self, key: chex.PRNGKey) -> Tuple[Dict[str, chex.Array], State]:
         # Store the original color mapping for visualization consistency
@@ -96,7 +96,7 @@ class SimpleSumoMPE(SimpleMPE):
         # regardless of which agent ID is actually on which side
 
         if self.random_spawn:
-            # Sample two independent angles and radii inside 70%–90% of arena
+            # Sample two independent angles and radii: angles ~ U[0, 2π), radii ~ U[0.2R, 0.7R]
             key, sub1, sub2 = jax.random.split(key, 3)
             angles = jax.random.uniform(sub1, (2,), minval=0.0, maxval=2 * jnp.pi)
             radii = jax.random.uniform(sub2, (2,), minval=0.2 * self.R, maxval=0.7 * self.R)

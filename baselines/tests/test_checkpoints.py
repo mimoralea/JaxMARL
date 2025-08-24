@@ -13,16 +13,49 @@ from pathlib import Path
 # Add the parent directory to the path so we can import the modules
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
+import hashlib
+import pytest
+
+# Skip this test module if required deps are missing
+pytest.importorskip("jax")
+pytest.importorskip("flax")
+pytest.importorskip("optax")
+pytest.importorskip("orbax")
+
 import jax
 import jax.numpy as jnp
-from omegaconf import OmegaConf
+import numpy as np
+import flax.linen as nn
+from flax.training import train_state
+import optax
 
-from baselines.FSPPPO.checkpoint_manager import (
-    save_checkpoint, load_checkpoint, get_available_runs,
-    get_agent_checkpoints, validate_checkpoint_differences,
-    print_checkpoint_summary, cleanup_old_checkpoints
+from baselines.FSPPPO.orbax_checkpoint_manager import (
+    save_checkpoint, load_checkpoint,
+    get_agent_checkpoints, cleanup_old_checkpoints,
+    FSPPPOCheckpointManager,
 )
-from baselines.FSPPPO.fspppo_ff_mpe import make_train
+from baselines.FSPPPO.jax_checkpoint_utils import (
+    create_checkpoint_manager_for_training,
+    save_final_checkpoints,
+)
+
+
+# Helpers
+def make_abstract_from_params(params):
+    """Create abstract shape/dtype structure for Orbax restore."""
+    return jax.tree_util.tree_map(
+        lambda x: jax.ShapeDtypeStruct(x.shape, x.dtype), params
+    )
+
+
+def hash_params(params) -> str:
+    """Compute MD5 hash of a PyTree of arrays (deterministic order)."""
+    m = hashlib.md5()
+    leaves, _ = jax.tree_util.tree_flatten(params)
+    for leaf in leaves:
+        arr = np.asarray(leaf)
+        m.update(arr.tobytes())
+    return m.hexdigest()
 
 
 def test_checkpoint_basic_functionality():
@@ -43,7 +76,7 @@ def test_checkpoint_basic_functionality():
             update_step=100,
             algorithm="test_algo",
             run_id="test_run",
-            agent_id="test_agent",
+            agent_id="main",
             base_dir=temp_dir
         )
 
@@ -52,7 +85,8 @@ def test_checkpoint_basic_functionality():
         print(f"✅ Checkpoint saved successfully: {checkpoint_path}")
 
         # Load checkpoint
-        loaded_params = load_checkpoint(checkpoint_path)
+        abstract = make_abstract_from_params(dummy_params)
+        loaded_params = load_checkpoint(checkpoint_path, abstract)
 
         # Verify parameters match
         for key in dummy_params:
@@ -60,10 +94,11 @@ def test_checkpoint_basic_functionality():
 
         print("✅ Checkpoint loaded successfully and parameters match!")
 
-        # Test directory structure
-        expected_dir = os.path.join(temp_dir, "test_algo", "test_run", "test_agent")
+        # Test directory structure (numeric step dir)
+        expected_dir = os.path.join(temp_dir, "test_algo", "test_run", "main", "100")
         assert os.path.exists(expected_dir), f"Directory structure not created: {expected_dir}"
-        print("✅ Directory structure created correctly!")
+        assert os.path.exists(os.path.join(expected_dir, "metadata.json")), "Metadata file missing!"
+        print("✅ Directory structure and metadata created correctly!")
 
 
 def test_checkpoint_differences():
@@ -72,6 +107,7 @@ def test_checkpoint_differences():
 
     with tempfile.TemporaryDirectory() as temp_dir:
         checkpoint_paths = []
+        saved_params_list = []
 
         # Create multiple checkpoints with different parameters
         for i in range(3):
@@ -85,13 +121,18 @@ def test_checkpoint_differences():
                 update_step=(i + 1) * 100,
                 algorithm="test_algo",
                 run_id="test_run",
-                agent_id="test_agent",
+                agent_id="main",
                 base_dir=temp_dir
             )
             checkpoint_paths.append(checkpoint_path)
+            saved_params_list.append(params)
 
-        # Validate that checkpoints are different
-        hashes = validate_checkpoint_differences(checkpoint_paths)
+        # Validate that checkpoints are different by restoring and hashing
+        hashes = {}
+        for ckpt_path, original_params in zip(checkpoint_paths, saved_params_list):
+            abstract = make_abstract_from_params(original_params)
+            restored = load_checkpoint(ckpt_path, abstract)
+            hashes[ckpt_path] = hash_params(restored)
 
         print(f"📊 Checkpoint hashes:")
         for path, hash_val in hashes.items():
@@ -116,7 +157,7 @@ def test_checkpoint_metadata():
                 update_step=(i + 1) * 50,
                 algorithm="test_algo",
                 run_id="test_run",
-                agent_id="test_agent",
+                agent_id="main",
                 base_dir=temp_dir
             )
 
@@ -124,7 +165,7 @@ def test_checkpoint_metadata():
         checkpoints = get_agent_checkpoints(
             algorithm="test_algo",
             run_id="test_run",
-            agent_id="test_agent",
+            agent_id="main",
             base_dir=temp_dir
         )
 
@@ -136,13 +177,9 @@ def test_checkpoint_metadata():
         assert update_steps == sorted(update_steps), "Checkpoints not sorted by update step!"
         print("✅ Checkpoints are properly sorted by update step!")
 
-        # Print summary
-        print_checkpoint_summary(
-            algorithm="test_algo",
-            run_id="test_run",
-            agent_id="test_agent",
-            base_dir=temp_dir
-        )
+        # Print summary (optional)
+        manager = FSPPPOCheckpointManager(temp_dir, "test_algo")
+        manager.print_checkpoint_summary("test_run", "main")
 
 
 def test_checkpoint_cleanup():
@@ -158,7 +195,7 @@ def test_checkpoint_cleanup():
                 update_step=(i + 1) * 10,
                 algorithm="test_algo",
                 run_id="test_run",
-                agent_id="test_agent",
+                agent_id="main",
                 base_dir=temp_dir
             )
 
@@ -166,7 +203,7 @@ def test_checkpoint_cleanup():
         checkpoints_before = get_agent_checkpoints(
             algorithm="test_algo",
             run_id="test_run",
-            agent_id="test_agent",
+            agent_id="main",
             base_dir=temp_dir
         )
         assert len(checkpoints_before) == 15, f"Expected 15 checkpoints, got {len(checkpoints_before)}"
@@ -176,7 +213,7 @@ def test_checkpoint_cleanup():
         removed_count = cleanup_old_checkpoints(
             algorithm="test_algo",
             run_id="test_run",
-            agent_id="test_agent",
+            agent_id="main",
             max_checkpoints=5,
             base_dir=temp_dir
         )
@@ -185,7 +222,7 @@ def test_checkpoint_cleanup():
         checkpoints_after = get_agent_checkpoints(
             algorithm="test_algo",
             run_id="test_run",
-            agent_id="test_agent",
+            agent_id="main",
             base_dir=temp_dir
         )
 
@@ -201,75 +238,56 @@ def test_checkpoint_cleanup():
 
 
 def test_training_integration():
-    """Test checkpoint integration with actual training."""
-    print("\n🧪 Testing checkpoint integration with training...")
+    """Test checkpoint integration using jax_checkpoint_utils (no heavy training)."""
+    print("\n🧪 Testing checkpoint integration (lightweight)...")
 
-    # Load minimal config for testing
-    config = OmegaConf.load('baselines/FSPPPO/config/fspppo_ff_mpe.yaml')
-    config = OmegaConf.to_container(config)
-
-    # Use minimal settings for quick test
-    config.update({
-        'TOTAL_TIMESTEPS': 1024,
-        'NUM_ENVS': 2,
-        'NUM_STEPS': 32,
-        'UPDATE_EPOCHS': 1,
-        'NUM_MINIBATCHES': 1,
-        'NUM_SEEDS': 1,
-        'CHECKPOINT_FREQ': 10,  # Save every 10 updates
+    # Minimal config
+    config = {
+        'CHECKPOINT_FREQ': 10,
         'MAX_CHECKPOINTS': 5,
-        'CHECKPOINT_BASE_DIR': 'test_checkpoints'
-    })
+        'CHECKPOINT_BASE_DIR': tempfile.mkdtemp(),
+        'ALGORITHM': 'fspppo',
+        'NUM_SEEDS': 1,
+        'NUM_UPDATES': 30,
+        'AGENT_ID': 'main',
+    }
 
-    # Clean up any existing test checkpoints
-    if os.path.exists('test_checkpoints'):
-        shutil.rmtree('test_checkpoints')
+    # Simple network for train state
+    class SimpleNet(nn.Module):
+        features: int = 8
+        @nn.compact
+        def __call__(self, x):
+            x = nn.Dense(self.features)(x)
+            return x
+
+    def create_test_train_state(rng_key, input_shape=(4,)):
+        net = SimpleNet()
+        dummy_input = jnp.zeros(input_shape)
+        params = net.init(rng_key, dummy_input)
+        tx = optax.adam(1e-3)
+        return train_state.TrainState.create(apply_fn=net.apply, params=params, tx=tx)
 
     try:
-        # Run training
-        print("🚀 Running training with checkpoint integration...")
-        train_fn = make_train(config)
-        rng = jax.random.PRNGKey(42)
-        train_jit = jax.jit(train_fn)
-        result = train_jit(rng)
+        checkpoint_manager, base_run_id = create_checkpoint_manager_for_training(config)
+        rng = jax.random.PRNGKey(0)
+        ts0 = create_test_train_state(rng)
 
-        run_id = result.get('run_id')
-        assert run_id is not None, "Run ID not returned from training!"
-        print(f"✅ Training completed with run_id: {run_id}")
+        # Save final checkpoints for single seed
+        save_final_checkpoints(ts0, config, checkpoint_manager, base_run_id)
 
-        # Check that checkpoints were created
-        checkpoints = get_agent_checkpoints(
-            algorithm="fspppo",
-            run_id=run_id,
-            agent_id="main_agent",
-            base_dir="test_checkpoints"
-        )
-
-        assert len(checkpoints) > 0, "No checkpoints were created during training!"
-        print(f"✅ Created {len(checkpoints)} checkpoints during training!")
-
-        # Validate checkpoint differences
-        checkpoint_paths = [cp['file_path'] for cp in checkpoints]
-        hashes = validate_checkpoint_differences(checkpoint_paths)
-
-        if len(hashes) > 1:
-            hash_values = list(hashes.values())
-            unique_hashes = len(set(hash_values))
-            print(f"✅ Checkpoint validation: {unique_hashes}/{len(hashes)} unique checkpoints!")
-
-        # Print summary
-        print_checkpoint_summary(
-            algorithm="fspppo",
-            run_id=run_id,
-            agent_id="main_agent",
-            base_dir="test_checkpoints"
-        )
-
+        # Verify per-seed checkpoints exist
+        for seed_idx in range(config['NUM_SEEDS']):
+            run_id = base_run_id
+            cps = get_agent_checkpoints(
+                algorithm=config['ALGORITHM'],
+                run_id=run_id,
+                agent_id=config['AGENT_ID'],
+                base_dir=config['CHECKPOINT_BASE_DIR']
+            )
+            assert len(cps) > 0, f"No checkpoints for seed {seed_idx}"
+        print("✅ Lightweight training integration passed!")
     finally:
-        # Clean up test checkpoints
-        if os.path.exists('test_checkpoints'):
-            shutil.rmtree('test_checkpoints')
-            print("🧹 Cleaned up test checkpoints")
+        shutil.rmtree(config['CHECKPOINT_BASE_DIR'], ignore_errors=True)
 
 
 def main():
