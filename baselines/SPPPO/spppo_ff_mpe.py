@@ -459,7 +459,7 @@ def main(config):
     )
 
     # Generate rollouts for different opponent types
-    opponent_types = ["self_play", "noop", "random_walk"]
+    opponent_types = ["self_play", "noop", "random"]
     print("\nGenerating rollout animations against different opponents...")
 
     # Use current time-based seeds to ensure different starting positions each run
@@ -565,7 +565,7 @@ def get_rollout(
     Args:
         train_state: The trained agent's parameters
         config: Configuration dictionary
-        opponent_type: Type of opponent ('self_play', 'noop', or 'random_walk')
+        opponent_type: Type of opponent ('self_play', 'noop', or 'random')
         seed: Random seed for reproducibility. If None, uses current time.
         run_id: Run identifier for organized folder structure
         training_seed: Training seed used for this rollout (for folder organization)
@@ -634,7 +634,7 @@ def get_rollout(
                 actions[second_agent] = jnp.array(0, dtype=jnp.int32)
 
             elif (
-                opponent_type == "random_walk"
+                opponent_type == "random"
             ):  # Opponent takes random actions
                 # Random action from 0-4 (NOOP, LEFT, RIGHT, DOWN, UP)
                 key_rand, key = jax.random.split(key)

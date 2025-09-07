@@ -1,12 +1,13 @@
 # NORMAL TRAINING PARAMS
-"LR": 2.5e-4
-"ANNEAL_LR": True
+"LR": 5.0e-4  # Higher learning rate for faster learning
+"ANNEAL_LR": False  # No annealing to maintain high learning rate
 "NUM_ENVS": 16
 "NUM_STEPS": 128
-"TOTAL_TIMESTEPS": 1e7
-"UPDATE_EPOCHS": 4
+"TOTAL_TIMESTEPS": 1e8
+"NUM_UPDATES": 48828  # Calculated from TOTAL_TIMESTEPS / (NUM_ENVS * NUM_STEPS)
+"UPDATE_EPOCHS": 8  # More epochs per update for better learning
 "NUM_MINIBATCHES": 4
-"ENT_COEF": 0.01
+"ENT_COEF": 0.1  # Much higher entropy coefficient for more exploration
 "SEED": 30
 "NUM_SEEDS": 10
 
@@ -35,6 +36,11 @@
 # Checkpoint Params (end-only for speed)
 "SAVE_AT_END": True             # Save final checkpoint
 "MAX_CHECKPOINTS_TO_KEEP": 10   # Keep N most recent checkpoints (None = keep all)
+
+# BR Opponent Configuration
+"TARGET_ALGORITHM": "ippo"  # Target algorithm to train against: ippo, spppo, or fspppo
+"OPPONENT_CHECKPOINT_PATH": ""  # Path to opponent checkpoint (optional, auto-discovered if empty)
+"RUN_NAME": "br_training"  # Run name for this BR training
 
 # WandB Params
 "ENTITY": ""

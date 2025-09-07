@@ -77,7 +77,7 @@ class BRCheckpointManager:
         if metadata is None:
             metadata = {}
 
-        # Add default metadata
+        # Add default metadata (keep strings here, but clean to numerics below for Orbax StandardCheckpointer)
         metadata.update(
             {
                 "step": step,
@@ -95,13 +95,22 @@ class BRCheckpointManager:
                     f"Missing train_state for agent: {agent_name}"
                 )
 
-            # Convert metadata to supported types (no strings)
+            # Convert metadata to supported types for StandardCheckpointer
+            # Keep strictly numeric fields to avoid serialization issues.
             clean_metadata = {
                 "step": step,
                 "agent_id": 0 if agent_name == "main" else 1,
-                "training_step": metadata.get("training_step", step),
+                "training_step": int(metadata.get("training_step", step)),
                 "is_final": int(metadata.get("is_final", False)),
             }
+
+            # Include optional opponent-identifying fields (numeric only)
+            if "opponent_algo_code" in metadata:
+                clean_metadata["opponent_algo_code"] = int(metadata["opponent_algo_code"])
+            if "opponent_seed" in metadata:
+                clean_metadata["opponent_seed"] = int(metadata["opponent_seed"])
+            if "opponent_step" in metadata:
+                clean_metadata["opponent_step"] = int(metadata["opponent_step"])
 
             save_args = {
                 "train_state": train_states[agent_name],
@@ -245,27 +254,30 @@ class BRCheckpointManager:
 def create_br_checkpoint_manager(
     run_id: str,
     seed: int,
+    target_algorithm: str,
     base_dir: str = "checkpoints",
     max_to_keep: Optional[int] = 10,
     agent_names: List[str] = None,
 ) -> BRCheckpointManager:
-    """Create a checkpoint manager for BR with standard directory structure.
+    """Create a checkpoint manager for BR with organized directory structure.
 
     Args:
         run_id: Run identifier (e.g., "run_20250718_170900")
         seed: Seed number
+        target_algorithm: Algorithm the BR agent is trained against (ippo, spppo, fspppo)
         base_dir: Base checkpoint directory
         max_to_keep: Maximum checkpoints to keep
-        agent_names: Names of the agents (default: ["main", "opponent"])
+        agent_names: Names of the agents (default: ["main_agent"])
 
     Returns:
         Configured BRCheckpointManager
     """
-    checkpoint_dir = os.path.join(base_dir, "br", f"{run_id}_seed{seed}")
+    # Follow structure: checkpoints/br/{algorithm}/run_*_seed*/{agent_type}/
+    checkpoint_dir = os.path.join(base_dir, "br", target_algorithm, f"{run_id}_seed{seed}")
     return BRCheckpointManager(
         checkpoint_dir=checkpoint_dir,
         max_to_keep=max_to_keep,
-        agent_names=agent_names or ["main", "opponent"],
+        agent_names=agent_names or ["main_agent"],
     )
 
 
@@ -278,6 +290,7 @@ class BRCheckpointCallback:
         checkpoint_manager: BRCheckpointManager,
         save_frequency: int = 325,
         save_at_end: bool = True,
+        extra_metadata: Optional[Dict[str, Any]] = None,
     ):
         """Initialize checkpoint callback.
 
@@ -290,6 +303,7 @@ class BRCheckpointCallback:
         self.save_frequency = save_frequency
         self.save_at_end = save_at_end
         self.saved_steps = set()
+        self.extra_metadata = extra_metadata or {}
 
     def __call__(
         self,
@@ -319,6 +333,8 @@ class BRCheckpointCallback:
                 "is_final": is_final,
                 "algorithm": "br",
             }
+            # Merge any extra metadata provided at construction time
+            metadata.update(self.extra_metadata)
 
             checkpoint_paths = self.checkpoint_manager.save_checkpoint(
                 step=step, train_states=train_states, metadata=metadata
@@ -335,21 +351,36 @@ class BRCheckpointCallback:
         """Save final checkpoint for BR training.
 
         Args:
-            train_state: Training state containing params for both agents
+            train_state: Training state containing params for the BR agent
             step: Final training step
 
         Returns:
             Dictionary of checkpoint paths or None
         """
-        # Extract individual agent states from the combined train_state
-        train_states = {
-            "main": train_state.replace(params=train_state.params[0]),
-            "opponent": train_state.replace(params=train_state.params[1]),
-        }
+        try:
+            print(f"🔍 Saving BR checkpoint at step {step}")
+            print(f"   Params type: {type(train_state.params)}")
+            
+            # For BR, we only save the main agent (BR agent)
+            # train_state.params is now just the BR agent params (not a tuple)
+            train_states = {
+                "main_agent": train_state,
+            }
+            
+            print(f"   Extracted train_states keys: {list(train_states.keys())}")
 
-        return self.__call__(
-            step=step, train_states=train_states, is_final=True
-        )
+            result = self.__call__(
+                step=step, train_states=train_states, is_final=True
+            )
+            
+            print("✅ BR checkpoint saved successfully")
+            return result
+            
+        except Exception as e:
+            print(f"❌ Error saving BR checkpoint: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
 
 
 # Utility functions for backward compatibility

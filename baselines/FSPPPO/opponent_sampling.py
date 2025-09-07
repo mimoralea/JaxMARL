@@ -45,28 +45,51 @@ class CheckpointInfo:
             self._parse_path()
 
     def _parse_path(self):
-        """Parse checkpoint path to extract metadata."""
-        # Expected path: checkpoints/fspppo/run_xyz_seed0/main/000123/
-        path_parts = Path(self.path).parts
+        """Parse checkpoint path to extract metadata.
 
-        # Extract step number
-        step_dir = [p for p in path_parts if p.startswith('step_')]
-        if step_dir:
-            self.update_step = int(step_dir[0].split('_')[1])
+        Supports both step directory formats:
+        - Numeric only: checkpoints/fspppo/run_xyz_seed0/main/12/
+        - Prefixed:     checkpoints/fspppo/run_xyz_seed0/main/step_000012/
+        """
+        path_parts = list(Path(self.path).parts)
 
-        # Extract seed and run_id
-        run_seed_dir = [p for p in path_parts if p.startswith('run_') and 'seed' in p]
-        if run_seed_dir:
-            # The full directory name is the run_id (e.g., "run_20250727_234127_seed30")
-            self.run_id = run_seed_dir[0]
-            # Extract just the seed number from the end
-            parts = run_seed_dir[0].split('_seed')
-            self.seed = int(parts[1])
+        # Find the run segment which also contains the seed
+        run_idx = None
+        for i, p in enumerate(path_parts):
+            if p.startswith("run_") and "seed" in p:
+                run_idx = i
+                self.run_id = p
+                # Extract just the seed number from the end
+                try:
+                    self.seed = int(p.split("_seed")[1])
+                except Exception:
+                    pass
+                break
 
-        # Extract agent_id
-        agent_dirs = [p for p in path_parts if 'agent' in p]
-        if agent_dirs:
-            self.agent_id = agent_dirs[0]
+        # Agent id is the segment immediately after run_id
+        if run_idx is not None and run_idx + 1 < len(path_parts):
+            self.agent_id = path_parts[run_idx + 1]
+
+        # Step directory is the segment immediately after agent_id
+        step_part = None
+        if run_idx is not None and run_idx + 2 < len(path_parts):
+            step_part = path_parts[run_idx + 2]
+
+        # Fallback: search for a step-like segment anywhere
+        if step_part is None:
+            for p in path_parts[::-1]:  # search from the end
+                if p.startswith("step_") or p.isdigit():
+                    step_part = p
+                    break
+
+        if step_part is not None:
+            try:
+                if step_part.startswith("step_"):
+                    self.update_step = int(step_part.split("_")[1])
+                else:
+                    self.update_step = int(step_part)
+            except Exception:
+                pass
 
 
 class OpponentSampler:

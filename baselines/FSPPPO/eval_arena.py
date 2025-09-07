@@ -44,119 +44,16 @@ except ImportError:
 
 def _load_params_or_baseline(path_or_baseline: str, env, agent_name: str, seed: int, activation: str = "tanh"):
     """Return a function(state, obs) -> action for the given side."""
-    if path_or_baseline == "noop":
-        print(f'Loading noop policy for {agent_name}')
-        return lambda *_: jnp.array(0)  # action 0 assumed to be noop
+    # Check if it's a scripted behavior
+    scripted_behaviors = ["noop", "random", "seek", "guardian", "dodge"]
+    if path_or_baseline in scripted_behaviors:
+        print(f'Loading scripted {path_or_baseline} policy for {agent_name}')
+        try:
+            from baselines.scripted_behaviors import get_scripted_agent
+            return get_scripted_agent(path_or_baseline, seed)
+        except ImportError:
+            raise ImportError("Cannot import scripted_behaviors module - ensure it's available")
 
-    if path_or_baseline == "seek":
-        print(f'Loading heuristic SEEK policy for {agent_name}')
-        # Observation layout: [self_x, self_y, self_vx, self_vy, opp_x, opp_y, opp_vx, opp_vy]
-        # Discrete actions: 0 noop, 1 left(-x), 2 right(+x), 3 down(-y), 4 up(+y)
-        mode = "chase"  # persistent FSM state
-        def _seek(_, obs: jnp.ndarray):
-            nonlocal mode
-            sx, sy = obs[0], obs[1]
-            dx = obs[4] - sx
-            dy = obs[5] - sy
-            vx, vy = obs[2], obs[3]
-            dist = jnp.sqrt(sx ** 2 + sy ** 2)
-            # If moving outward, brake and steer inward
-            outward_dot = sx * vx + sy * vy
-            # Alignment with target (opponent)
-            dir_dot = vx * dx + vy * dy
-            # Switch modes based on position / velocity
-            if mode == "chase" and ((dist > 0.25) or (outward_dot > 0)):
-                mode = "retreat"
-            elif mode == "retreat" and (dist < 0.15) and (outward_dot <= 0):
-                mode = "chase"
-            # Decide action
-            if mode == "retreat":
-                # Move back toward centre along dominant axis
-                if jnp.abs(sx) > jnp.abs(sy):
-                    action = 1 if sx > 0 else 2  # step toward x=0
-                else:
-                    action = 3 if sy > 0 else 4  # step toward y=0
-                return jnp.array(action)
-            # CHASE mode
-            # If heading away from opponent, immediately correct course
-            if dir_dot < 0:
-                if jnp.abs(dx) > jnp.abs(dy):
-                    action = jnp.array(2) if dx > 0 else jnp.array(1)
-                else:
-                    action = jnp.array(4) if dy > 0 else jnp.array(3)
-                return action
-            # Otherwise chase opponent
-            if jnp.abs(dx) > jnp.abs(dy):
-                return jnp.array(2) if dx > 0 else jnp.array(1)
-            else:
-                return jnp.array(4) if dy > 0 else jnp.array(3)
-        return _seek
-
-    if path_or_baseline == "guardian":
-        print(f'Loading defensive GUARDIAN policy for {agent_name}')
-        SAFE_RAD = 0.15  # stay very close (<=0.15) to centre (arena R≈0.4)
-        def _guardian(_, obs: jnp.ndarray):
-            sx, sy = obs[0], obs[1]
-            ox, oy = obs[4], obs[5]
-            self_dist = jnp.sqrt(sx ** 2 + sy ** 2)
-            opp_dist = jnp.sqrt(ox ** 2 + oy ** 2)
-            # If we are drifting outwards move back to centre
-            if self_dist > SAFE_RAD * 0.9:
-                if jnp.abs(sx) > jnp.abs(sy):
-                    return jnp.array(1) if sx > 0 else jnp.array(2)
-                else:
-                    return jnp.array(3) if sy > 0 else jnp.array(4)
-            # If opponent is outside safe radius, stay put
-            if opp_dist > SAFE_RAD:
-                return jnp.array(0)  # noop
-            # If opponent is close, move away
-            dx, dy = ox - sx, oy - sy
-            if jnp.abs(dx) > jnp.abs(dy):
-                return jnp.array(1) if dx > 0 else jnp.array(2)
-            else:
-                return jnp.array(3) if dy > 0 else jnp.array(4)
-        return _guardian
-
-    if path_or_baseline == "dodge":
-        print(f'Loading evasive DODGE policy for {agent_name}')
-        def _dodge(_, obs: jnp.ndarray):
-            sx, sy = obs[0], obs[1]
-            ox, oy = obs[4], obs[5]
-            ovx, ovy = obs[6], obs[7]
-
-            # Predict opponent position in next few steps
-            PREDICT_STEPS = 3
-            pred_ox = ox + ovx * PREDICT_STEPS
-            pred_oy = oy + ovy * PREDICT_STEPS
-
-            # Move away from predicted opponent position
-            dx = pred_ox - sx
-            dy = pred_oy - sy
-
-            # Stay near center while dodging
-            self_dist = jnp.sqrt(sx ** 2 + sy ** 2)
-            if self_dist > 0.3:  # if too far from center
-                # Move toward center
-                if jnp.abs(sx) > jnp.abs(sy):
-                    return jnp.array(1) if sx > 0 else jnp.array(2)
-                else:
-                    return jnp.array(3) if sy > 0 else jnp.array(4)
-
-            # Dodge opponent
-            if jnp.abs(dx) > jnp.abs(dy):
-                return jnp.array(1) if dx > 0 else jnp.array(2)  # move away in x
-            else:
-                return jnp.array(3) if dy > 0 else jnp.array(4)  # move away in y
-        return _dodge
-
-    if path_or_baseline == "random":
-        print(f'Loading random policy for {agent_name}')
-        key = jax.random.PRNGKey(seed)
-        def _random(_, obs):
-            nonlocal key
-            key, subkey = jax.random.split(key)
-            return jax.random.randint(subkey, (), 0, env.action_space(agent_name).n)
-        return _random
 
     # Otherwise treat as FSPPPO checkpoint path
     checkpoint_path = Path(path_or_baseline).resolve()  # Convert to absolute path

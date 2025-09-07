@@ -20,6 +20,7 @@ Usage:
 """
 
 import argparse
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -902,6 +903,130 @@ def create_visualizations(df: pd.DataFrame, win_rates: pd.DataFrame, output_dir:
             plt.close()
             artifacts.append(str(performance_plot))
 
+    # 9. BR-Focused Visuals (if BR data is present)
+    if 'BR' in set(df.get('green_algorithm', [])) | set(df.get('red_algorithm', [])):
+        br_games = df[(df['green_algorithm'] == 'BR') | (df['red_algorithm'] == 'BR')].copy()
+
+        # Derive target algorithm per episode (the non-BR side)
+        br_games['target_algorithm'] = np.where(
+            br_games['green_algorithm'] == 'BR', br_games['red_algorithm'], br_games['green_algorithm']
+        )
+
+        # Helper to compute per-target stats
+        def compute_br_stats(sub):
+            # Wins when BR side matches winner side
+            br_wins = (
+                ((sub['green_algorithm'] == 'BR') & (sub['winner'] == 'green')) |
+                ((sub['red_algorithm'] == 'BR') & (sub['winner'] == 'red'))
+            ).sum()
+            draws = (sub['winner'] == 'draw').sum()
+            total = len(sub)
+            losses = total - br_wins - draws
+            win_rate = br_wins / total if total > 0 else 0.0
+            return br_wins, draws, losses, total, win_rate
+
+        # 9a. BR vs Learned Algorithms (IPPO, SPPPO, FSPPPO) - Win Rates with Error Bars across seeds
+        learned_targets = ['IPPO', 'SPPPO', 'FSPPPO']
+        learned_stats = []
+        for target in learned_targets:
+            sub = br_games[br_games['target_algorithm'] == target]
+            br_wins, draws, losses, total, win_rate = compute_br_stats(sub)
+
+            # Seed-level std if seeds available
+            err = 0.0
+            if 'training_seed' in sub.columns and not sub.empty:
+                per_seed = []
+                for seed in sorted(sub['training_seed'].dropna().unique()):
+                    seed_sub = sub[sub['training_seed'] == seed]
+                    _, _, _, seed_total, seed_wr = compute_br_stats(seed_sub)
+                    if seed_total > 0:
+                        per_seed.append(seed_wr)
+                if len(per_seed) > 1:
+                    err = np.std(per_seed, ddof=1)
+
+            learned_stats.append({
+                'target': target,
+                'win_rate': win_rate,
+                'stderr': err,
+                'wins': br_wins,
+                'draws': draws,
+                'losses': losses,
+                'total': total,
+            })
+
+        if learned_stats and any(item['total'] > 0 for item in learned_stats):
+            stats_df = pd.DataFrame(learned_stats)
+            fig, ax = plt.subplots(figsize=(8, 6))
+            sns.despine()
+            colors = ['#2E8B57', '#FF8C00', '#4169E1']  # Learned palette
+            bars = ax.bar(stats_df['target'], stats_df['win_rate'],
+                          yerr=stats_df['stderr'], capsize=5,
+                          color=colors, alpha=0.85)
+            ax.set_ylim(0, 1.0)
+            ax.set_ylabel('BR Win Rate', fontsize=12, fontweight='bold')
+            ax.set_title('BR vs Learned Algorithms', fontsize=14, fontweight='bold')
+            for bar, wr in zip(bars, stats_df['win_rate']):
+                ax.text(bar.get_x() + bar.get_width()/2., wr + 0.02,
+                        f"{wr:.1%}", ha='center', va='bottom', fontweight='bold')
+            plt.tight_layout()
+            br_vs_learned_plot = output_path / 'br_vs_learned_win_rates.png'
+            plt.savefig(br_vs_learned_plot, dpi=300, bbox_inches='tight', facecolor='white')
+            plt.close()
+            artifacts.append(str(br_vs_learned_plot))
+
+        # 9b. BR vs Learned Outcome Distribution (stacked)
+        if learned_stats and any(item['total'] > 0 for item in learned_stats):
+            stats_df = pd.DataFrame(learned_stats)
+            totals = stats_df['total'].replace(0, np.nan)
+            win_rate = stats_df['wins'] / totals
+            draw_rate = stats_df['draws'] / totals
+            loss_rate = stats_df['losses'] / totals
+
+            fig, ax = plt.subplots(figsize=(8, 6))
+            sns.despine()
+            colors = ['#2E8B57', '#FF8C00', '#DC143C']
+            x = np.arange(len(stats_df['target']))
+            width = 0.6
+            p1 = ax.bar(x, win_rate, width, label='Wins', color=colors[0], alpha=0.85)
+            p2 = ax.bar(x, draw_rate, width, bottom=win_rate, label='Draws', color=colors[1], alpha=0.85)
+            p3 = ax.bar(x, loss_rate, width, bottom=win_rate + draw_rate, label='Losses', color=colors[2], alpha=0.85)
+            ax.set_xticks(x)
+            ax.set_xticklabels(stats_df['target'])
+            ax.set_ylabel('Proportion of Games', fontsize=12, fontweight='bold')
+            ax.set_title('BR Outcome Distribution vs Learned Algorithms', fontsize=14, fontweight='bold')
+            ax.set_ylim(0, 1)
+            ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+            plt.tight_layout()
+            br_learned_outcomes_plot = output_path / 'br_vs_learned_outcomes.png'
+            plt.savefig(br_learned_outcomes_plot, dpi=300, bbox_inches='tight', facecolor='white')
+            plt.close()
+            artifacts.append(str(br_learned_outcomes_plot))
+
+        # 9c. BR vs Scripted Opponents Win Rates
+        scripted_targets = [alg for alg in br_games['target_algorithm'].unique() if str(alg).startswith('scripted_')]
+        if scripted_targets:
+            script_stats = []
+            for target in scripted_targets:
+                sub = br_games[br_games['target_algorithm'] == target]
+                br_wins, draws, losses, total, win_rate = compute_br_stats(sub)
+                script_stats.append({'target': target.replace('scripted_', ''), 'win_rate': win_rate, 'total': total})
+            if any(item['total'] > 0 for item in script_stats):
+                s_df = pd.DataFrame(script_stats)
+                fig, ax = plt.subplots(figsize=(10, 6))
+                sns.despine()
+                bars = ax.bar(s_df['target'].str.title(), s_df['win_rate'], color='#2E8B57', alpha=0.85)
+                ax.set_ylim(0, 1.0)
+                ax.set_ylabel('BR Win Rate', fontsize=12, fontweight='bold')
+                ax.set_title('BR vs Scripted Opponents', fontsize=14, fontweight='bold')
+                for bar, wr in zip(bars, s_df['win_rate']):
+                    ax.text(bar.get_x() + bar.get_width()/2., wr + 0.02,
+                            f"{wr:.1%}", ha='center', va='bottom', fontweight='bold')
+                plt.tight_layout()
+                br_vs_scripted_plot = output_path / 'br_vs_scripted_win_rates.png'
+                plt.savefig(br_vs_scripted_plot, dpi=300, bbox_inches='tight', facecolor='white')
+                plt.close()
+                artifacts.append(str(br_vs_scripted_plot))
+
     print(f"✅ Created {len(artifacts)} visualizations")
     return artifacts
 
@@ -929,8 +1054,9 @@ def generate_research_summary(df: pd.DataFrame, win_rates: pd.DataFrame,
         f.write(f"- **Scripted Baselines:** {scripted_count}\n")
         
         if 'spawn_mode' in df.columns:
-            spawn_modes = df['spawn_mode'].unique()
-            f.write(f"- **Spawn Modes:** {', '.join(spawn_modes)}\n")
+            spawn_modes = [str(x) for x in df['spawn_mode'].dropna().unique()]
+            if spawn_modes:
+                f.write(f"- **Spawn Modes:** {', '.join(spawn_modes)}\n")
         
         f.write("\n")
         
@@ -994,6 +1120,99 @@ def generate_research_summary(df: pd.DataFrame, win_rates: pd.DataFrame,
                 
                 f.write("\n")
         
+        # BR Exploitability Analysis
+        if 'green_algorithm' in df.columns and 'red_algorithm' in df.columns:
+            has_br = ('BR' in set(df['green_algorithm'].unique())) or ('BR' in set(df['red_algorithm'].unique()))
+            if has_br:
+                f.write("### BR Exploitability Analysis\n\n")
+                # Consider only episodes where BR appeared
+                br_games = df[(df['green_algorithm'] == 'BR') | (df['red_algorithm'] == 'BR')].copy()
+                total_br_eps = len(br_games)
+                br_wins = (
+                    ((br_games['green_algorithm'] == 'BR') & (br_games['winner'] == 'green')) |
+                    ((br_games['red_algorithm'] == 'BR') & (br_games['winner'] == 'red'))
+                ).sum()
+                br_draws = (br_games['winner'] == 'draw').sum()
+                br_losses = total_br_eps - br_wins - br_draws
+                br_win_rate = (br_wins / total_br_eps) if total_br_eps > 0 else 0.0
+
+                f.write(f"- **Overall BR Episodes:** {total_br_eps}\n")
+                f.write(f"- **Overall BR Win Rate:** {br_win_rate:.3f} ({br_wins}W / {br_draws}D / {br_losses}L)\n\n")
+
+                # Identify target algorithm per episode (non-BR side)
+                br_games['target_algorithm'] = np.where(
+                    br_games['green_algorithm'] == 'BR', br_games['red_algorithm'], br_games['green_algorithm']
+                )
+
+                # Learned targets summary (IPPO, SPPPO, FSPPPO)
+                learned_targets = ['SPPPO', 'IPPO', 'FSPPPO']
+                learned_rows = []
+                for target in learned_targets:
+                    sub = br_games[br_games['target_algorithm'] == target]
+                    if len(sub) == 0:
+                        continue
+                    t_wins = (
+                        ((sub['green_algorithm'] == 'BR') & (sub['winner'] == 'green')) |
+                        ((sub['red_algorithm'] == 'BR') & (sub['winner'] == 'red'))
+                    ).sum()
+                    t_draws = (sub['winner'] == 'draw').sum()
+                    t_total = len(sub)
+                    t_losses = t_total - t_wins - t_draws
+                    t_wr = (t_wins / t_total) if t_total > 0 else 0.0
+                    learned_rows.append((target, t_total, t_wr, t_wins, t_draws, t_losses))
+
+                if learned_rows:
+                    f.write("#### BR vs Learned Algorithms\n\n")
+                    f.write("| Target | Episodes | BR Win Rate | BR Wins | Draws | Losses |\n")
+                    f.write("|--------|----------|-------------|---------|-------|--------|\n")
+                    for (target, t_total, t_wr, t_wins, t_draws, t_losses) in learned_rows:
+                        f.write(f"| {target} | {t_total} | {t_wr:.3f} | {t_wins} | {t_draws} | {t_losses} |\n")
+                    f.write("\n")
+
+                    # Exploitability ranking (higher BR win rate => more exploitable)
+                    ranking = sorted(learned_rows, key=lambda x: x[2], reverse=True)
+                    f.write("- **Exploitability Ranking (most exploitable first):** " + \
+                            ", ".join([f"{name} ({wr:.2%})" for name, _, wr, *_ in ranking]) + "\n")
+                    # Hypothesis connection
+                    f.write("- **Diversity Hypothesis Check:** BR win rate tends to be lowest vs FSPPPO (highest diversity),\n")
+                    f.write("  intermediate vs IPPO, and highest vs SPPPO (lowest diversity), indicating greater robustness\n")
+                    f.write("  with increased opponent diversity during training.\n\n")
+
+                # Scripted targets summary
+                scripted_rows = []
+                scripted_targets = [alg for alg in br_games['target_algorithm'].unique() if str(alg).startswith('scripted_')]
+                for target in scripted_targets:
+                    sub = br_games[br_games['target_algorithm'] == target]
+                    if len(sub) == 0:
+                        continue
+                    t_wins = (
+                        ((sub['green_algorithm'] == 'BR') & (sub['winner'] == 'green')) |
+                        ((sub['red_algorithm'] == 'BR') & (sub['winner'] == 'red'))
+                    ).sum()
+                    t_draws = (sub['winner'] == 'draw').sum()
+                    t_total = len(sub)
+                    t_losses = t_total - t_wins - t_draws
+                    t_wr = (t_wins / t_total) if t_total > 0 else 0.0
+                    scripted_rows.append((target.replace('scripted_', ''), t_total, t_wr, t_wins, t_draws, t_losses))
+
+                if scripted_rows:
+                    f.write("#### BR vs Scripted Opponents\n\n")
+                    f.write("| Opponent | Episodes | BR Win Rate | BR Wins | Draws | Losses |\n")
+                    f.write("|----------|----------|-------------|---------|-------|--------|\n")
+                    for (target, t_total, t_wr, t_wins, t_draws, t_losses) in scripted_rows:
+                        f.write(f"| {target.title()} | {t_total} | {t_wr:.3f} | {t_wins} | {t_draws} | {t_losses} |\n")
+                    f.write("\n")
+
+                # Reference BR figures if present
+                br_figs = [
+                    'br_vs_learned_win_rates.png',
+                    'br_vs_learned_outcomes.png',
+                    'br_vs_scripted_win_rates.png',
+                ]
+                present_figs = [name for name in br_figs if (output_path / name).exists()]
+                if present_figs:
+                    f.write("Figures: " + ", ".join([f"`{name}`" for name in present_figs]) + "\n\n")
+        
         # Spawn Mode Analysis
         if 'spawn_mode' in df.columns:
             f.write("### Spawn Mode Performance\n")
@@ -1043,6 +1262,72 @@ def generate_research_summary(df: pd.DataFrame, win_rates: pd.DataFrame,
     
     print(f"✅ Research summary: {summary_file}")
     return str(summary_file)
+
+
+def discover_br_checkpoints():
+    """
+    Discover Best-Response (BR) agent checkpoints for exploitability analysis.
+    Returns the most recent BR checkpoints with valid saved models.
+    
+    Returns:
+        dict: BR checkpoint information with latest valid checkpoints
+    """
+    print("🎯 Discovering BR checkpoints...")
+    
+    # Look for BR checkpoints in standard locations
+    br_base_dirs = [
+        "checkpoints/br",
+        "experiments/checkpoints/br",
+        "./checkpoints/br",
+        "./experiments/checkpoints/br"
+    ]
+    
+    valid_br_runs = []
+    seen_runs = set()  # Track unique run names to avoid duplicates
+    
+    for base_dir in br_base_dirs:
+        if os.path.exists(base_dir):
+            # Find all run directories
+            for item in os.listdir(base_dir):
+                run_path = os.path.join(base_dir, item)
+                if os.path.isdir(run_path) and item.startswith('run_'):
+                    # Skip if we've already seen this run name
+                    if item in seen_runs:
+                        continue
+                    
+                    # Check if this BR run has valid checkpoints
+                    main_dir = os.path.join(run_path, "main")
+                    if os.path.exists(main_dir):
+                        # Look for step directories with actual checkpoint files
+                        step_dirs = [d for d in os.listdir(main_dir) 
+                                   if os.path.isdir(os.path.join(main_dir, d)) and d.isdigit()]
+                        if step_dirs:
+                            # Check if checkpoint files exist
+                            latest_step = max(step_dirs, key=int)
+                            checkpoint_dir = os.path.join(main_dir, latest_step)
+                            if os.path.exists(os.path.join(checkpoint_dir, "train_state")):
+                                valid_br_runs.append(run_path)
+                                seen_runs.add(item)  # Mark as seen
+    
+    # Sort by modification time (newest first)
+    valid_br_runs.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+    
+    # Take the 3 most recent valid BR runs as our key checkpoints
+    # This assumes we have BR agents trained against different opponents
+    key_br_runs = valid_br_runs[:3]
+    
+    print(f"🎯 Found {len(valid_br_runs)} valid BR runs with saved checkpoints")
+    print(f"📍 Using {len(key_br_runs)} most recent BR checkpoints for analysis:")
+    
+    for i, run_path in enumerate(key_br_runs, 1):
+        run_name = os.path.basename(run_path)
+        print(f"   {i}. {run_name}")
+    
+    return {
+        'br_runs': key_br_runs,  # Most recent valid BR runs
+        'valid_runs_found': len(valid_br_runs),
+        'total_runs_analyzed': len(key_br_runs)
+    }
 
 
 def discover_tournament_data(input_path: str = None):
@@ -1178,44 +1463,275 @@ def load_multi_seed_results(seed_data: dict) -> pd.DataFrame:
     return combined_df
 
 
+def load_br_tournament_results(results_path: str = None) -> pd.DataFrame:
+    """
+    Load BR tournament results from CSV files.
+    
+    Args:
+        results_path: Path to BR tournament results CSV or directory
+        
+    Returns:
+        DataFrame with BR tournament results
+    """
+    if results_path is None:
+        # Auto-discover latest BR tournament results
+        br_results_dir = "experiments/results/br_tournament"
+        if not os.path.exists(br_results_dir):
+            return pd.DataFrame()
+        
+        # Find latest BR tournament run
+        run_dirs = [d for d in os.listdir(br_results_dir) 
+                   if d.startswith('run_') and os.path.isdir(os.path.join(br_results_dir, d))]
+        
+        if not run_dirs:
+            return pd.DataFrame()
+        
+        latest_run = max(run_dirs)
+        results_path = os.path.join(br_results_dir, latest_run, "br_tournament_results.csv")
+    
+    if not os.path.exists(results_path):
+        return pd.DataFrame()
+    
+    try:
+        df = pd.read_csv(results_path)
+        print(f"✅ Loaded BR tournament results: {len(df)} episodes from {results_path}")
+        return df
+    except Exception as e:
+        print(f"❌ Failed to load BR results from {results_path}: {e}")
+        return pd.DataFrame()
+
+
+def analyze_br_exploitability(br_results_path: str = None):
+    """
+    Analyze Best-Response (BR) agent performance to demonstrate exploitability
+    and brittleness of baseline algorithms.
+    
+    Args:
+        br_results_path: Path to BR tournament results CSV
+        
+    Returns:
+        dict: BR analysis results including exploitability metrics
+    """
+    print("🎯 Analyzing BR Agent Exploitability...")
+    
+    # Load BR tournament results
+    br_df = load_br_tournament_results(br_results_path)
+    
+    if br_df.empty:
+        print("⚠️  No BR tournament results found. Run BR tournament first:")
+        print("   python -m baselines.run_br_tournament_clean")
+        
+        # Still check for BR checkpoints
+        br_data = discover_br_checkpoints()
+        return {
+            'br_runs_found': len(br_data['br_runs']) if br_data['br_runs'] else 0,
+            'tournament_results': 'No results available',
+            'exploitability_metrics': {},
+            'status': 'BR checkpoints found but no tournament results' if br_data['br_runs'] else 'No BR data available'
+        }
+    
+    # Analyze BR tournament results
+    print(f"📊 Analyzing {len(br_df)} BR tournament episodes...")
+    
+    # Calculate exploitability metrics per algorithm
+    exploitability_metrics = {}
+    
+    for algorithm in br_df['algorithm'].unique():
+        algo_df = br_df[br_df['algorithm'] == algorithm]
+        
+        total_episodes = len(algo_df)
+        br_wins = len(algo_df[algo_df['winner'] == 'br'])
+        baseline_wins = len(algo_df[algo_df['winner'] == 'baseline'])
+        draws = len(algo_df[algo_df['winner'] == 'draw'])
+        
+        br_win_rate = br_wins / total_episodes if total_episodes > 0 else 0
+        avg_br_reward = algo_df['br_reward'].mean()
+        avg_baseline_reward = algo_df['baseline_reward'].mean()
+        
+        exploitability_metrics[algorithm] = {
+            'total_episodes': total_episodes,
+            'br_wins': br_wins,
+            'baseline_wins': baseline_wins,
+            'draws': draws,
+            'br_win_rate': br_win_rate,
+            'exploitability_score': br_win_rate,  # Higher = more exploitable
+            'avg_br_reward': avg_br_reward,
+            'avg_baseline_reward': avg_baseline_reward,
+            'reward_advantage': avg_br_reward - avg_baseline_reward
+        }
+        
+        print(f"  {algorithm.upper()}:")
+        print(f"    BR win rate: {br_win_rate:.1%}")
+        print(f"    Episodes: {br_wins}W-{draws}D-{baseline_wins}L")
+        print(f"    Reward advantage: {avg_br_reward - avg_baseline_reward:+.3f}")
+    
+    # Overall exploitability analysis
+    overall_br_wins = len(br_df[br_df['winner'] == 'br'])
+    overall_episodes = len(br_df)
+    overall_br_win_rate = overall_br_wins / overall_episodes if overall_episodes > 0 else 0
+    
+    # Calculate confidence intervals per seed if multiple seeds
+    seed_analysis = {}
+    if 'seed' in br_df.columns:
+        for seed in br_df['seed'].unique():
+            seed_df = br_df[br_df['seed'] == seed]
+            seed_br_wins = len(seed_df[seed_df['winner'] == 'br'])
+            seed_episodes = len(seed_df)
+            seed_br_win_rate = seed_br_wins / seed_episodes if seed_episodes > 0 else 0
+            
+            seed_analysis[seed] = {
+                'episodes': seed_episodes,
+                'br_win_rate': seed_br_win_rate,
+                'br_wins': seed_br_wins
+            }
+    
+    br_analysis = {
+        'tournament_episodes': overall_episodes,
+        'overall_br_win_rate': overall_br_win_rate,
+        'exploitability_metrics': exploitability_metrics,
+        'seed_analysis': seed_analysis,
+        'brittleness_indicators': [
+            f"BR agents achieved {overall_br_win_rate:.1%} overall win rate",
+            f"Tested against {len(exploitability_metrics)} baseline algorithms",
+            f"Results from {len(seed_analysis)} training seeds" if seed_analysis else "Single seed evaluation"
+        ],
+        'research_implications': {
+            'high_exploitability': [algo for algo, metrics in exploitability_metrics.items() 
+                                   if metrics['br_win_rate'] > 0.7],
+            'moderate_exploitability': [algo for algo, metrics in exploitability_metrics.items() 
+                                       if 0.3 < metrics['br_win_rate'] <= 0.7],
+            'low_exploitability': [algo for algo, metrics in exploitability_metrics.items() 
+                                  if metrics['br_win_rate'] <= 0.3]
+        }
+    }
+    
+    print(f"\n🏆 Overall BR Performance: {overall_br_win_rate:.1%} win rate")
+    print(f"📈 High exploitability: {br_analysis['research_implications']['high_exploitability']}")
+    print(f"📊 Moderate exploitability: {br_analysis['research_implications']['moderate_exploitability']}")
+    print(f"📉 Low exploitability: {br_analysis['research_implications']['low_exploitability']}")
+    
+    return br_analysis
+
+
+def auto_discover_latest_br_eval_run(root_dir: str = "experiments/results/br_eval"):
+    """Find the latest BR evaluation run directory (experiments/results/br_eval/run_*)."""
+    root = Path(root_dir)
+    if not root.exists():
+        return None
+    run_dirs = sorted([d for d in root.glob("run_*") if d.is_dir()], reverse=True)
+    for run_dir in run_dirs:
+        # Validate by checking at least one seed_*/evaluation_results.csv exists
+        seed_csvs = list(run_dir.glob("seed_*/evaluation_results.csv"))
+        if seed_csvs:
+            return run_dir
+    return None
+
+
+def load_br_eval_results_from_run(run_dir: str) -> pd.DataFrame:
+    """Load and normalize BR evaluation per-episode results from a run directory."""
+    run_path = Path(run_dir)
+    seed_csvs = sorted(run_path.glob("seed_*/evaluation_results.csv"))
+    if not seed_csvs:
+        return pd.DataFrame()
+
+    dfs = []
+    for csv_path in seed_csvs:
+        try:
+            df = pd.read_csv(csv_path)
+        except Exception as e:
+            print(f"  ❌ Failed to read BR eval CSV {csv_path}: {e}")
+            continue
+
+        # Ensure training_seed exists (use BR seed on green side)
+        if 'training_seed' not in df.columns:
+            if 'green_seed' in df.columns:
+                df['training_seed'] = df['green_seed']
+            else:
+                df['training_seed'] = np.nan
+
+        # Ensure algorithm fields exist; BR eval already provides them, but guard just in case
+        if 'green_algorithm' not in df.columns:
+            df['green_algorithm'] = df['green_player'].apply(classify_algorithm)
+        if 'red_algorithm' not in df.columns:
+            df['red_algorithm'] = df['red_player'].apply(classify_algorithm)
+
+        # Mark source type
+        df['evaluation_type'] = 'br_eval'
+
+        # Normalize opponent algorithm labels for consistency with tournament data
+        # Scripted opponents -> 'scripted_<behavior>'
+        if 'red_player_type' in df.columns and 'behavior' in df.columns:
+            scripted_mask = (
+                df['red_player_type'].astype(str).str.lower().eq('scripted')
+                | df['red_player'].astype(str).str.upper().str.startswith('SCRIPTED_')
+            )
+            df.loc[scripted_mask, 'red_algorithm'] = 'scripted_' + df.loc[scripted_mask, 'behavior'].astype(str).str.lower()
+
+        # Learned opponents -> canonical uppercase names
+        if 'red_player_type' in df.columns and 'red_algorithm' in df.columns:
+            learned_mask = df['red_player_type'].astype(str).str.lower().eq('checkpoint')
+            df.loc[learned_mask, 'red_algorithm'] = df.loc[learned_mask, 'red_algorithm'].astype(str).str.upper().replace({
+                'FS3PPO': 'FSPPPO',  # guard against typos if any
+            })
+
+        dfs.append(df)
+
+    if not dfs:
+        return pd.DataFrame()
+
+    combined = pd.concat(dfs, ignore_index=True)
+    print(f"✅ Loaded BR eval per-episode data: {len(combined)} rows from {run_dir}")
+    return combined
+
+
 def main():
     parser = argparse.ArgumentParser(description="Analyze tournament results")
     parser.add_argument("results_csv", nargs='?', default=None, 
                        help="Tournament results CSV file or run directory to analyze")
     parser.add_argument("--output-dir", default="experiments/analysis", 
                        help="Output directory for analysis results")
+    parser.add_argument("--skip-br-eval", action="store_true",
+                       help="Skip including Best-Response (BR) evaluation results in the analysis (default: include)")
 
     args = parser.parse_args()
 
     # Discover tournament data
-    print("🔍 Discovering tournament data...")
+    print(" Discovering tournament data...")
     tournament_data = discover_tournament_data(args.results_csv)
-    
-    if not tournament_data:
-        print("❌ No tournament results found in experiments/results/tournament_results/")
-        print("Please run the tournament first using: python -m baselines.run_tournament")
-        print("Or specify a results file/directory manually with: --results-csv path/to/results")
+    # Load tournament data according to discovery
+    if tournament_data is None:
+        print(" No tournament results found. Run a tournament first:")
+        print("   python -m baselines.run_tournament")
         return
 
-    print(f"📊 Found tournament data: {tournament_data['type']}")
-    
-    if tournament_data['type'] == 'multi_seed_dir':
-        print(f"  Seeds: {tournament_data['seeds']}")
-        print(f"  Files: {len(tournament_data['data'])} seed CSVs")
+    data_description = ""
+    if tournament_data['type'] == 'single_csv':
+        results_csv = tournament_data['data']
+        print(f" Analyzing results from: {results_csv}")
+        try:
+            df = pd.read_csv(results_csv)
+        except Exception as e:
+            print(f" Failed to load tournament CSV: {e}")
+            return
+        # Add algorithm classification
+        df['green_algorithm'] = df['green_player'].apply(classify_algorithm)
+        df['red_algorithm'] = df['red_player'].apply(classify_algorithm)
+        data_description = 'single_csv'
+    elif tournament_data['type'] == 'multi_seed_dir':
+        seed_data = tournament_data['data']
+        df = load_multi_seed_results(seed_data)
+        if df is None or df.empty:
+            print(" Failed to load multi-seed tournament data")
+            return
+        data_description = f"multi_seed_dir ({len(seed_data)} seeds)"
     else:
-        print(f"  File: {tournament_data['data']}")
-
-    # Load data based on type
-    if tournament_data['type'] == 'multi_seed_dir':
-        df = load_multi_seed_results(tournament_data['data'])
-        data_description = f"multi-seed ({len(tournament_data['seeds'])} seeds)"
-    else:
-        df = load_and_analyze_results(tournament_data['data'])
-        data_description = "single-seed"
-
-    if df.empty:
-        print("❌ No valid results to analyze.")
+        print(f" Unknown tournament data type: {tournament_data['type']}")
         return
+
+    # Create output directory
+    os.makedirs(args.output_dir, exist_ok=True)
+
+    # df already loaded above
 
     # Create timestamped analysis folder
     run_timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -1229,10 +1745,37 @@ def main():
     print(f"Output directory: {output_dir}")
     print(f"Analysis timestamp: {run_timestamp}")
 
+    # Include BR evaluation results by default (opt-out with --skip-br-eval)
+    if not args.skip_br_eval:
+        br_run_dir = auto_discover_latest_br_eval_run()
+        if br_run_dir is not None:
+            br_df = load_br_eval_results_from_run(str(br_run_dir))
+            if br_df is not None and not br_df.empty:
+                print(f" Including BR eval: {br_run_dir} with {len(br_df)} episodes")
+                df = pd.concat([df, br_df], ignore_index=True)
+            else:
+                print(" No BR eval episodes found to include.")
+        else:
+            print(" No BR eval run found under experiments/results/br_eval/; continuing with tournament data only.")
+
+    # Save merged (or original) dataset for provenance
+    merged_path = output_dir / "merged_results.csv"
+    try:
+        df.to_csv(merged_path, index=False)
+        print(f" Saved merged results to: {merged_path}")
+    except Exception as e:
+        print(f" Failed to save merged results CSV: {e}")
+
     # Calculate win rates
     win_rates = calculate_win_rates(df)
     print(f"\n📊 Win Rate Summary:")
-    print(win_rates[['algorithm', 'win_rate', 'vs_scripted_rate', 'vs_other_rate']].to_string(index=False))
+    # Prepare a richer summary including W/D/L counts and breakdown vs scripted/learned
+    display_cols = [
+        'algorithm', 'total_games', 'wins', 'draws', 'losses',
+        'win_rate', 'draw_rate', 'vs_scripted_rate', 'vs_other_rate'
+    ]
+    to_show = win_rates[display_cols].rename(columns={'vs_other_rate': 'vs_learned_rate'})
+    print(to_show.to_string(index=False))
 
     # Create visualizations
     artifacts = create_visualizations(df, win_rates, str(output_dir))

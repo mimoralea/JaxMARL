@@ -507,7 +507,8 @@ def main(config):
     train_state = jax.tree.map(lambda x: x[0], out["runner_state"][0])
 
     # Generate rollouts for different opponent types
-    opponent_types = ["self_play", "noop", "random_walk"]
+    # Include 'checkpoint' which uses the original opponent (agent_1) parameters
+    opponent_types = ["self_play", "noop", "random", "checkpoint"]
     print("\nGenerating rollout animations against different opponents...")
 
     # Use current time-based seeds to ensure different starting positions each run
@@ -532,6 +533,7 @@ def main(config):
             seed=rollout_seed,
             run_id=rollout_run_id,
             training_seed=0,
+            opponent_params=(train_state.params[1] if opponent_type == "checkpoint" else None),
         )
 
     # Get the environment name to check if it's a zero-sum game
@@ -607,13 +609,14 @@ def get_rollout(
     seed=None,
     run_id=None,
     training_seed=0,
+    opponent_params=None,
 ):
     """Generate a rollout of the environment for visualization
 
     Args:
         train_state: The trained agent's parameters
         config: Configuration dictionary
-        opponent_type: Type of opponent ('self_play', 'noop', or 'random_walk')
+        opponent_type: Type of opponent ('self_play', 'noop', or 'random')
         seed: Random seed for reproducibility. If None, uses current time.
         run_id: Run identifier for organized folder structure
         training_seed: Training seed used for this rollout (for folder organization)
@@ -645,7 +648,7 @@ def get_rollout(
 
     # Get trained parameters from training state
     # IPPO has two agents, so train_state.params is (agent_0_params, agent_1_params)
-    # For rollout, we use the first agent's parameters
+    # For rollout, we use the first agent's parameters for the controlled player (agent_0)
     network_params = train_state.params[0]
 
     # Reset environment with unique seed
@@ -682,7 +685,7 @@ def get_rollout(
                 actions[second_agent] = jnp.array(0, dtype=jnp.int32)
 
             elif (
-                opponent_type == "random_walk"
+                opponent_type == "random"
             ):  # Opponent takes random actions
                 # Random action from 0-4 (NOOP, LEFT, RIGHT, DOWN, UP)
                 key_rand, key = jax.random.split(key)
@@ -690,6 +693,13 @@ def get_rollout(
                 actions[second_agent] = jnp.array(
                     random_action, dtype=jnp.int32
                 )
+            elif opponent_type == "checkpoint":
+                # Use provided opponent params; if None, default to agent_1 original params
+                opp_params = opponent_params if opponent_params is not None else train_state.params[1]
+                agent_obs = obs[second_agent].flatten()
+                pi, _ = network.apply(opp_params, agent_obs)
+                action = pi.sample(seed=key_a)
+                actions[second_agent] = action
 
         # Step environment
         obs, next_state, reward, done, info = env.step(key_s, state, actions)
