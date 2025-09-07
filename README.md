@@ -136,6 +136,70 @@ The built container can then be run:
 make run
 ```
 
+## Canonical Research Workflow (Training → Evaluation → Analysis) 📈
+
+The repository provides a minimal, canonical set of entry points for training, evaluation, and analysis. All research figures (PNGs) and Markdown summaries are generated exclusively by `baselines/analyze_results.py`.
+
+- **Train Learned Baselines**
+  - Script: `baselines/batch_train.py`
+  - Output: `checkpoints/{ippo|spppo|fspppo}/run_YYYYMMDD_HHMMSS_seedS/main/step_*`
+  - Example:
+    ```bash
+    python -m baselines.batch_train
+    ```
+
+- **Train Best-Response (BR) Agents**
+  - Script: `baselines/batch_train_br.py`
+  - Output: `checkpoints/br/{ippo|spppo|fspppo|noop|random|seek|guardian|dodge}/run_YYYYMMDD_HHMMSS_seedS/main_agent/step_*`
+  - Example:
+    ```bash
+    python -m baselines.batch_train_br
+    ```
+
+- **Tournament: Learned vs Learned/Scripted (round-robin)**
+  - Script: `baselines/run_tournament.py`
+  - Output: `experiments/results/tournament_results/run_YYYYMMDD_HHMMSS/seed_S/tournament_results.csv`
+  - Example:
+    ```bash
+    python -m baselines.run_tournament
+    ```
+
+- **BR Matchups: BR vs Its Training Opponent (learned and/or scripted)**
+  - Script: `baselines/run_br_matchups.py`
+  - Output: `experiments/results/br_eval/run_YYYYMMDD_HHMMSS/seed_S/evaluation_results.csv`
+  - Notes: Consolidated evaluator (no separate `br_evaluation.py`).
+  - Example:
+    ```bash
+    # Multi-seed, scripted-only example
+    python -m baselines.run_br_matchups --episodes 100 --br-seeds 0,1,2 --only-scripted
+    ```
+
+- **Analysis and Figures (sole source of PNGs/Markdown)**
+  - Script: `baselines/analyze_results.py`
+  - Inputs: auto-discovers latest tournament results and BR evaluations
+  - Output: `experiments/analysis/run_YYYYMMDD_HHMMSS/`
+  - Produces: research-quality PNGs and `research_summary.md`
+  - Example:
+    ```bash
+    python -m baselines.analyze_results
+    ```
+
+### Standardized Checkpoint Layout
+
+- Learned algorithms:
+  - `checkpoints/{ippo|spppo|fspppo}/run_*_seedS/main/step_*`
+- Best-response (BR):
+  - `checkpoints/br/{target_behavior_or_algo}/run_*_seedS/main_agent/step_*`
+
+This structure ensures consistent seed semantics (seeds are run-level identifiers) and simplified checkpoint discovery across scripts.
+
+### Scripted Behaviors Import Path
+
+- New recommended path: `from baselines.behaviors import scripted`
+- Backward-compatible shim (still available): `from baselines import scripted_behaviors`
+
+Only `baselines/analyze_results.py` generates figures and Markdown. Legacy figure/gif generators have been removed to avoid duplication.
+
 ## Contributing 🔨
 Please contribute! Please take a look at our [contributing guide](https://github.com/FLAIROx/JaxMARL/blob/main/CONTRIBUTING.md) for how to add an environment/algorithm or submit a bug report. If you're looking for a project, we also have a few suggestions listed under the roadmap :)
 
